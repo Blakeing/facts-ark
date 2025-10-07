@@ -24,6 +24,9 @@ export const switchVariants = tv({
       // Layout
       'relative inline-flex shrink-0 items-center',
 
+      // Padding for thumb spacing
+      'p-0.5',
+
       // Visual
       'rounded-full',
 
@@ -35,13 +38,13 @@ export const switchVariants = tv({
       'cursor-pointer',
 
       // Focus states (using new focus-ring system)
-      'focus-ring',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 
       // States
       'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
 
       // Animations & Transitions (using new design system)
-      'transition-colors-smooth',
+      'transition-colors',
       'active:scale-95',
     ],
 
@@ -50,13 +53,10 @@ export const switchVariants = tv({
       'inline-block pointer-events-none',
 
       // Visual
-      'rounded-full bg-background shadow-lg',
-
-      // Transform
-      'data-[state=checked]:translate-x-full',
+      'rounded-full bg-background shadow-lg ring-0',
 
       // Animations & Transitions (using new design system)
-      'transition-transform-smooth',
+      'transition-transform duration-200',
     ],
 
     label: [
@@ -74,17 +74,17 @@ export const switchVariants = tv({
     size: {
       sm: {
         control: 'w-9 h-5',
-        thumb: 'size-4',
+        thumb: 'size-4 data-[state=checked]:translate-x-4',
         label: 'text-xs',
       },
       md: {
         control: 'w-11 h-6',
-        thumb: 'size-5',
+        thumb: 'size-5 data-[state=checked]:translate-x-5',
         label: 'text-sm',
       },
       lg: {
         control: 'w-14 h-7',
-        thumb: 'size-6',
+        thumb: 'size-6 data-[state=checked]:translate-x-7',
         label: 'text-base',
       },
     },
