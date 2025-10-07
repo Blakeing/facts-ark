@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { NumberInput } from '@ark-ui/vue/number-input'
 import { ChevronDown, ChevronUp } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { numberInputVariants } from './number-input.variants'
 import type { NumberInputProps, NumberInputRootEmits } from './number-input.types'
 
@@ -27,7 +28,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <NumberInput.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <NumberInput.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <NumberInput.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </NumberInput.Label>

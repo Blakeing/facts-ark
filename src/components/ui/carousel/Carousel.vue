@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Carousel } from '@ark-ui/vue/carousel'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { carouselVariants } from './carousel.variants'
 import type { CarouselProps, CarouselRootEmits } from './carousel.types'
 
@@ -67,7 +68,7 @@ const slideCount = computed(() => props.items.length)
   <Carousel.Root
     v-bind="forwarded"
     :slide-count="slideCount"
-    :class="[styles.root(), props.class]"
+    :class="cn(styles.root(), props.class)"
   >
     <!-- Navigation Controls -->
     <Carousel.Control v-if="props.showArrows" :class="styles.control()">

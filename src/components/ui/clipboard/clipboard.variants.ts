@@ -9,12 +9,11 @@ import { tv } from 'tailwind-variants/lite'
 export const clipboardVariants = tv({
   slots: {
     root: 'w-full',
-    label: 'block text-sm font-medium text-gray-700 mb-2',
+    label: 'block text-sm font-medium text-foreground mb-2',
     control: 'flex gap-2',
-    input:
-      'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm',
+    input: 'block w-full rounded-md border-input shadow-sm focus-ring sm:text-sm',
     trigger:
-      'inline-flex items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50',
+      'inline-flex items-center justify-center rounded-md bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50',
     indicator: 'flex items-center',
   },
   variants: {

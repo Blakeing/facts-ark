@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Collapsible } from '@ark-ui/vue/collapsible'
 import { ChevronDown } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { collapsibleVariants } from './collapsible.variants'
 import type { CollapsibleProps, CollapsibleRootEmits } from './collapsible.types'
 
@@ -45,7 +47,13 @@ const props = withDefaults(defineProps<CollapsibleProps>(), {
 })
 
 const emits = defineEmits<CollapsibleRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['variant', 'trigger', 'content', 'icon', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   collapsibleVariants({
@@ -55,7 +63,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Collapsible.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Collapsible.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Collapsible.Trigger :class="styles.trigger()">
       <!-- Optional icon -->
       <component

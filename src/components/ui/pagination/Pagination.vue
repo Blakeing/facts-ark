@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Pagination } from '@ark-ui/vue/pagination'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { paginationVariants } from './pagination.variants'
 import type { PaginationProps, PaginationRootEmits } from './pagination.types'
 
@@ -27,7 +28,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Pagination.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Pagination.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Pagination.PrevTrigger :class="styles.prevTrigger()">
       <ChevronLeft class="h-4 w-4" />
       <span class="sr-only">Previous</span>

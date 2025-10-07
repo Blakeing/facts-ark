@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { ToggleGroup } from '@ark-ui/vue/toggle-group'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { toggleGroupVariants } from './toggle-group.variants'
 import type { ToggleGroupProps, ToggleGroupRootEmits } from './toggle-group.types'
 
@@ -24,7 +25,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <ToggleGroup.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <ToggleGroup.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <ToggleGroup.Item
       v-for="option in props.options"
       :key="option.value"

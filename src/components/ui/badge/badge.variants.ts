@@ -46,14 +46,14 @@ export const badgeVariants = tv({
       // Outline - bordered
       outline: ['border border-input bg-background text-foreground'],
 
-      // Success (custom)
-      success: ['bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'],
+      // Success - uses accent color system
+      success: ['bg-accent/10 text-accent-foreground dark:bg-accent/20'],
 
-      // Warning (custom)
-      warning: ['bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'],
+      // Warning - uses muted with amber tint
+      warning: ['bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-100'],
 
-      // Info (custom)
-      info: ['bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100'],
+      // Info - uses muted color system
+      info: ['bg-muted text-muted-foreground'],
     },
     size: {
       sm: 'px-1.5 py-0.5 text-xs',

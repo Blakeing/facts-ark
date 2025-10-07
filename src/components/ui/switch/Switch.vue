@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Switch } from '@ark-ui/vue/switch'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { switchVariants } from './switch.variants'
 import type { SwitchProps, SwitchRootEmits } from './switch.types'
 
@@ -27,7 +28,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Switch.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Switch.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Switch.Control :class="styles.control()">
       <Switch.Thumb :class="styles.thumb()" />
     </Switch.Control>

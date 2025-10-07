@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Progress } from '@ark-ui/vue/progress'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { progressVariants } from './progress.variants'
 import type { ProgressProps, ProgressRootEmits } from './progress.types'
 
@@ -59,7 +60,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Progress.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Progress.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <div v-if="props.label || props.showValue" :class="styles.label()">
       <Progress.Label v-if="props.label" :class="styles.labelText()">
         {{ props.label }}

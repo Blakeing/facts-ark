@@ -18,24 +18,23 @@ import { tv } from 'tailwind-variants/lite'
  */
 export const radioGroupVariants = tv({
   slots: {
-    root: 'space-y-3',
-
+    root: '',
     label: 'block text-sm font-medium text-foreground mb-3',
-
     indicator: '',
-
-    item: 'flex items-start',
-
+    item: '',
     itemControl: [
-      // Layout
-      'mt-0.5 size-4 rounded-full',
+      // Size
+      'size-4 rounded-full',
 
-      // Visual
-      'border',
+      // Visual - outer ring
+      'border border-input bg-background',
+      'data-[state=checked]:border-primary',
 
-      // Colors
-      'border-input',
-      'data-[state=checked]:border-primary data-[state=checked]:bg-primary',
+      // Inner indicator dot (pseudo-element)
+      'relative',
+      'after:content-[""] after:absolute after:inset-0 after:rounded-full',
+      'after:scale-0 after:transition-transform',
+      'data-[state=checked]:after:scale-50 data-[state=checked]:after:bg-primary',
 
       // Focus states
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -46,40 +45,22 @@ export const radioGroupVariants = tv({
       // Transition
       'transition-colors',
     ],
-
-    itemText: ['ml-3 block text-sm font-medium text-foreground', 'data-[disabled]:opacity-50'],
-
+    itemText: 'block text-sm font-medium text-foreground data-[disabled]:opacity-50',
     itemDescription: 'text-sm text-muted-foreground',
   },
   variants: {
     variant: {
       default: {
+        root: 'space-y-3',
         item: 'flex items-start',
+        itemControl: 'mt-0.5',
+        itemText: 'ml-3',
       },
       cards: {
         root: 'grid gap-3',
-        item: [
-          // Layout
-          'relative flex cursor-pointer rounded-lg p-4',
-
-          // Colors
-          'border border-input bg-background',
-
-          // States
-          'hover:border-accent',
-          'data-[state=checked]:border-primary data-[state=checked]:ring-2 data-[state=checked]:ring-primary',
-
-          // Visual
-          'shadow-sm',
-
-          // Focus
-          'focus:outline-none',
-
-          // Transition
-          'transition-colors',
-        ],
-        itemControl: 'absolute right-4 top-4',
-        itemText: 'ml-0 block text-sm font-medium text-foreground',
+        item: 'relative flex items-center justify-between cursor-pointer rounded-lg p-4 border border-input bg-background hover:border-accent data-[state=checked]:border-primary data-[state=checked]:ring-2 data-[state=checked]:ring-primary shadow-sm focus:outline-none transition-colors',
+        itemControl: 'order-2 flex-shrink-0',
+        itemText: 'order-1',
       },
     },
   },

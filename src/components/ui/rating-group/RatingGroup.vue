@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { RatingGroup } from '@ark-ui/vue/rating-group'
 import { Star } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { ratingGroupVariants } from './rating-group.variants'
 import type { RatingGroupProps, RatingGroupRootEmits } from './rating-group.types'
 
@@ -25,7 +26,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <RatingGroup.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <RatingGroup.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <RatingGroup.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </RatingGroup.Label>

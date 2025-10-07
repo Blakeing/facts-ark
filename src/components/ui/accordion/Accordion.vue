@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Accordion } from '@ark-ui/vue/accordion'
 import { ChevronRight } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { accordionVariants } from './accordion.variants'
 import type { AccordionProps, AccordionRootEmits } from './accordion.types'
 
@@ -49,7 +51,13 @@ const props = withDefaults(defineProps<AccordionProps>(), {
 })
 
 const emits = defineEmits<AccordionRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['items', 'variant', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   accordionVariants({
@@ -59,7 +67,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Accordion.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Accordion.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Accordion.Item
       v-for="item in props.items"
       :key="item.value"

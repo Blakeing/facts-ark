@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Tabs } from '@ark-ui/vue/tabs'
 import { computed, ref } from 'vue'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { Select } from '../select'
 import { tabsVariants } from './tabs.variants'
 import type { TabsProps, TabsRootEmits } from './tabs.types'
@@ -53,7 +54,13 @@ const props = withDefaults(defineProps<TabsProps>(), {
 })
 
 const emits = defineEmits<TabsRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['items', 'variant', 'indicator', 'responsive', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   tabsVariants({
@@ -109,7 +116,7 @@ const handleMobileChange = (details: { value: string[] }) => {
             <component
               :is="item.icon"
               v-if="item.icon"
-              class="mr-2 -ml-0.5 size-5 text-gray-400 group-hover:text-gray-500 group-data-[selected]:text-indigo-500"
+              class="mr-2 -ml-0.5 size-5 text-muted-foreground group-hover:text-foreground group-data-[selected]:text-primary"
               aria-hidden="true"
             />
 
@@ -119,7 +126,7 @@ const handleMobileChange = (details: { value: string[] }) => {
             <!-- Badge -->
             <span
               v-if="item.badge"
-              class="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-900"
+              class="ml-2 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground"
             >
               {{ item.badge }}
             </span>

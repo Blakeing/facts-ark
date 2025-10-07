@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Slider } from '@ark-ui/vue/slider'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { sliderVariants } from './slider.variants'
 import type { SliderProps, SliderRootEmits } from './slider.types'
 
@@ -71,7 +72,7 @@ const thumbCount = computed(() => {
 </script>
 
 <template>
-  <Slider.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Slider.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <div v-if="props.label || props.showValue" :class="styles.label()">
       <Slider.Label v-if="props.label" :class="styles.labelText()">
         {{ props.label }}

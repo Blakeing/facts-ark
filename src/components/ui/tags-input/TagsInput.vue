@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { TagsInput } from '@ark-ui/vue/tags-input'
 import { X } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { tagsInputVariants } from './tags-input.variants'
 import type { TagsInputProps, TagsInputRootEmits } from './tags-input.types'
 
@@ -20,7 +21,7 @@ const styles = computed(() => tagsInputVariants({ variant: props.variant }))
 </script>
 
 <template>
-  <TagsInput.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <TagsInput.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <TagsInput.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </TagsInput.Label>

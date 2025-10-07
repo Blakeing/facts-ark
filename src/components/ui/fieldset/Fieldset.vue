@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { Fieldset } from '@ark-ui/vue/fieldset'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { fieldsetVariants } from './fieldset.variants'
 import type { FieldsetProps } from './fieldset.types'
 
@@ -26,7 +27,7 @@ const styles = computed(() => fieldsetVariants())
 </script>
 
 <template>
-  <Fieldset.Root v-bind="props" :class="[styles.root(), props.class]">
+  <Fieldset.Root v-bind="props" :class="cn(styles.root(), props.class)">
     <Fieldset.Legend v-if="props.legend" :class="styles.legend()">
       {{ props.legend }}
     </Fieldset.Legend>

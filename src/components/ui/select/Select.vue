@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Select, createListCollection } from '@ark-ui/vue/select'
 import { ChevronDown, Check } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { selectVariants } from './select.variants'
 import type { SelectProps, SelectRootEmits, SelectItem, SelectItemGroup } from './select.types'
 
@@ -51,7 +53,13 @@ const props = withDefaults(defineProps<SelectProps>(), {
 })
 
 const emits = defineEmits<SelectRootEmits<SelectItem>>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['items', 'label', 'placeholder', 'size', 'indicatorPosition', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   selectVariants({
@@ -93,7 +101,7 @@ const collection = computed(() => {
 </script>
 
 <template>
-  <Select.Root v-bind="forwarded" :collection="collection" :class="[styles.root(), props.class]">
+  <Select.Root v-bind="forwarded" :collection="collection" :class="cn(styles.root(), props.class)">
     <Select.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </Select.Label>
@@ -113,8 +121,8 @@ const collection = computed(() => {
             :aria-label="selectedItem.status === true || selectedItem.status === 'online' ? 'Online' : 'Offline'"
             :class="[
               selectedItem.status === true || selectedItem.status === 'online'
-                ? 'bg-green-400'
-                : 'bg-gray-200',
+                ? 'bg-green-500 dark:bg-green-400'
+                : 'bg-muted-foreground/30',
               styles.itemStatus(),
             ]"
           />
@@ -123,12 +131,12 @@ const collection = computed(() => {
             <Select.ValueText :placeholder="props.placeholder" />
           </span>
           <!-- Description -->
-          <span v-if="selectedItem?.description" class="truncate text-gray-500">
+          <span v-if="selectedItem?.description" class="truncate text-muted-foreground">
             {{ selectedItem.description }}
           </span>
         </span>
         <Select.Indicator :class="styles.indicator()">
-          <ChevronDown class="size-5 text-gray-400" />
+          <ChevronDown class="size-5 text-muted-foreground" />
         </Select.Indicator>
       </Select.Trigger>
     </Select.Control>
@@ -166,8 +174,8 @@ const collection = computed(() => {
                     v-else-if="item.status !== undefined"
                     :class="[
                       item.status === true || item.status === 'online'
-                        ? 'bg-green-400'
-                        : 'bg-gray-200',
+                        ? 'bg-green-500 dark:bg-green-400'
+                        : 'bg-muted-foreground/30',
                       styles.itemStatus(),
                     ]"
                     aria-hidden="true"
@@ -208,8 +216,8 @@ const collection = computed(() => {
                   v-else-if="item.status !== undefined"
                   :class="[
                     item.status === true || item.status === 'online'
-                      ? 'bg-green-400'
-                      : 'bg-gray-200',
+                      ? 'bg-green-500 dark:bg-green-400'
+                      : 'bg-muted-foreground/30',
                     styles.itemStatus(),
                   ]"
                   aria-hidden="true"

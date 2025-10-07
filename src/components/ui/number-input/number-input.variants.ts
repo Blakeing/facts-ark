@@ -7,14 +7,14 @@ import { tv } from 'tailwind-variants/lite'
 export const numberInputVariants = tv({
   slots: {
     root: 'w-full',
-    label: 'block text-sm font-medium text-gray-700 mb-2',
+    label: 'block text-sm font-medium text-foreground mb-2',
     control: 'relative inline-flex',
     input:
-      'block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+      'block w-full rounded-md border-input shadow-sm focus-ring disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
     incrementTrigger:
-      'absolute right-0 top-0 inline-flex items-center justify-center border-l border-gray-300 bg-gray-50 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50',
+      'absolute right-0 top-0 inline-flex items-center justify-center border-l border-border bg-muted hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50',
     decrementTrigger:
-      'absolute right-0 bottom-0 inline-flex items-center justify-center border-l border-t border-gray-300 bg-gray-50 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50',
+      'absolute right-0 bottom-0 inline-flex items-center justify-center border-l border-t border-border bg-muted hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50',
   },
   variants: {
     variant: {

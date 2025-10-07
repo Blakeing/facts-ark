@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Dialog } from '@ark-ui/vue/dialog'
 import { X } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { dialogVariants } from './dialog.variants'
 import type { DialogProps, DialogRootEmits } from './dialog.types'
 
@@ -55,7 +57,13 @@ const props = withDefaults(defineProps<DialogProps>(), {
 })
 
 const emits = defineEmits<DialogRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['variant', 'title', 'description', 'trigger', 'showClose', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   dialogVariants({
@@ -66,7 +74,7 @@ const styles = computed(() =>
 
 <template>
   <Dialog.Root v-bind="forwarded">
-    <Dialog.Trigger v-if="props.trigger" :class="[styles.trigger(), props.class]">
+    <Dialog.Trigger v-if="props.trigger" :class="cn(styles.trigger(), props.class)">
       <slot name="trigger">
         {{ props.trigger }}
       </slot>

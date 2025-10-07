@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Steps } from '@ark-ui/vue/steps'
 import { Check } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { stepsVariants } from './steps.variants'
 import type { StepsProps } from './steps.types'
 
@@ -24,7 +25,7 @@ const styles = computed(() => stepsVariants({ variant: props.variant }))
 </script>
 
 <template>
-  <Steps.Root v-bind="forwarded" :count="props.items.length" :class="[styles.root(), props.class]">
+  <Steps.Root v-bind="forwarded" :count="props.items.length" :class="cn(styles.root(), props.class)">
     <Steps.List :class="styles.list()">
       <Steps.Item
         v-for="(item, index) in props.items"
@@ -62,14 +63,14 @@ const styles = computed(() => stepsVariants({ variant: props.variant }))
     >
       <slot :name="`step-${index}`" :step="item">
         <h3 class="text-lg font-semibold mb-2">{{ item.title }}</h3>
-        <p v-if="item.description" class="text-gray-600">{{ item.description }}</p>
+        <p v-if="item.description" class="text-muted-foreground">{{ item.description }}</p>
       </slot>
     </Steps.Content>
 
     <Steps.CompletedContent :class="styles.completedContent()">
       <slot name="completed">
-        <h3 class="text-lg font-semibold text-green-900 mb-2">All Steps Complete!</h3>
-        <p class="text-green-700">You have successfully completed all steps.</p>
+        <h3 class="text-lg font-semibold text-foreground mb-2">All Steps Complete!</h3>
+        <p class="text-muted-foreground">You have successfully completed all steps.</p>
       </slot>
     </Steps.CompletedContent>
 

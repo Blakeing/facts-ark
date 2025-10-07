@@ -1,7 +1,7 @@
 /**
  * Base styles and utility classes
  *
- * Color definitions are in park-ui-tokens.css using Tailwind v4's @theme directive
+ * Color definitions are in tailwind-theme.css using Tailwind v4's @theme directive
  */
 
 @layer base {
@@ -36,25 +36,30 @@
 }
 
 /* ============================================
-   ANIMATIONS
+   ARK UI ANIMATIONS
+   Using Ark UI's --height and --width CSS variables
    ============================================ */
 
 /* Accordion animations */
 @keyframes accordion-down {
   from {
     height: 0;
+    opacity: 0;
   }
   to {
-    height: var(--radix-accordion-content-height);
+    height: var(--height);
+    opacity: 1;
   }
 }
 
 @keyframes accordion-up {
   from {
-    height: var(--radix-accordion-content-height);
+    height: var(--height);
+    opacity: 1;
   }
   to {
     height: 0;
+    opacity: 0;
   }
 }
 
@@ -65,36 +70,18 @@
     opacity: 0;
   }
   to {
-    height: var(--radix-collapsible-content-height);
+    height: var(--height);
     opacity: 1;
   }
 }
 
 @keyframes collapsible-up {
   from {
-    height: var(--radix-collapsible-content-height);
+    height: var(--height);
     opacity: 1;
   }
   to {
     height: 0;
     opacity: 0;
-  }
-}
-
-@layer components {
-  /* Ark UI Collapsible component animations */
-  [data-scope='collapsible'][data-part='content'] {
-    overflow: hidden;
-    transition-property: height;
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  [data-scope='collapsible'][data-part='content'][data-state='open'] {
-    animation: collapsible-down 200ms ease-out;
-  }
-
-  [data-scope='collapsible'][data-part='content'][data-state='closed'] {
-    animation: collapsible-up 200ms ease-out;
   }
 }

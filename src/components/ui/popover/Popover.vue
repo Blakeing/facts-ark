@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Popover } from '@ark-ui/vue/popover'
 import { X } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { popoverVariants } from './popover.variants'
 import type { PopoverProps, PopoverRootEmits } from './popover.types'
 
@@ -15,14 +17,20 @@ const props = withDefaults(defineProps<PopoverProps>(), {
 })
 
 const emits = defineEmits<PopoverRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['variant', 'title', 'description', 'trigger', 'showClose', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() => popoverVariants({ variant: props.variant }))
 </script>
 
 <template>
   <Popover.Root v-bind="forwarded">
-    <Popover.Trigger v-if="props.trigger" :class="[styles.trigger(), props.class]">
+    <Popover.Trigger v-if="props.trigger" :class="cn(styles.trigger(), props.class)">
       <slot name="trigger">
         {{ props.trigger }}
       </slot>

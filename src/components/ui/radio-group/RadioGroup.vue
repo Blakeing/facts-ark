@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { RadioGroup } from '@ark-ui/vue/radio-group'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { radioGroupVariants } from './radio-group.variants'
 import type { RadioGroupProps, RadioGroupRootEmits } from './radio-group.types'
 
@@ -58,7 +59,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <RadioGroup.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <RadioGroup.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <RadioGroup.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </RadioGroup.Label>

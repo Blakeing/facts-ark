@@ -8,13 +8,14 @@ import { tv } from 'tailwind-variants/lite'
 
 /**
  * Field variant definitions
+ * Uses semantic tokens for dark mode and theming support
  */
 export const fieldVariants = tv({
   slots: {
     root: 'space-y-2',
-    label: 'block text-sm font-medium text-gray-700',
-    helperText: 'text-sm text-gray-500',
-    errorText: 'text-sm text-red-600',
-    requiredIndicator: 'text-red-500 ml-1',
+    label: 'block text-sm font-medium text-foreground',
+    helperText: 'text-sm text-muted-foreground',
+    errorText: 'text-sm text-destructive',
+    requiredIndicator: 'text-destructive ml-1',
   },
 })

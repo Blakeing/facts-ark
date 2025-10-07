@@ -40,7 +40,7 @@ export const dialogVariants = tv({
 
     backdrop: [
       // Position
-      'fixed inset-0',
+      'fixed inset-0 z-50',
 
       // Colors
       'bg-black/80',
@@ -48,9 +48,9 @@ export const dialogVariants = tv({
       // Visual effects
       'backdrop-blur-sm',
 
-      // Animations
-      'data-[state=open]:animate-in data-[state=closed]:animate-out',
-      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      // Animations - smooth fade only
+      'data-[state=open]:animate-dialog-backdrop-in',
+      'data-[state=closed]:animate-dialog-backdrop-out',
     ],
 
     positioner: 'fixed inset-0 z-50 flex items-center justify-center p-4',
@@ -68,11 +68,9 @@ export const dialogVariants = tv({
       // Visual
       'rounded-lg shadow-lg',
 
-      // Animations
-      'data-[state=open]:animate-in data-[state=closed]:animate-out',
-      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-      'data-[state=closed]:slide-out-to-bottom-[2%] data-[state=open]:slide-in-from-bottom-[2%]',
+      // Animations - smooth scale + slight slide
+      'data-[state=open]:animate-dialog-content-in',
+      'data-[state=closed]:animate-dialog-content-out',
 
       // Focus
       'focus:outline-none',

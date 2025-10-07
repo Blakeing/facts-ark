@@ -3,6 +3,8 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Tooltip } from '@ark-ui/vue/tooltip'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { tooltipVariants } from './tooltip.variants'
 import type { TooltipProps, TooltipRootEmits } from './tooltip.types'
 
@@ -43,7 +45,13 @@ const props = withDefaults(defineProps<TooltipProps>(), {
 })
 
 const emits = defineEmits<TooltipRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['content', 'trigger', 'variant', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() =>
   tooltipVariants({
@@ -54,7 +62,7 @@ const styles = computed(() =>
 
 <template>
   <Tooltip.Root v-bind="forwarded">
-    <Tooltip.Trigger :class="[styles.trigger(), props.class]">
+    <Tooltip.Trigger :class="cn(styles.trigger(), props.class)">
       <slot name="trigger">
         {{ props.trigger }}
       </slot>

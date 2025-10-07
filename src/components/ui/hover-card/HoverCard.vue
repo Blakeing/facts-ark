@@ -3,6 +3,8 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { HoverCard } from '@ark-ui/vue/hover-card'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { hoverCardVariants } from './hover-card.variants'
 import type { HoverCardProps, HoverCardRootEmits } from './hover-card.types'
 
@@ -30,14 +32,20 @@ const props = withDefaults(defineProps<HoverCardProps>(), {
 })
 
 const emits = defineEmits<HoverCardRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['variant', 'content', 'trigger', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() => hoverCardVariants({ variant: props.variant }))
 </script>
 
 <template>
   <HoverCard.Root v-bind="forwarded">
-    <HoverCard.Trigger :class="[styles.trigger(), props.class]">
+    <HoverCard.Trigger :class="cn(styles.trigger(), props.class)">
       <slot name="trigger">
         {{ props.trigger }}
       </slot>

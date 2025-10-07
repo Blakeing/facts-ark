@@ -4,6 +4,8 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Menu } from '@ark-ui/vue/menu'
 import { ChevronDown } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { useOmitProps } from '@/lib/useOmitProps'
 import { menuVariants } from './menu.variants'
 import type { MenuProps, MenuRootEmits } from './menu.types'
 
@@ -13,14 +15,20 @@ const props = withDefaults(defineProps<MenuProps>(), {
 })
 
 const emits = defineEmits<MenuRootEmits>()
-const forwarded = useForwardPropsEmits(props, emits)
+
+// Filter out custom props before forwarding to Ark UI
+const arkProps = useOmitProps(
+  props,
+  ['items', 'trigger', 'variant', 'class'] as const
+)
+const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() => menuVariants({ variant: props.variant }))
 </script>
 
 <template>
   <Menu.Root v-bind="forwarded">
-    <Menu.Trigger v-if="props.trigger || $slots.trigger" :class="[styles.trigger(), props.class]">
+    <Menu.Trigger v-if="props.trigger || $slots.trigger" :class="cn(styles.trigger(), props.class)">
       <slot name="trigger">
         {{ props.trigger }}
         <ChevronDown class="h-4 w-4" />

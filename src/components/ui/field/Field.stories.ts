@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { Field } from '@ark-ui/vue/field'
 import { ref } from 'vue'
 import FieldComponent from './Field.vue'
+import FieldInput from './FieldInput.vue'
 import Input from '../input/Input.vue'
 import Textarea from '../textarea/Textarea.vue'
 import Checkbox from '../checkbox/Checkbox.vue'
@@ -45,6 +46,54 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+/**
+ * BEST PRACTICE: Use FieldInput for seamless integration
+ * FieldInput automatically:
+ * - Connects to Field's accessibility context
+ * - Inherits invalid state for error styling
+ * - Gets proper IDs and ARIA attributes
+ */
+export const BestPractice: Story = {
+  render: () => ({
+    components: { Field: FieldComponent, FieldInput },
+    setup() {
+      const email = ref('')
+      return { email }
+    },
+    template: `
+      <Field
+        label="Email Address"
+        required
+        helperText="We'll send a confirmation email"
+      >
+        <FieldInput
+          v-model="email"
+          type="email"
+          placeholder="you@example.com"
+        />
+      </Field>
+    `,
+  }),
+}
+
+/**
+ * FieldInput automatically detects invalid state from Field
+ */
+export const WithAutoErrorState: Story = {
+  render: () => ({
+    components: { Field: FieldComponent, FieldInput },
+    template: `
+      <Field
+        label="Email"
+        invalid
+        errorText="Please enter a valid email address"
+      >
+        <FieldInput type="email" placeholder="email@example.com" />
+      </Field>
+    `,
+  }),
+}
 
 export const WithInput: Story = {
   render: (args) => ({
@@ -169,10 +218,14 @@ export const WithTextarea: Story = {
   }),
 }
 
+/**
+ * Complete form example using FieldInput (BEST PRACTICE)
+ * Notice how FieldInput automatically inherits error state from Field
+ */
 export const FormExample: Story = {
   args: {},
   render: () => ({
-    components: { Field: FieldComponent, Input, Textarea, Checkbox },
+    components: { Field: FieldComponent, FieldInput, Textarea, Checkbox },
     setup() {
       const form = ref({
         name: '',
@@ -201,11 +254,10 @@ export const FormExample: Story = {
           :errorText="errors.name ? 'Name must be at least 2 characters' : undefined"
           helperText="Enter your first and last name"
         >
-          <Input
+          <FieldInput
             v-model="form.name"
             type="text"
             placeholder="John Doe"
-            :invalid="errors.name"
           />
         </Field>
 
@@ -215,11 +267,10 @@ export const FormExample: Story = {
           :invalid="errors.email"
           :errorText="errors.email ? 'Please enter a valid email' : undefined"
         >
-          <Input
+          <FieldInput
             v-model="form.email"
             type="email"
             placeholder="john@example.com"
-            :invalid="errors.email"
           />
         </Field>
 
@@ -263,25 +314,49 @@ export const FormExample: Story = {
 export const MultipleFields: Story = {
   args: {},
   render: () => ({
-    components: { Field: FieldComponent, Input },
+    components: { Field: FieldComponent, FieldInput },
     template: `
       <div class="space-y-4">
         <Field label="First Name" required>
-          <Input type="text" placeholder="John" />
+          <FieldInput type="text" placeholder="John" />
         </Field>
 
         <Field label="Last Name" required>
-          <Input type="text" placeholder="Doe" />
+          <FieldInput type="text" placeholder="Doe" />
         </Field>
 
         <Field label="Email" required helperText="We'll send a confirmation email">
-          <Input type="email" placeholder="john@example.com" />
+          <FieldInput type="email" placeholder="john@example.com" />
         </Field>
 
         <Field label="Phone" helperText="Optional">
-          <Input type="tel" placeholder="+1 (555) 000-0000" />
+          <FieldInput type="tel" placeholder="+1 (555) 000-0000" />
         </Field>
       </div>
+    `,
+  }),
+}
+
+/**
+ * Legacy: Using standalone Input component
+ * This still works, but FieldInput is recommended for better integration
+ */
+export const WithStandaloneInput: Story = {
+  args: {},
+  render: () => ({
+    components: { Field: FieldComponent, Input },
+    setup() {
+      const email = ref('')
+      return { email }
+    },
+    template: `
+      <Field label="Email Address" required helperText="We'll never share your email">
+        <Input
+          v-model="email"
+          type="email"
+          placeholder="you@example.com"
+        />
+      </Field>
     `,
   }),
 }

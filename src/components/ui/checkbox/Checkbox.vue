@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Checkbox } from '@ark-ui/vue/checkbox'
 import { Check } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { checkboxVariants } from './checkbox.variants'
 import type { CheckboxProps, CheckboxRootEmits } from './checkbox.types'
 
@@ -30,7 +31,7 @@ const iconSizes = { sm: 12, md: 16, lg: 20 } as const
 </script>
 
 <template>
-  <Checkbox.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Checkbox.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Checkbox.Control :class="styles.control()">
       <Checkbox.Indicator>
         <Check :size="iconSizes[props.size ?? 'md']" class="text-white" />

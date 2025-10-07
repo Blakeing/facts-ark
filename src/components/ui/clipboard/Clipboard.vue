@@ -4,6 +4,7 @@ import { useForwardPropsEmits } from '@ark-ui/vue'
 import { Clipboard } from '@ark-ui/vue/clipboard'
 import { Check, Copy } from 'lucide-vue-next'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { clipboardVariants } from './clipboard.variants'
 import type { ClipboardProps, ClipboardRootEmits } from './clipboard.types'
 
@@ -54,7 +55,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <Clipboard.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <Clipboard.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <Clipboard.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </Clipboard.Label>

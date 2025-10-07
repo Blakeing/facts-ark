@@ -3,6 +3,7 @@
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { SegmentGroup } from '@ark-ui/vue/segment-group'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { segmentGroupVariants } from './segment-group.variants'
 import type { SegmentGroupProps, SegmentGroupRootEmits } from './segment-group.types'
 
@@ -41,7 +42,7 @@ const styles = computed(() =>
 </script>
 
 <template>
-  <SegmentGroup.Root v-bind="forwarded" :class="[styles.root(), props.class]">
+  <SegmentGroup.Root v-bind="forwarded" :class="cn(styles.root(), props.class)">
     <SegmentGroup.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
     </SegmentGroup.Label>
