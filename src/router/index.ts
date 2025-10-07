@@ -32,6 +32,18 @@ const router = createRouter({
       // Lazy-loaded route: generates separate chunk (About.[hash].js)
       component: () => import('../views/AboutView.vue'),
     },
+    {
+      path: '/showcase',
+      name: 'showcase',
+      // Component showcase with all migrated Park UI components
+      component: () => import('../views/ComponentShowcaseView.vue'),
+    },
+    {
+      path: '/theme',
+      name: 'theme',
+      // Tailwind CSS v4 theming ecosystem demo
+      component: () => import('../views/ThemeDemo.vue'),
+    },
   ],
 })
 

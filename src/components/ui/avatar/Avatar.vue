@@ -41,6 +41,7 @@ const iconSizes = {
   md: 20,
   lg: 24,
   xl: 32,
+  '2xl': 40,
 } as const
 
 const avatarClass = computed(() =>
@@ -54,12 +55,12 @@ const avatarClass = computed(() =>
 <template>
   <Avatar.Root v-bind="forwarded" :class="avatarClass">
     <Avatar.Fallback
-      class="flex size-full items-center justify-center bg-gray-100 text-gray-600 font-medium"
+      class="flex size-full items-center justify-center bg-muted text-muted-foreground font-medium"
     >
       <template v-if="initials && initials.length >= 2">
         {{ initials }}
       </template>
-      <UserIcon v-else :size="iconSizes[size ?? 'md']" class="text-gray-400" />
+      <UserIcon v-else :size="iconSizes[size ?? 'md']" class="opacity-50" />
     </Avatar.Fallback>
     <Avatar.Image
       v-if="src"

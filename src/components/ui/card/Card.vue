@@ -23,6 +23,7 @@ const cardClass = computed(() =>
   cardVariants({
     variant: props.variant,
     padding: props.padding,
+    interactive: props.interactive,
     class: props.class,
   })
 )
@@ -30,7 +31,7 @@ const cardClass = computed(() =>
 
 <template>
   <div :class="cardClass">
-    <div v-if="$slots.header" class="mb-4 border-b border-gray-200 pb-4">
+    <div v-if="$slots.header" class="mb-4 border-b border-border pb-4">
       <slot name="header" />
     </div>
 
@@ -38,7 +39,7 @@ const cardClass = computed(() =>
       <slot />
     </div>
 
-    <div v-if="$slots.footer" class="mt-4 border-t border-gray-200 pt-4">
+    <div v-if="$slots.footer" class="mt-4 border-t border-border pt-4">
       <slot name="footer" />
     </div>
   </div>

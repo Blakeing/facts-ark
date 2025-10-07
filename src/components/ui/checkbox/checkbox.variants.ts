@@ -1,43 +1,70 @@
 /**
  * Checkbox component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior and data attributes
+ * Design inspired by Park UI's checkbox component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Checkbox size variants
- */
-export const sizeStyles = {
-  sm: 'size-4',
-  md: 'size-5',
-  lg: 'size-6',
-} as const
-
-/**
- * Checkbox variant definitions
+ * Checkbox variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens
+ * - Proper focus states with ring
+ * - Smooth transitions
+ * - Accessible by default (Ark UI)
  */
 export const checkboxVariants = tv({
   slots: {
     root: 'flex items-center gap-2',
-    control:
-      'flex items-center justify-center rounded border-2 border-gray-300 bg-white data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-    label:
-      'text-sm font-medium text-gray-700 cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+    control: [
+      // Layout
+      'flex items-center justify-center',
+
+      // Visual
+      'rounded border-2',
+
+      // Colors
+      'border-input bg-background',
+      'data-[state=checked]:bg-primary data-[state=checked]:border-primary',
+
+      // Focus states (using new focus-ring system)
+      'focus-ring',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+      // Animations & Transitions (using new design system)
+      'transition-colors-smooth',
+      'active:scale-95',
+    ],
+
+    label: [
+      // Typography
+      'font-medium text-foreground',
+
+      // Interaction
+      'cursor-pointer select-none',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+    ],
   },
   variants: {
     size: {
       sm: {
-        control: sizeStyles.sm,
+        control: 'size-4',
         label: 'text-xs',
       },
       md: {
-        control: sizeStyles.md,
+        control: 'size-5',
         label: 'text-sm',
       },
       lg: {
-        control: sizeStyles.lg,
+        control: 'size-6',
         label: 'text-base',
       },
     },

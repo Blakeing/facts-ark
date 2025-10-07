@@ -1,39 +1,66 @@
 /**
  * Input component - variant definitions
  *
- * Minimal styling approach - rely on native browser behavior
+ * Design inspired by Park UI's input component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Input size variants
- */
-export const sizeStyles = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-3 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
-} as const
-
-/**
- * Input variant definitions
+ * Input variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens
+ * - Proper focus states with ring
+ * - File upload styling
+ * - Disabled and readonly states
  */
 export const inputVariants = tv({
   base: [
-    'w-full rounded-md border border-gray-300 bg-white text-gray-900',
-    'placeholder:text-gray-400',
-    'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50',
-    'read-only:bg-gray-50',
+    // Layout
+    'flex w-full rounded-md',
+
+    // Border & Background
+    'border border-input bg-background',
+
+    // Typography
+    'text-sm text-foreground',
+
+    // Padding
+    'px-3 py-2',
+
+    // File input styling
+    'file:border-0 file:bg-transparent file:text-sm file:font-medium',
+
+    // Placeholder
+    'placeholder:text-muted-foreground',
+
+    // Focus states (using new focus-ring system)
+    'focus-ring',
+
+    // Disabled state
+    'disabled:cursor-not-allowed disabled:opacity-50',
+
+    // Readonly state
+    'read-only:opacity-50',
+
+    // Animations & Transitions (using new design system)
+    'transition-colors-smooth',
   ],
   variants: {
-    size: sizeStyles,
-    invalid: {
-      true: 'border-red-500',
-      false: '',
+    size: {
+      sm: 'h-9 px-2 text-xs',
+      md: 'h-10 px-3 text-sm',
+      lg: 'h-11 px-4 text-base',
+    },
+    variant: {
+      default: '',
+      error: 'border-destructive focus-visible:ring-destructive',
     },
   },
   defaultVariants: {
     size: 'md',
-    invalid: false,
+    variant: 'default',
   },
 })

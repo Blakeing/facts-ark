@@ -12,7 +12,13 @@ const props = withDefaults(defineProps<StepsProps>(), {
   orientation: 'horizontal',
 })
 
-const forwarded = useForwardPropsEmits(props, {})
+const emit = defineEmits<{
+  stepChange: [details: { step: number }]
+  stepComplete: []
+  'update:step': [step: number]
+}>()
+
+const forwarded = useForwardPropsEmits(props, emit)
 
 const styles = computed(() => stepsVariants({ variant: props.variant }))
 </script>
@@ -27,19 +33,14 @@ const styles = computed(() => stepsVariants({ variant: props.variant }))
         :class="styles.item()"
       >
         <Steps.Trigger :class="styles.trigger()">
-          <Steps.Indicator :class="styles.indicator()">
-            <Steps.Status>
-              <template #complete>
-                <Check class="h-5 w-5" />
-              </template>
-              <template #incomplete>
+          <Steps.ItemContext v-slot="context">
+            <Steps.Indicator :class="styles.indicator()">
+              <Check v-if="context.current || context.completed" class="h-5 w-5" />
+              <template v-else>
                 {{ index + 1 }}
               </template>
-              <template #current>
-                {{ index + 1 }}
-              </template>
-            </Steps.Status>
-          </Steps.Indicator>
+            </Steps.Indicator>
+          </Steps.ItemContext>
 
           <div class="flex flex-col text-left">
             <span :class="styles.title()">{{ item.title }}</span>

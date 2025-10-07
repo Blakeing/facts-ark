@@ -82,6 +82,7 @@ export const Default: Story = {
   args: {
     variant: 'default',
     items: images,
+    slideCount: images.length,
   },
 }
 
@@ -89,6 +90,7 @@ export const Overlay: Story = {
   args: {
     variant: 'overlay',
     items: images,
+    slideCount: images.length,
   },
 }
 
@@ -96,6 +98,7 @@ export const Thumbnails: Story = {
   args: {
     variant: 'thumbnails',
     items: images,
+    slideCount: images.length,
     slidesPerPage: 3,
   },
 }
@@ -104,6 +107,7 @@ export const WithAutoplay: Story = {
   args: {
     variant: 'default',
     items: images,
+    slideCount: images.length,
     autoplay: { delay: 3000 },
     loop: true,
   },
@@ -120,6 +124,7 @@ export const WithLoop: Story = {
   args: {
     variant: 'default',
     items: images,
+    slideCount: images.length,
     loop: true,
   },
   parameters: {
@@ -135,6 +140,7 @@ export const WithoutControls: Story = {
   args: {
     variant: 'default',
     items: images,
+    slideCount: images.length,
     showArrows: false,
     showIndicators: false,
     allowMouseDrag: true,
@@ -156,6 +162,7 @@ export const CustomContent: Story = {
       { id: 'slide-2', title: 'Slide 2' },
       { id: 'slide-3', title: 'Slide 3' },
     ],
+    slideCount: 3,
   },
   render: (args) => ({
     components: { Carousel },
@@ -196,6 +203,7 @@ export const CustomContent: Story = {
 export const AllVariants: Story = {
   args: {
     items: images.slice(0, 3),
+    slideCount: 3,
   },
   render: (args) => ({
     components: { Carousel },

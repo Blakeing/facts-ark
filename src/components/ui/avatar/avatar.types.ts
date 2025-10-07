@@ -3,7 +3,13 @@
  */
 
 import type { AvatarRootProps, AvatarRootEmits } from '@ark-ui/vue/avatar'
-import type { sizeVariants } from './avatar.variants'
+import type { VariantProps } from 'tailwind-variants'
+import type { avatarVariants } from './avatar.variants'
+
+/**
+ * Avatar variant props extracted from avatarVariants
+ */
+type AvatarVariantProps = VariantProps<typeof avatarVariants>
 
 /**
  * Avatar props
@@ -11,10 +17,16 @@ import type { sizeVariants } from './avatar.variants'
 export interface AvatarProps extends AvatarRootProps {
   /** User's full name - used for alt text and generating initials */
   name: string
+
   /** Image source URL */
   src?: string
-  /** Avatar size variant */
-  size?: keyof typeof sizeVariants
+
+  /**
+   * Avatar size variant
+   * @default 'md'
+   */
+  size?: AvatarVariantProps['size']
+
   /** Additional CSS classes */
   class?: string
 }

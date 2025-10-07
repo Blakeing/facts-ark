@@ -2,16 +2,30 @@
  * Badge component - type definitions
  */
 
-import type { variantStyles, sizeStyles } from './badge.variants'
+import type { VariantProps } from 'tailwind-variants'
+import type { badgeVariants } from './badge.variants'
+
+/**
+ * Badge variant props extracted from badgeVariants
+ */
+type BadgeVariantProps = VariantProps<typeof badgeVariants>
 
 /**
  * Badge props
  */
 export interface BadgeProps {
-  /** Visual style variant */
-  variant?: keyof typeof variantStyles
-  /** Size variant */
-  size?: keyof typeof sizeStyles
+  /**
+   * Visual style variant
+   * @default 'default'
+   */
+  variant?: BadgeVariantProps['variant']
+
+  /**
+   * Size variant
+   * @default 'md'
+   */
+  size?: BadgeVariantProps['size']
+
   /** Additional CSS classes */
   class?: string
 }

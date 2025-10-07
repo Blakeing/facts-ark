@@ -44,6 +44,9 @@ const frameworks = [
 ]
 
 export const Default: Story = {
+  args: {
+    items: frameworks,
+  },
   render: (args) => ({
     components: { Select },
     setup() {
@@ -62,7 +65,9 @@ export const Default: Story = {
 }
 
 export const WithSelection: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -81,7 +86,9 @@ export const WithSelection: Story = {
 }
 
 export const WithDescriptions: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -113,7 +120,9 @@ export const WithDescriptions: Story = {
 }
 
 export const WithAvatars: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -152,7 +161,9 @@ export const WithAvatars: Story = {
 }
 
 export const WithStatus: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -177,7 +188,9 @@ export const WithStatus: Story = {
 }
 
 export const Grouped: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -222,7 +235,9 @@ export const Grouped: Story = {
 }
 
 export const Disabled: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -241,7 +256,9 @@ export const Disabled: Story = {
 }
 
 export const Small: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -260,7 +277,9 @@ export const Small: Story = {
 }
 
 export const Large: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {
@@ -279,7 +298,9 @@ export const Large: Story = {
 }
 
 export const Interactive: Story = {
-  args: {},
+  args: {
+    items: frameworks,
+  },
   render: () => ({
     components: { Select },
     setup() {

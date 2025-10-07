@@ -3,6 +3,13 @@
  */
 
 import type { CarouselRootProps, CarouselRootEmits } from '@ark-ui/vue/carousel'
+import type { VariantProps } from 'tailwind-variants'
+import type { carouselVariants } from './carousel.variants'
+
+/**
+ * Carousel variant props extracted from carouselVariants
+ */
+type CarouselVariantProps = VariantProps<typeof carouselVariants>
 
 /**
  * Individual carousel item definition
@@ -26,12 +33,19 @@ export interface CarouselItem {
 export interface CarouselProps extends CarouselRootProps {
   /** Array of carousel items to render */
   items: CarouselItem[]
-  /** Visual variant */
-  variant?: 'default' | 'overlay' | 'thumbnails'
+
+  /**
+   * Visual variant
+   * @default 'default'
+   */
+  variant?: CarouselVariantProps['variant']
+
   /** Show navigation arrows */
   showArrows?: boolean
+
   /** Show indicator dots */
   showIndicators?: boolean
+
   /** Additional CSS classes */
   class?: string
 }

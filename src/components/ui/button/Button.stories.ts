@@ -8,12 +8,12 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'outline', 'ghost', 'danger'],
+      options: ['solid', 'outline', 'ghost', 'link', 'destructive', 'secondary'],
       description: 'Visual style variant of the button',
     },
     size: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
+      options: ['xs', 'sm', 'md', 'lg', 'xl'],
       description: 'Size of the button',
     },
     fullWidth: {
@@ -35,7 +35,7 @@ const meta = {
     },
   },
   args: {
-    variant: 'primary',
+    variant: 'solid',
     size: 'md',
     loading: false,
     disabled: false,
@@ -47,16 +47,16 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Primary: Story = {
+export const Solid: Story = {
   args: {
-    variant: 'primary',
+    variant: 'solid',
   },
   render: (args) => ({
     components: { Button },
     setup() {
       return { args }
     },
-    template: '<Button v-bind="args">Primary Button</Button>',
+    template: '<Button v-bind="args">Solid Button</Button>',
   }),
 }
 
@@ -99,16 +99,29 @@ export const Ghost: Story = {
   }),
 }
 
-export const Danger: Story = {
+export const Link: Story = {
   args: {
-    variant: 'danger',
+    variant: 'link',
   },
   render: (args) => ({
     components: { Button },
     setup() {
       return { args }
     },
-    template: '<Button v-bind="args">Danger Button</Button>',
+    template: '<Button v-bind="args">Link Button</Button>',
+  }),
+}
+
+export const Destructive: Story = {
+  args: {
+    variant: 'destructive',
+  },
+  render: (args) => ({
+    components: { Button },
+    setup() {
+      return { args }
+    },
+    template: '<Button v-bind="args">Destructive Button</Button>',
   }),
 }
 
@@ -144,9 +157,11 @@ export const Sizes: Story = {
     components: { Button },
     template: `
       <div class="flex flex-col gap-4 items-start">
-        <Button size="sm">Small Button</Button>
-        <Button size="md">Medium Button</Button>
-        <Button size="lg">Large Button</Button>
+        <Button size="xs">Extra Small</Button>
+        <Button size="sm">Small</Button>
+        <Button size="md">Medium</Button>
+        <Button size="lg">Large</Button>
+        <Button size="xl">Extra Large</Button>
       </div>
     `,
   }),
@@ -158,11 +173,12 @@ export const AllVariants: Story = {
     components: { Button },
     template: `
       <div class="flex flex-wrap gap-4">
-        <Button variant="primary">Primary</Button>
+        <Button variant="solid">Solid</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="outline">Outline</Button>
         <Button variant="ghost">Ghost</Button>
-        <Button variant="danger">Danger</Button>
+        <Button variant="link">Link</Button>
+        <Button variant="destructive">Destructive</Button>
       </div>
     `,
   }),

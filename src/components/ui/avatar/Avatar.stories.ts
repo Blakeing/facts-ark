@@ -16,7 +16,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: ['sm', 'md', 'lg', 'xl'],
+      options: ['sm', 'md', 'lg', 'xl', '2xl'],
       description: 'Size of the avatar',
     },
   },
@@ -93,6 +93,7 @@ export const AllSizes: Story = {
         <Avatar name="Jane Smith" size="md" />
         <Avatar name="Bob Wilson" size="lg" />
         <Avatar name="Alice Brown" size="xl" />
+        <Avatar name="David Lee" size="2xl" />
       </div>
     `,
   }),

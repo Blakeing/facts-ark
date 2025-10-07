@@ -3,7 +3,13 @@
  */
 
 import type { CheckboxRootProps, CheckboxRootEmits } from '@ark-ui/vue/checkbox'
-import type { sizeStyles } from './checkbox.variants'
+import type { VariantProps } from 'tailwind-variants'
+import type { checkboxVariants } from './checkbox.variants'
+
+/**
+ * Checkbox variant props extracted from checkboxVariants
+ */
+type CheckboxVariantProps = VariantProps<typeof checkboxVariants>
 
 /**
  * Checkbox props
@@ -11,8 +17,13 @@ import type { sizeStyles } from './checkbox.variants'
 export interface CheckboxProps extends CheckboxRootProps {
   /** Checkbox label text */
   label?: string
-  /** Size variant */
-  size?: keyof typeof sizeStyles
+
+  /**
+   * Size variant
+   * @default 'md'
+   */
+  size?: CheckboxVariantProps['size']
+
   /** Additional CSS classes */
   class?: string
 }

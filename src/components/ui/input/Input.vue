@@ -5,24 +5,24 @@ import { inputVariants } from './input.variants'
 import type { InputProps } from './input.types'
 
 /**
- * A simple input component with minimal styling.
+ * A Park UI-inspired input component with semantic tokens.
  *
  * @example
  * <Input v-model="value" placeholder="Enter text" />
  * <Input type="email" required />
- * <Input size="lg" invalid />
+ * <Input size="lg" variant="error" />
  */
 
 const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
   size: 'md',
-  invalid: false,
+  variant: 'default',
 })
 
 const inputClass = computed(() =>
   inputVariants({
     size: props.size,
-    invalid: props.invalid,
+    variant: props.variant,
     class: props.class,
   })
 )

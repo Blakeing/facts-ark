@@ -1,0 +1,568 @@
+/**
+ * Animation & Transition System
+ *
+ * Consistent animations and transitions for a polished, professional feel.
+ * All animations use hardware-accelerated properties when possible.
+ *
+ * Categories:
+ * - Transitions: Smooth property changes
+ * - Keyframe Animations: Complex multi-step animations
+ * - Utility Classes: Quick animation helpers
+ */
+
+/* ============================================
+   TRANSITION UTILITIES
+   Consistent transition speeds across the app
+   ============================================ */
+
+@layer utilities {
+  /* Duration utilities */
+  .transition-fast {
+    transition-duration: 150ms;
+  }
+
+  .transition-base {
+    transition-duration: 200ms;
+  }
+
+  .transition-slow {
+    transition-duration: 300ms;
+  }
+
+  .transition-slower {
+    transition-duration: 500ms;
+  }
+
+  /* Common transition properties */
+  .transition-smooth {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  .transition-colors-smooth {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  .transition-transform-smooth {
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  .transition-opacity-smooth {
+    transition-property: opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   Reusable animation sequences
+   ============================================ */
+
+/* Fade In/Out */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Slide In/Out (All directions) */
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Scale In/Out */
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* Zoom In/Out */
+@keyframes zoom-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* Bounce */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Spin */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shake (for errors) */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Shimmer (for loading states) */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Progress bar fill */
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* Slide and fade (for dialogs/popovers) */
+@keyframes slide-fade-in {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-fade-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   ANIMATION UTILITY CLASSES
+   Apply animations easily
+   ============================================ */
+
+@layer utilities {
+  /* Fade animations */
+  .animate-fade-in {
+    animation: fade-in 200ms ease-out;
+  }
+
+  .animate-fade-out {
+    animation: fade-out 200ms ease-out;
+  }
+
+  /* Slide animations */
+  .animate-slide-in-from-top {
+    animation: slide-in-from-top 300ms ease-out;
+  }
+
+  .animate-slide-in-from-bottom {
+    animation: slide-in-from-bottom 300ms ease-out;
+  }
+
+  .animate-slide-in-from-left {
+    animation: slide-in-from-left 300ms ease-out;
+  }
+
+  .animate-slide-in-from-right {
+    animation: slide-in-from-right 300ms ease-out;
+  }
+
+  /* Scale animations */
+  .animate-scale-in {
+    animation: scale-in 200ms ease-out;
+  }
+
+  .animate-scale-out {
+    animation: scale-out 200ms ease-out;
+  }
+
+  /* Zoom animations */
+  .animate-zoom-in {
+    animation: zoom-in 200ms ease-out;
+  }
+
+  .animate-zoom-out {
+    animation: zoom-out 200ms ease-out;
+  }
+
+  /* Interactive animations */
+  .animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+  }
+
+  .animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  .animate-shake {
+    animation: shake 400ms ease-in-out;
+  }
+
+  /* Loading animations */
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-muted) 0%,
+      var(--color-accent) 50%,
+      var(--color-muted) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  /* Dialog/Popover animations */
+  .animate-slide-fade-in {
+    animation: slide-fade-in 200ms ease-out;
+  }
+
+  .animate-slide-fade-out {
+    animation: slide-fade-out 200ms ease-out;
+  }
+}
+
+/* ============================================
+   FOCUS RING UTILITIES
+   Consistent, accessible focus states
+   ============================================ */
+
+@layer utilities {
+  /* Standard focus ring */
+  .focus-ring {
+    outline: none;
+    transition: box-shadow 150ms ease-in-out;
+  }
+
+  .focus-ring:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-background),
+      0 0 0 4px var(--color-ring);
+  }
+
+  /* Inset focus ring (for buttons, cards) */
+  .focus-ring-inset {
+    outline: none;
+    transition: box-shadow 150ms ease-in-out;
+  }
+
+  .focus-ring-inset:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--color-ring);
+  }
+
+  /* Primary focus ring (matches primary color) */
+  .focus-ring-primary {
+    outline: none;
+    transition: box-shadow 150ms ease-in-out;
+  }
+
+  .focus-ring-primary:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-background),
+      0 0 0 4px var(--color-primary);
+  }
+}
+
+/* ============================================
+   HOVER EFFECTS
+   Consistent hover behaviors
+   ============================================ */
+
+@layer utilities {
+  /* Lift on hover (for cards) */
+  .hover-lift {
+    transition:
+      transform 200ms ease-out,
+      box-shadow 200ms ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  }
+
+  /* Scale on hover (for buttons, interactive elements) */
+  .hover-scale {
+    transition: transform 200ms ease-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Brighten on hover */
+  .hover-brighten {
+    transition: filter 200ms ease-out;
+  }
+
+  .hover-brighten:hover {
+    filter: brightness(1.1);
+  }
+
+  /* Glow on hover */
+  .hover-glow {
+    transition: box-shadow 200ms ease-out;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px var(--color-primary);
+  }
+}
+
+/* ============================================
+   SKELETON LOADING
+   For loading states
+   ============================================ */
+
+@layer components {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-muted) 0%,
+      var(--color-accent) 50%,
+      var(--color-muted) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-md);
+  }
+
+  .skeleton-text {
+    height: 1rem;
+    width: 100%;
+  }
+
+  .skeleton-heading {
+    height: 2rem;
+    width: 60%;
+  }
+
+  .skeleton-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-full);
+  }
+
+  .skeleton-button {
+    height: 2.5rem;
+    width: 8rem;
+  }
+}
+
+/* ============================================
+   ENTER/EXIT ANIMATIONS FOR ARK UI
+   Consistent animations for Ark UI components
+   ============================================ */
+
+@layer components {
+  /* Dialog animations */
+  [data-scope='dialog'][data-part='backdrop'] {
+    animation: fade-in 200ms ease-out;
+  }
+
+  [data-scope='dialog'][data-part='backdrop'][data-state='closed'] {
+    animation: fade-out 200ms ease-out;
+  }
+
+  [data-scope='dialog'][data-part='content'] {
+    animation: scale-in 200ms ease-out;
+  }
+
+  [data-scope='dialog'][data-part='content'][data-state='closed'] {
+    animation: scale-out 200ms ease-out;
+  }
+
+  /* Popover animations */
+  [data-scope='popover'][data-part='content'] {
+    animation: slide-fade-in 200ms ease-out;
+  }
+
+  [data-scope='popover'][data-part='content'][data-state='closed'] {
+    animation: slide-fade-out 200ms ease-out;
+  }
+
+  /* Tooltip animations */
+  [data-scope='tooltip'][data-part='content'] {
+    animation: fade-in 150ms ease-out;
+  }
+
+  /* Menu animations */
+  [data-scope='menu'][data-part='content'] {
+    animation: scale-in 150ms ease-out;
+  }
+
+  /* Select animations */
+  [data-scope='select'][data-part='content'] {
+    animation: slide-fade-in 200ms ease-out;
+  }
+
+  /* Hover card animations */
+  [data-scope='hover-card'][data-part='content'] {
+    animation: fade-in 200ms ease-out;
+  }
+}
+
+/* ============================================
+   SMOOTH SCROLLING
+   ============================================ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   Respect user preferences for reduced motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

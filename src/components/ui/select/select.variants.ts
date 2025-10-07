@@ -1,71 +1,116 @@
 /**
  * Select component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior and data attributes
+ * Design inspired by Park UI's select component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Select size variants
- */
-export const sizeStyles = {
-  sm: {
-    trigger: 'px-3 py-1.5 text-sm',
-    content: 'text-sm',
-  },
-  md: {
-    trigger: 'px-3 py-2 text-base',
-    content: 'text-base',
-  },
-  lg: {
-    trigger: 'px-4 py-3 text-lg',
-    content: 'text-lg',
-  },
-} as const
-
-/**
- * Select variant definitions
+ * Select variants matching Park UI's design system
  *
- * Philosophy: Minimal custom styles, let Ark UI handle behavior
+ * Features:
+ * - Semantic color tokens throughout
+ * - Proper focus states with ring
+ * - Consistent sizing with Input component
+ * - Accessible by default (Ark UI)
  */
 export const selectVariants = tv({
   slots: {
     root: 'relative',
-    label: 'block text-sm font-medium text-gray-700 mb-1',
+
+    label: 'block text-sm font-medium text-foreground mb-1',
+
     control: 'relative',
-    trigger:
-      'relative w-full cursor-pointer rounded-md bg-white pr-8 text-left text-gray-900 border border-gray-300 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+    trigger: [
+      // Layout
+      'relative w-full cursor-pointer rounded-md pr-8 text-left',
+
+      // Colors
+      'bg-background text-foreground',
+      'border border-input',
+
+      // Focus states
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+      // Transition
+      'transition-colors',
+    ],
+
     valueText: 'block truncate',
+
     indicator:
-      'pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400',
-    positioner: 'z-10',
-    content:
-      'mt-1 max-h-60 w-[var(--reference-width)] overflow-auto rounded-md bg-white py-1 shadow-lg border border-gray-200',
+      'pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-muted-foreground',
+
+    positioner: 'z-50',
+
+    content: [
+      // Layout
+      'mt-1 max-h-60 w-[var(--reference-width)] overflow-auto rounded-md py-1',
+
+      // Colors
+      'bg-popover text-popover-foreground',
+      'border border-border',
+
+      // Shadow
+      'shadow-lg',
+    ],
+
     itemGroup: '',
-    itemGroupLabel: 'px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider',
-    item: 'relative cursor-pointer select-none py-2 text-gray-900 data-[highlighted]:bg-indigo-600 data-[highlighted]:text-white data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+    itemGroupLabel:
+      'px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider',
+
+    item: [
+      // Layout
+      'relative cursor-pointer select-none py-2',
+
+      // Colors
+      'text-foreground',
+      'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+      // Transition
+      'transition-colors',
+    ],
+
     itemText: 'block truncate',
-    itemIndicator:
-      'absolute inset-y-0 flex items-center text-indigo-600 data-[highlighted]:text-white',
+
+    itemIndicator: [
+      'absolute inset-y-0 flex items-center',
+      'text-primary',
+      'data-[highlighted]:text-accent-foreground',
+    ],
+
     itemContent: 'flex items-center gap-3',
+
     itemAvatar: 'size-5 shrink-0 rounded-full',
+
     itemStatus: 'inline-block size-2 shrink-0 rounded-full',
-    itemDescription: 'ml-2 truncate text-gray-500 data-[highlighted]:text-indigo-200',
+
+    itemDescription:
+      'ml-2 truncate text-muted-foreground data-[highlighted]:text-accent-foreground',
   },
   variants: {
     size: {
       sm: {
-        trigger: sizeStyles.sm.trigger,
-        content: sizeStyles.sm.content,
+        trigger: 'h-9 px-2 text-xs',
+        content: 'text-xs',
       },
       md: {
-        trigger: sizeStyles.md.trigger,
-        content: sizeStyles.md.content,
+        trigger: 'h-10 px-3 text-sm',
+        content: 'text-sm',
       },
       lg: {
-        trigger: sizeStyles.lg.trigger,
-        content: sizeStyles.lg.content,
+        trigger: 'h-11 px-4 text-base',
+        content: 'text-base',
       },
     },
     indicatorPosition: {

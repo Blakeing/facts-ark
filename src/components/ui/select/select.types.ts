@@ -3,7 +3,13 @@
  */
 
 import type { SelectRootProps, SelectRootEmits } from '@ark-ui/vue/select'
-import type { sizeStyles } from './select.variants'
+import type { VariantProps } from 'tailwind-variants'
+import type { selectVariants } from './select.variants'
+
+/**
+ * Select variant props extracted from selectVariants
+ */
+type SelectVariantProps = VariantProps<typeof selectVariants>
 
 /**
  * Select item definition
@@ -39,14 +45,25 @@ export interface SelectItemGroup {
 export interface SelectProps extends Omit<SelectRootProps<SelectItem>, 'collection'> {
   /** Array of select items or grouped items */
   items: SelectItem[] | SelectItemGroup[]
+
   /** Label for the select */
   label?: string
+
   /** Placeholder text when no value is selected */
   placeholder?: string
-  /** Size variant */
-  size?: keyof typeof sizeStyles
-  /** Position of check indicator */
-  indicatorPosition?: 'left' | 'right'
+
+  /**
+   * Size variant
+   * @default 'md'
+   */
+  size?: SelectVariantProps['size']
+
+  /**
+   * Position of check indicator
+   * @default 'right'
+   */
+  indicatorPosition?: SelectVariantProps['indicatorPosition']
+
   /** Additional CSS classes */
   class?: string
 }

@@ -3,6 +3,13 @@
  */
 
 import type { SegmentGroupRootProps, SegmentGroupRootEmits } from '@ark-ui/vue/segment-group'
+import type { VariantProps } from 'tailwind-variants'
+import type { segmentGroupVariants } from './segment-group.variants'
+
+/**
+ * Segment Group variant props extracted from segmentGroupVariants
+ */
+type SegmentGroupVariantProps = VariantProps<typeof segmentGroupVariants>
 
 /**
  * Individual segment option definition
@@ -22,12 +29,22 @@ export interface SegmentOption {
 export interface SegmentGroupProps extends SegmentGroupRootProps {
   /** Array of segment options to render */
   options: SegmentOption[]
-  /** Visual variant */
-  variant?: 'default' | 'pills'
-  /** Size variant */
-  size?: 'sm' | 'md' | 'lg'
+
+  /**
+   * Visual variant
+   * @default 'default'
+   */
+  variant?: SegmentGroupVariantProps['variant']
+
+  /**
+   * Size variant
+   * @default 'md'
+   */
+  size?: SegmentGroupVariantProps['size']
+
   /** Label text */
   label?: string
+
   /** Additional CSS classes */
   class?: string
 }

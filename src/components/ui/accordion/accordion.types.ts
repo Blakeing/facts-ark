@@ -3,7 +3,14 @@
  */
 
 import type { AccordionRootProps, AccordionRootEmits } from '@ark-ui/vue/accordion'
+import type { VariantProps } from 'tailwind-variants'
 import type { Component } from 'vue'
+import type { accordionVariants } from './accordion.variants'
+
+/**
+ * Accordion variant props extracted from accordionVariants
+ */
+type AccordionVariantProps = VariantProps<typeof accordionVariants>
 
 /**
  * Individual accordion item definition
@@ -27,8 +34,13 @@ export interface AccordionItem {
 export interface AccordionProps extends AccordionRootProps {
   /** Array of accordion items to render */
   items: AccordionItem[]
-  /** Visual variant */
-  variant?: 'default' | 'bordered' | 'separated' | 'contained'
+
+  /**
+   * Visual variant
+   * @default 'default'
+   */
+  variant?: AccordionVariantProps['variant']
+
   /** Additional CSS classes */
   class?: string
 }

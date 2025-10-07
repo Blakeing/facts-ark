@@ -9,7 +9,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'outline'],
+      options: ['outline', 'elevated', 'filled'],
       description: 'Visual style variant',
     },
     padding: {
@@ -19,7 +19,7 @@ const meta = {
     },
   },
   args: {
-    variant: 'default',
+    variant: 'outline',
     padding: 'md',
   },
 } satisfies Meta<typeof Card>
@@ -186,6 +186,37 @@ export const LargePadding: Story = {
   }),
 }
 
+export const AllVariants: Story = {
+  args: {},
+  render: () => ({
+    components: { Card },
+    template: `
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium mb-2">Outline (default)</h3>
+          <Card variant="outline">
+            <p>Card with border and subtle shadow</p>
+          </Card>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-2">Elevated</h3>
+          <Card variant="elevated">
+            <p>Card with shadow, no border</p>
+          </Card>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-2">Filled</h3>
+          <Card variant="filled">
+            <p>Card with subtle background</p>
+          </Card>
+        </div>
+      </div>
+    `,
+  }),
+}
+
 export const CardGrid: Story = {
   args: {},
   render: () => ({
@@ -197,24 +228,24 @@ export const CardGrid: Story = {
             <h3 class="text-lg font-semibold">Starter</h3>
           </template>
           <div class="space-y-2">
-            <p class="text-3xl font-bold">$9<span class="text-base font-normal text-gray-500">/mo</span></p>
-            <p class="text-sm text-gray-600">Perfect for individuals</p>
+            <p class="text-3xl font-bold">$9<span class="text-base font-normal text-muted-foreground">/mo</span></p>
+            <p class="text-sm text-muted-foreground">Perfect for individuals</p>
           </div>
           <template #footer>
             <Button variant="outline" fullWidth>Choose Plan</Button>
           </template>
         </Card>
 
-        <Card>
+        <Card variant="elevated">
           <template #header>
             <h3 class="text-lg font-semibold">Professional</h3>
           </template>
           <div class="space-y-2">
-            <p class="text-3xl font-bold">$29<span class="text-base font-normal text-gray-500">/mo</span></p>
-            <p class="text-sm text-gray-600">For small teams</p>
+            <p class="text-3xl font-bold">$29<span class="text-base font-normal text-muted-foreground">/mo</span></p>
+            <p class="text-sm text-muted-foreground">For small teams</p>
           </div>
           <template #footer>
-            <Button fullWidth>Choose Plan</Button>
+            <Button variant="solid" fullWidth>Choose Plan</Button>
           </template>
         </Card>
 
@@ -223,8 +254,8 @@ export const CardGrid: Story = {
             <h3 class="text-lg font-semibold">Enterprise</h3>
           </template>
           <div class="space-y-2">
-            <p class="text-3xl font-bold">$99<span class="text-base font-normal text-gray-500">/mo</span></p>
-            <p class="text-sm text-gray-600">For large organizations</p>
+            <p class="text-3xl font-bold">$99<span class="text-base font-normal text-muted-foreground">/mo</span></p>
+            <p class="text-sm text-muted-foreground">For large organizations</p>
           </div>
           <template #footer>
             <Button variant="outline" fullWidth>Contact Sales</Button>

@@ -1,18 +1,54 @@
 /**
  * Pagination component - variant definitions
+ *
+ * Design inspired by Park UI's pagination component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
+/**
+ * Pagination variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens throughout
+ * - Multiple sizes
+ * - Simple variant for minimal UI
+ * - Smooth transitions
+ */
 export const paginationVariants = tv({
   slots: {
     root: 'flex items-center justify-center gap-2',
-    prevTrigger:
-      'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50',
-    nextTrigger:
-      'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50',
-    item: 'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-gray-100 data-[selected]:bg-indigo-600 data-[selected]:text-white data-[selected]:hover:bg-indigo-700',
-    ellipsis: 'flex items-center justify-center text-gray-500',
+
+    prevTrigger: [
+      'inline-flex items-center justify-center rounded-md',
+      'text-sm font-medium',
+      'text-foreground',
+      'transition-colors',
+      'hover:bg-accent hover:text-accent-foreground',
+      'disabled:pointer-events-none disabled:opacity-50',
+    ],
+
+    nextTrigger: [
+      'inline-flex items-center justify-center rounded-md',
+      'text-sm font-medium',
+      'text-foreground',
+      'transition-colors',
+      'hover:bg-accent hover:text-accent-foreground',
+      'disabled:pointer-events-none disabled:opacity-50',
+    ],
+
+    item: [
+      'inline-flex items-center justify-center rounded-md',
+      'text-sm font-medium',
+      'text-foreground',
+      'transition-colors',
+      'hover:bg-accent hover:text-accent-foreground',
+      'data-[selected]:bg-primary data-[selected]:text-primary-foreground',
+      'data-[selected]:hover:bg-primary/90',
+    ],
+
+    ellipsis: 'flex items-center justify-center text-muted-foreground',
   },
   variants: {
     variant: {

@@ -10,6 +10,7 @@ import {
   Boxes,
   Book,
   Info,
+  Palette,
 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
@@ -40,6 +41,8 @@ const props = withDefaults(defineProps<Props>(), {
   navigation: () => [
     { name: 'Home', href: '/', icon: Home, current: true },
     { name: 'About', href: '/about', icon: Info, current: false },
+    { name: 'Component Showcase', href: '/showcase', icon: Palette, current: false },
+    { name: 'Theme Demo', href: '/theme', icon: Palette, current: false },
     {
       name: 'Storybook',
       icon: Boxes,
@@ -82,7 +85,7 @@ const isOpen = computed({
   <!-- Mobile sidebar -->
   <Dialog.Root v-model:open="isOpen">
     <Dialog.Backdrop
-      class="fixed inset-0 z-50 bg-gray-900/80 transition-opacity duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 lg:hidden"
+      class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 lg:hidden"
     />
     <Dialog.Positioner class="fixed inset-0 z-50 flex lg:hidden">
       <Dialog.Content
@@ -91,18 +94,14 @@ const isOpen = computed({
         <div class="absolute left-full top-0 flex w-16 justify-center pt-5 duration-300 ease-in-out">
           <Dialog.CloseTrigger class="-m-2.5 p-2.5">
             <span class="sr-only">Close sidebar</span>
-            <X class="size-6 text-white" aria-hidden="true" />
+            <X class="size-6 text-foreground" aria-hidden="true" />
           </Dialog.CloseTrigger>
         </div>
 
         <!-- Mobile sidebar content -->
-        <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-50 px-6">
+        <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-card px-6 border-r border-border">
           <div class="flex h-16 shrink-0 items-center">
-            <img
-              class="h-8 w-auto"
-              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-              alt="Facts Ark"
-            />
+            <span class="text-xl font-bold text-foreground">🎨 Facts Ark</span>
           </div>
           <nav class="flex flex-1 flex-col">
             <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -113,19 +112,19 @@ const isOpen = computed({
                       v-if="!item.children && item.href"
                       :to="item.href"
                       :class="cn(
-                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
                         item.current
-                          ? 'bg-gray-100 text-indigo-600'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600'
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-foreground hover:bg-muted hover:text-foreground'
                       )"
                     >
                       <component
                         :is="item.icon"
                         :class="cn(
-                          'size-6 shrink-0',
+                          'size-6 shrink-0 transition-colors-smooth',
                           item.current
-                            ? 'text-indigo-600'
-                            : 'text-gray-400 group-hover:text-indigo-600'
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground group-hover:text-foreground'
                         )"
                         aria-hidden="true"
                       />
@@ -134,25 +133,25 @@ const isOpen = computed({
                     <Collapsible.Root v-else>
                       <Collapsible.Trigger
                         :class="cn(
-                          'group flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-gray-700',
-                          item.current ? 'bg-gray-100' : 'hover:bg-gray-100'
+                          'group flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-foreground transition-colors-smooth focus-ring active:scale-[0.98]',
+                          item.current ? 'bg-muted' : 'hover:bg-muted'
                         )"
                       >
-                        <component :is="item.icon" class="size-6 shrink-0 text-gray-400" aria-hidden="true" />
+                        <component :is="item.icon" class="size-6 shrink-0 text-muted-foreground transition-colors-smooth group-hover:text-foreground" aria-hidden="true" />
                         {{ item.name }}
                         <ChevronRight
-                          class="ml-auto size-5 shrink-0 text-gray-400 transition-transform duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:text-gray-500"
+                          class="ml-auto size-5 shrink-0 text-muted-foreground transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:text-foreground group-hover:text-foreground"
                           aria-hidden="true"
                         />
                       </Collapsible.Trigger>
-                      <Collapsible.Content class="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+                      <Collapsible.Content class="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2">
                         <ul class="mt-1 px-2 space-y-1">
                           <li v-for="subItem in item.children" :key="subItem.name">
                             <a
                               :href="subItem.href"
                               :class="cn(
-                                'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-gray-700',
-                                subItem.current ? 'bg-gray-100' : 'hover:bg-gray-100'
+                                'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring',
+                                subItem.current ? 'bg-muted font-medium' : 'hover:bg-muted'
                               )"
                             >
                               {{ subItem.name }}
@@ -165,24 +164,24 @@ const isOpen = computed({
                 </ul>
               </li>
               <li>
-                <div class="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
+                <div class="text-xs font-semibold leading-6 text-muted-foreground">Your teams</div>
                 <ul role="list" class="-mx-2 mt-2 space-y-1">
                   <li v-for="team in teams" :key="team.name">
                     <a
                       :href="team.href"
                       :class="cn(
-                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
                         team.current
-                          ? 'bg-gray-100 text-indigo-600'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600'
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'text-foreground hover:bg-muted'
                       )"
                     >
                       <span
                         :class="cn(
-                          'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium',
+                          'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-background text-[0.625rem] font-medium transition-all',
                           team.current
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600'
+                            ? 'border-primary text-primary'
+                            : 'border-border text-muted-foreground group-hover:border-primary group-hover:text-primary group-hover:scale-110'
                         )"
                       >
                         {{ team.initial }}
@@ -195,10 +194,10 @@ const isOpen = computed({
               <li class="-mx-6 mt-auto">
                 <a
                   href="#"
-                  class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100"
+                  class="group flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-muted transition-colors-smooth focus-ring active:scale-[0.98]"
                 >
                   <img
-                    class="size-8 rounded-full bg-gray-100 outline -outline-offset-1 outline-black/5"
+                    class="size-8 rounded-full bg-muted outline -outline-offset-1 outline-border transition-transform group-hover:scale-110"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt=""
                   />
@@ -215,9 +214,9 @@ const isOpen = computed({
 
   <!-- Static desktop sidebar -->
   <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-50 px-6 ring-1 ring-gray-200">
+    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-card px-6 border-r border-border">
       <div class="flex h-16 shrink-0 items-center">
-       Facts Ark
+        <span class="text-xl font-bold text-foreground">🎨 Facts Ark</span>
       </div>
       <nav class="flex flex-1 flex-col">
         <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -228,17 +227,17 @@ const isOpen = computed({
                   v-if="!item.children && item.href"
                   :to="item.href"
                   :class="cn(
-                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
                     item.current
-                      ? 'bg-gray-100 text-indigo-600'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-foreground hover:bg-muted hover:text-foreground'
                   )"
                 >
                   <component
                     :is="item.icon"
                     :class="cn(
-                      'size-6 shrink-0',
-                      item.current ? 'text-indigo-600' : 'text-gray-400 group-hover:text-indigo-600'
+                      'size-6 shrink-0 transition-colors-smooth',
+                      item.current ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'
                     )"
                     aria-hidden="true"
                   />
@@ -247,25 +246,25 @@ const isOpen = computed({
                 <Collapsible.Root v-else>
                   <Collapsible.Trigger
                     :class="cn(
-                      'group flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-gray-700',
-                      item.current ? 'bg-gray-100' : 'hover:bg-gray-100'
+                      'group flex w-full items-center gap-x-3 rounded-md p-2 text-left text-sm font-semibold leading-6 text-foreground transition-colors-smooth focus-ring active:scale-[0.98]',
+                      item.current ? 'bg-muted' : 'hover:bg-muted'
                     )"
                   >
-                    <component :is="item.icon" class="size-6 shrink-0 text-gray-400" aria-hidden="true" />
+                    <component :is="item.icon" class="size-6 shrink-0 text-muted-foreground transition-colors-smooth group-hover:text-foreground" aria-hidden="true" />
                     {{ item.name }}
                     <ChevronRight
-                      class="ml-auto size-5 shrink-0 text-gray-400 transition-transform duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:text-gray-500"
+                      class="ml-auto size-5 shrink-0 text-muted-foreground transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:text-foreground group-hover:text-foreground"
                       aria-hidden="true"
                     />
                   </Collapsible.Trigger>
-                  <Collapsible.Content class="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+                  <Collapsible.Content class="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2">
                     <ul class="mt-1 px-2 space-y-1">
                       <li v-for="subItem in item.children" :key="subItem.name">
                         <a
                           :href="subItem.href"
                           :class="cn(
-                            'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-gray-700',
-                            subItem.current ? 'bg-gray-100' : 'hover:bg-gray-100'
+                            'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring',
+                            subItem.current ? 'bg-muted font-medium' : 'hover:bg-muted'
                           )"
                         >
                           {{ subItem.name }}
@@ -278,24 +277,24 @@ const isOpen = computed({
             </ul>
           </li>
           <li>
-            <div class="text-xs font-semibold leading-6 text-gray-500">Your teams</div>
+            <div class="text-xs font-semibold leading-6 text-muted-foreground">Your teams</div>
             <ul role="list" class="-mx-2 mt-2 space-y-1">
               <li v-for="team in teams" :key="team.name">
                 <a
                   :href="team.href"
                   :class="cn(
-                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
                     team.current
-                      ? 'bg-gray-100 text-indigo-600'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-foreground hover:bg-muted'
                   )"
                 >
                   <span
                     :class="cn(
-                      'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium',
+                      'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-background text-[0.625rem] font-medium transition-all',
                       team.current
-                        ? 'border-indigo-600 text-indigo-600'
-                        : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600'
+                        ? 'border-primary text-primary'
+                        : 'border-border text-muted-foreground group-hover:border-primary group-hover:text-primary group-hover:scale-110'
                     )"
                   >
                     {{ team.initial }}
@@ -308,10 +307,10 @@ const isOpen = computed({
           <li class="-mx-6 mt-auto">
             <a
               href="#"
-              class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100"
+              class="group flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-muted transition-colors-smooth focus-ring active:scale-[0.98]"
             >
               <img
-                class="size-8 rounded-full bg-gray-100 outline -outline-offset-1 outline-black/5"
+                class="size-8 rounded-full bg-muted outline -outline-offset-1 outline-border transition-transform group-hover:scale-110"
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt=""
               />

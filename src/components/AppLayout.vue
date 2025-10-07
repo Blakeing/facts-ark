@@ -25,7 +25,7 @@ const sidebarOpen = ref(false)
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen bg-background text-foreground">
     <!-- Sidebar (mobile + desktop) -->
     <AppSidebar v-model:open="sidebarOpen" />
 
@@ -35,7 +35,7 @@ const sidebarOpen = ref(false)
       <AppHeader @open-sidebar="sidebarOpen = true" />
 
       <!-- Page content -->
-      <main>
+      <main class="bg-background">
         <slot />
       </main>
     </div>

@@ -17,10 +17,6 @@ const meta = {
       options: ['none', 'vertical', 'horizontal', 'both'],
       description: 'Resize behavior',
     },
-    invalid: {
-      control: 'boolean',
-      description: 'Whether the textarea has validation errors',
-    },
     disabled: {
       control: 'boolean',
       description: 'Whether the textarea is disabled',
@@ -45,7 +41,6 @@ const meta = {
   args: {
     size: 'md',
     resize: 'vertical',
-    invalid: false,
     disabled: false,
     readonly: false,
     required: false,
@@ -85,7 +80,7 @@ export const ReadOnly: Story = {
 
 export const Invalid: Story = {
   args: {
-    invalid: true,
+    variant: 'error',
     placeholder: 'Invalid textarea',
   },
 }

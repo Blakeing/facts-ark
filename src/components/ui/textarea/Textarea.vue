@@ -5,17 +5,17 @@ import { textareaVariants } from './textarea.variants'
 import type { TextareaProps } from './textarea.types'
 
 /**
- * A simple textarea component with minimal styling.
+ * A Park UI-inspired textarea component with semantic tokens.
  *
  * @example
  * <Textarea v-model="value" placeholder="Enter text" />
  * <Textarea rows="5" resize="none" />
- * <Textarea size="lg" invalid />
+ * <Textarea size="lg" variant="error" />
  */
 
 const props = withDefaults(defineProps<TextareaProps>(), {
   size: 'md',
-  invalid: false,
+  variant: 'default',
   resize: 'vertical',
   rows: 3,
 })
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<TextareaProps>(), {
 const textareaClass = computed(() =>
   textareaVariants({
     size: props.size,
-    invalid: props.invalid,
+    variant: props.variant,
     resize: props.resize,
     class: props.class,
   })

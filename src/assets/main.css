@@ -1,2 +1,4 @@
 @import 'tailwindcss';
+@import './tailwind-theme.css'; /* Enhanced Tailwind + Park UI theming */
+@import './animations.css'; /* Consistent animations & transitions */
 @import './base.css';

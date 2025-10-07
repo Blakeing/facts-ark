@@ -8,7 +8,16 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'success', 'warning', 'error', 'info'],
+      options: [
+        'default',
+        'primary',
+        'secondary',
+        'destructive',
+        'outline',
+        'success',
+        'warning',
+        'info',
+      ],
       description: 'Visual style variant',
     },
     size: {
@@ -62,16 +71,42 @@ export const Warning: Story = {
   }),
 }
 
-export const Error: Story = {
+export const Primary: Story = {
   args: {
-    variant: 'error',
+    variant: 'primary',
   },
   render: (args) => ({
     components: { Badge },
     setup() {
       return { args }
     },
-    template: '<Badge v-bind="args">Error</Badge>',
+    template: '<Badge v-bind="args">Primary</Badge>',
+  }),
+}
+
+export const Destructive: Story = {
+  args: {
+    variant: 'destructive',
+  },
+  render: (args) => ({
+    components: { Badge },
+    setup() {
+      return { args }
+    },
+    template: '<Badge v-bind="args">Destructive</Badge>',
+  }),
+}
+
+export const Outline: Story = {
+  args: {
+    variant: 'outline',
+  },
+  render: (args) => ({
+    components: { Badge },
+    setup() {
+      return { args }
+    },
+    template: '<Badge v-bind="args">Outline</Badge>',
   }),
 }
 
@@ -93,12 +128,26 @@ export const AllVariants: Story = {
   render: () => ({
     components: { Badge },
     template: `
-      <div class="flex flex-wrap gap-2">
-        <Badge variant="default">Default</Badge>
-        <Badge variant="success">Success</Badge>
-        <Badge variant="warning">Warning</Badge>
-        <Badge variant="error">Error</Badge>
-        <Badge variant="info">Info</Badge>
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-medium mb-2">Semantic Variants</h3>
+          <div class="flex flex-wrap gap-2">
+            <Badge variant="default">Default</Badge>
+            <Badge variant="primary">Primary</Badge>
+            <Badge variant="secondary">Secondary</Badge>
+            <Badge variant="destructive">Destructive</Badge>
+            <Badge variant="outline">Outline</Badge>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium mb-2">Status Variants</h3>
+          <div class="flex flex-wrap gap-2">
+            <Badge variant="success">Success</Badge>
+            <Badge variant="warning">Warning</Badge>
+            <Badge variant="info">Info</Badge>
+          </div>
+        </div>
       </div>
     `,
   }),
@@ -134,7 +183,11 @@ export const WithStatus: Story = {
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm">Failed:</span>
-          <Badge variant="error">Offline</Badge>
+          <Badge variant="destructive">Offline</Badge>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm">Info:</span>
+          <Badge variant="info">Beta</Badge>
         </div>
       </div>
     `,

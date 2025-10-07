@@ -1,40 +1,63 @@
 /**
  * Slider component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior and data attributes
+ * Design inspired by Park UI's slider component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
+/**
+ * Slider variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens throughout
+ * - Multiple status colors
+ * - Smooth thumb interactions
+ * - Multiple sizes
+ */
 export const sliderVariants = tv({
   slots: {
     root: 'w-full',
+
     label: 'flex items-center justify-between mb-2',
-    labelText: 'text-sm font-medium text-gray-700',
-    valueText: 'text-sm font-medium text-gray-700',
+
+    labelText: 'text-sm font-medium text-foreground',
+
+    valueText: 'text-sm font-medium text-foreground',
+
     control: 'relative flex items-center w-full',
-    track: 'relative w-full overflow-hidden rounded-full bg-gray-200',
+
+    track: 'relative w-full overflow-hidden rounded-full bg-muted',
+
     range: 'absolute h-full',
-    thumb:
-      'block rounded-full bg-white shadow-sm ring-2 ring-offset-2 transition-shadow hover:shadow-md focus:outline-none focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+
+    thumb: [
+      'block rounded-full bg-background shadow-sm',
+      'ring-2 ring-offset-2',
+      'transition-shadow',
+      'hover:shadow-md',
+      'focus:outline-none focus:ring-offset-2',
+      'disabled:pointer-events-none disabled:opacity-50',
+    ],
   },
   variants: {
     variant: {
       default: {
-        range: 'bg-indigo-600',
-        thumb: 'ring-indigo-600 focus:ring-indigo-600',
+        range: 'bg-primary',
+        thumb: 'ring-primary focus:ring-primary',
       },
       success: {
-        range: 'bg-green-600',
-        thumb: 'ring-green-600 focus:ring-green-600',
+        range: 'bg-success',
+        thumb: 'ring-success focus:ring-success',
       },
       warning: {
-        range: 'bg-yellow-500',
-        thumb: 'ring-yellow-500 focus:ring-yellow-500',
+        range: 'bg-warning',
+        thumb: 'ring-warning focus:ring-warning',
       },
       danger: {
-        range: 'bg-red-600',
-        thumb: 'ring-red-600 focus:ring-red-600',
+        range: 'bg-destructive',
+        thumb: 'ring-destructive focus:ring-destructive',
       },
     },
     size: {

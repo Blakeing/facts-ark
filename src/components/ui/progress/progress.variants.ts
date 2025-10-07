@@ -1,33 +1,48 @@
 /**
  * Progress component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior and data attributes
+ * Design inspired by Park UI's progress component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
+/**
+ * Progress variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens throughout
+ * - Multiple status colors
+ * - Smooth animations
+ * - Multiple sizes
+ */
 export const progressVariants = tv({
   slots: {
     root: 'w-full',
+
     label: 'flex items-center justify-between mb-2',
-    labelText: 'text-sm font-medium text-gray-700',
-    valueText: 'text-sm font-medium text-gray-700',
-    track: 'overflow-hidden rounded-full bg-gray-200',
+
+    labelText: 'text-sm font-medium text-foreground',
+
+    valueText: 'text-sm font-medium text-foreground',
+
+    track: 'overflow-hidden rounded-full bg-muted',
+
     range: 'h-full transition-all duration-300 ease-in-out',
   },
   variants: {
     variant: {
       default: {
-        range: 'bg-indigo-600',
+        range: 'bg-primary',
       },
       success: {
-        range: 'bg-green-600',
+        range: 'bg-success',
       },
       warning: {
-        range: 'bg-yellow-500',
+        range: 'bg-warning',
       },
       danger: {
-        range: 'bg-red-600',
+        range: 'bg-destructive',
       },
     },
     size: {

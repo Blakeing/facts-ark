@@ -1,36 +1,59 @@
 /**
  * Textarea component - variant definitions
  *
- * Minimal styling approach - rely on native browser behavior
+ * Design inspired by Park UI's textarea component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Textarea size variants
- */
-export const sizeStyles = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-3 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
-} as const
-
-/**
- * Textarea variant definitions
+ * Textarea variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens (matching Input component)
+ * - Proper focus states with ring
+ * - Flexible resize options
+ * - Accessible by default
  */
 export const textareaVariants = tv({
   base: [
-    'w-full rounded-md border border-gray-300 bg-white text-gray-900',
-    'placeholder:text-gray-400',
-    'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50',
-    'read-only:bg-gray-50',
-    'resize-y',
+    // Layout
+    'flex w-full rounded-md',
+
+    // Border & Background
+    'border border-input bg-background',
+
+    // Typography
+    'text-sm text-foreground',
+
+    // Padding
+    'px-3 py-2',
+
+    // Placeholder
+    'placeholder:text-muted-foreground',
+
+    // Focus states (using new focus-ring system)
+    'focus-ring',
+
+    // Disabled state
+    'disabled:cursor-not-allowed disabled:opacity-50',
+
+    // Readonly state
+    'read-only:opacity-50',
+
+    // Animations & Transitions (using new design system)
+    'transition-colors-smooth',
   ],
   variants: {
-    size: sizeStyles,
-    invalid: {
-      true: 'border-red-500',
-      false: '',
+    size: {
+      sm: 'px-2 py-1.5 text-xs',
+      md: 'px-3 py-2 text-sm',
+      lg: 'px-4 py-3 text-base',
+    },
+    variant: {
+      default: '',
+      error: 'border-destructive focus-visible:ring-destructive',
     },
     resize: {
       none: 'resize-none',
@@ -41,7 +64,7 @@ export const textareaVariants = tv({
   },
   defaultVariants: {
     size: 'md',
-    invalid: false,
+    variant: 'default',
     resize: 'vertical',
   },
 })

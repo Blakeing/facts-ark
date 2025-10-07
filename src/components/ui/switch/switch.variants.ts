@@ -1,59 +1,90 @@
 /**
  * Switch component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior and data attributes
+ * Design inspired by Park UI's switch component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Switch size variants
- */
-export const sizeStyles = {
-  sm: {
-    width: 'w-9',
-    height: 'h-5',
-    thumb: 'size-4',
-  },
-  md: {
-    width: 'w-11',
-    height: 'h-6',
-    thumb: 'size-5',
-  },
-  lg: {
-    width: 'w-14',
-    height: 'h-7',
-    thumb: 'size-6',
-  },
-} as const
-
-/**
- * Switch variant definitions
+ * Switch variants matching Park UI's design system
+ *
+ * Features:
+ * - Semantic color tokens
+ * - Proper focus states with ring
+ * - Smooth transitions
+ * - Accessible by default (Ark UI)
  */
 export const switchVariants = tv({
   slots: {
     root: 'flex items-center gap-2',
-    control:
-      'relative inline-flex shrink-0 cursor-pointer rounded-full bg-gray-200 data-[state=checked]:bg-indigo-600 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
-    thumb: 'inline-block rounded-full bg-white shadow data-[state=checked]:translate-x-full',
-    label:
-      'text-sm font-medium text-gray-700 cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+    control: [
+      // Layout
+      'relative inline-flex shrink-0 items-center',
+
+      // Visual
+      'rounded-full',
+
+      // Colors
+      'bg-input',
+      'data-[state=checked]:bg-primary',
+
+      // Interaction
+      'cursor-pointer',
+
+      // Focus states (using new focus-ring system)
+      'focus-ring',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+
+      // Animations & Transitions (using new design system)
+      'transition-colors-smooth',
+      'active:scale-95',
+    ],
+
+    thumb: [
+      // Layout
+      'inline-block pointer-events-none',
+
+      // Visual
+      'rounded-full bg-background shadow-lg',
+
+      // Transform
+      'data-[state=checked]:translate-x-full',
+
+      // Animations & Transitions (using new design system)
+      'transition-transform-smooth',
+    ],
+
+    label: [
+      // Typography
+      'font-medium text-foreground',
+
+      // Interaction
+      'cursor-pointer select-none',
+
+      // States
+      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+    ],
   },
   variants: {
     size: {
       sm: {
-        control: `${sizeStyles.sm.width} ${sizeStyles.sm.height}`,
-        thumb: sizeStyles.sm.thumb,
+        control: 'w-9 h-5',
+        thumb: 'size-4',
         label: 'text-xs',
       },
       md: {
-        control: `${sizeStyles.md.width} ${sizeStyles.md.height}`,
-        thumb: sizeStyles.md.thumb,
+        control: 'w-11 h-6',
+        thumb: 'size-5',
         label: 'text-sm',
       },
       lg: {
-        control: `${sizeStyles.lg.width} ${sizeStyles.lg.height}`,
-        thumb: sizeStyles.lg.thumb,
+        control: 'w-14 h-7',
+        thumb: 'size-6',
         label: 'text-base',
       },
     },

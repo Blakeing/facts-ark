@@ -1,33 +1,56 @@
 /**
  * Card component - variant definitions
+ *
+ * Design inspired by Park UI's card component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Card variant definitions
+ * Card variants matching Park UI's design system
+ *
+ * Variants:
+ * - outline: Card with border (default)
+ * - elevated: Card with shadow, no border
+ * - filled: Card with subtle background
  */
-export const variantStyles = {
-  default: 'bg-white border border-gray-200',
-  bordered: 'bg-white border-2 border-gray-300',
-  elevated: 'bg-white shadow-lg border border-transparent',
-} as const
-
-export const paddingStyles = {
-  none: 'p-0',
-  sm: 'p-4',
-  md: 'p-6',
-  lg: 'p-8',
-} as const
-
 export const cardVariants = tv({
-  base: 'rounded-lg overflow-hidden',
+  base: [
+    // Layout
+    'rounded-lg',
+
+    // Typography
+    'text-card-foreground',
+
+    // Animations & Transitions (using new design system)
+    'transition-smooth',
+  ],
   variants: {
-    variant: variantStyles,
-    padding: paddingStyles,
+    variant: {
+      // Outline - default with border
+      outline: ['bg-card', 'border border-border', 'shadow-sm'],
+
+      // Elevated - shadow instead of border
+      elevated: ['bg-card', 'shadow-md'],
+
+      // Filled - subtle background
+      filled: ['bg-muted', 'border-0'],
+    },
+    padding: {
+      none: 'p-0',
+      sm: 'p-4',
+      md: 'p-6',
+      lg: 'p-8',
+    },
+    interactive: {
+      true: 'hover-lift cursor-pointer',
+      false: '',
+    },
   },
   defaultVariants: {
-    variant: 'default',
+    variant: 'outline',
     padding: 'md',
+    interactive: false,
   },
 })

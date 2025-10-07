@@ -9,7 +9,7 @@ const meta = {
   argTypes: {
     type: {
       control: 'select',
-      options: ['text', 'email', 'password', 'number', 'tel', 'url', 'search'],
+      options: ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'file'],
       description: 'HTML input type',
     },
     size: {
@@ -17,9 +17,10 @@ const meta = {
       options: ['sm', 'md', 'lg'],
       description: 'Size of the input',
     },
-    invalid: {
-      control: 'boolean',
-      description: 'Whether the input has validation errors',
+    variant: {
+      control: 'select',
+      options: ['default', 'error'],
+      description: 'Visual variant of the input',
     },
     disabled: {
       control: 'boolean',
@@ -41,7 +42,7 @@ const meta = {
   args: {
     type: 'text',
     size: 'md',
-    invalid: false,
+    variant: 'default',
     disabled: false,
     readonly: false,
     required: false,
@@ -93,10 +94,16 @@ export const ReadOnly: Story = {
   }),
 }
 
-export const Invalid: Story = {
+export const Error: Story = {
   args: {
-    invalid: true,
-    placeholder: 'Invalid input',
+    variant: 'error',
+    placeholder: 'Error state input',
+  },
+}
+
+export const FileUpload: Story = {
+  args: {
+    type: 'file',
   },
 }
 
@@ -113,9 +120,29 @@ export const AllSizes: Story = {
     components: { Input },
     template: `
       <div class="flex flex-col gap-4">
-        <Input size="sm" placeholder="Small input" />
-        <Input size="md" placeholder="Medium input" />
-        <Input size="lg" placeholder="Large input" />
+        <Input size="sm" placeholder="Small input (h-9)" />
+        <Input size="md" placeholder="Medium input (h-10)" />
+        <Input size="lg" placeholder="Large input (h-11)" />
+      </div>
+    `,
+  }),
+}
+
+export const AllVariants: Story = {
+  args: {},
+  render: () => ({
+    components: { Input },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Default</label>
+          <Input variant="default" placeholder="Default input" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1 text-destructive">Error</label>
+          <Input variant="error" placeholder="Error input" />
+          <p class="text-sm text-destructive mt-1">This field has an error</p>
+        </div>
       </div>
     `,
   }),
