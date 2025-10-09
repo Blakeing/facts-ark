@@ -44,6 +44,12 @@ const router = createRouter({
       // Tailwind CSS v4 theming ecosystem demo
       component: () => import('../views/ThemeDemo.vue'),
     },
+    {
+      path: '/transitions',
+      name: 'transitions',
+      // Vue Transition API demonstrations
+      component: () => import('../components/TransitionDemo.vue'),
+    },
   ],
 })
 

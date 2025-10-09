@@ -11,6 +11,7 @@ import {
   Book,
   Info,
   Palette,
+  Sparkles,
 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
     { name: 'About', href: '/about', icon: Info, current: false },
     { name: 'Component Showcase', href: '/showcase', icon: Palette, current: false },
     { name: 'Theme Demo', href: '/theme', icon: Palette, current: false },
+    { name: 'Transitions Demo', href: '/transitions', icon: Sparkles, current: false },
     {
       name: 'Storybook',
       icon: Boxes,

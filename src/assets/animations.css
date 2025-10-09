@@ -1,191 +1,48 @@
 /**
- * Animation & Transition System
+ * Streamlined Animation System
  *
- * Consistent animations and transitions for a polished, professional feel.
- * All animations use hardware-accelerated properties when possible.
- *
- * Categories:
- * - Transitions: Smooth property changes
- * - Keyframe Animations: Complex multi-step animations
- * - Utility Classes: Quick animation helpers
+ * Focused on what's actually used:
+ * - Vue Transitions: For reactive state changes
+ * - Utility Classes: For interactive states (hover, focus)
+ * - Essential Animations: Loading, errors, special effects
  */
 
 /* ============================================
-   TRANSITION UTILITIES
-   Consistent transition speeds across the app
+   ESSENTIAL TRANSITION UTILITIES
    ============================================ */
 
 @layer utilities {
-  /* Duration utilities */
-  .transition-fast {
-    transition-duration: 150ms;
-  }
-
-  .transition-base {
-    transition-duration: 200ms;
-  }
-
-  .transition-slow {
-    transition-duration: 300ms;
-  }
-
-  .transition-slower {
-    transition-duration: 500ms;
-  }
-
-  /* Common transition properties */
-  .transition-smooth {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-  }
-
+  /* Used extensively in components */
   .transition-colors-smooth {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
 
+  /* For transform-based animations */
   .transition-transform-smooth {
     transition-property: transform;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-  }
-
-  .transition-opacity-smooth {
-    transition-property: opacity;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 200ms;
   }
 }
 
 /* ============================================
-   KEYFRAME ANIMATIONS
-   Reusable animation sequences
+   ESSENTIAL KEYFRAMES
+   Only animations that can't be done with Vue Transitions
    ============================================ */
 
-/* Fade In/Out */
-@keyframes fade-in {
+/* Spin - for loading indicators */
+@keyframes spin {
   from {
-    opacity: 0;
+    transform: rotate(0deg);
   }
   to {
-    opacity: 1;
+    transform: rotate(360deg);
   }
 }
 
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* Slide In/Out (All directions) */
-@keyframes slide-in-from-top {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-from-bottom {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-from-left {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-from-right {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Scale In/Out */
-@keyframes scale-in {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes scale-out {
-  from {
-    transform: scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-}
-
-/* Zoom In/Out */
-@keyframes zoom-in {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes zoom-out {
-  from {
-    transform: scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: scale(0);
-    opacity: 0;
-  }
-}
-
-/* Bounce */
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-/* Pulse */
+/* Pulse - for emphasis */
 @keyframes pulse {
   0%,
   100% {
@@ -196,17 +53,7 @@
   }
 }
 
-/* Spin */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Shake (for errors) */
+/* Shake - for error states */
 @keyframes shake {
   0%,
   100% {
@@ -227,7 +74,7 @@
   }
 }
 
-/* Shimmer (for loading states) */
+/* Shimmer - for loading states */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -237,197 +84,27 @@
   }
 }
 
-/* Progress bar fill */
-@keyframes progress-fill {
-  from {
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  to {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-}
-
-/* Slide and fade (for dialogs/popovers) */
-@keyframes slide-fade-in {
-  from {
-    transform: translateY(-8px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slide-fade-out {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-8px);
-    opacity: 0;
-  }
-}
-
-/* Dialog-specific animations (smooth, no jumping) */
-@keyframes dialog-backdrop-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes dialog-backdrop-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes dialog-content-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-2%);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes dialog-content-out {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95) translateY(-2%);
-  }
-}
-
-/* ============================================
-   ANIMATION UTILITY CLASSES
-   Apply animations easily
-   ============================================ */
-
 @layer utilities {
-  /* Fade animations */
-  .animate-fade-in {
-    animation: fade-in 200ms ease-out;
-  }
-
-  .animate-fade-out {
-    animation: fade-out 200ms ease-out;
-  }
-
-  /* Slide animations */
-  .animate-slide-in-from-top {
-    animation: slide-in-from-top 300ms ease-out;
-  }
-
-  .animate-slide-in-from-bottom {
-    animation: slide-in-from-bottom 300ms ease-out;
-  }
-
-  .animate-slide-in-from-left {
-    animation: slide-in-from-left 300ms ease-out;
-  }
-
-  .animate-slide-in-from-right {
-    animation: slide-in-from-right 300ms ease-out;
-  }
-
-  /* Scale animations */
-  .animate-scale-in {
-    animation: scale-in 200ms ease-out;
-  }
-
-  .animate-scale-out {
-    animation: scale-out 200ms ease-out;
-  }
-
-  /* Zoom animations */
-  .animate-zoom-in {
-    animation: zoom-in 200ms ease-out;
-  }
-
-  .animate-zoom-out {
-    animation: zoom-out 200ms ease-out;
-  }
-
-  /* Dialog animations */
-  .animate-dialog-backdrop-in {
-    animation: dialog-backdrop-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .animate-dialog-backdrop-out {
-    animation: dialog-backdrop-out 150ms cubic-bezier(0.4, 0, 1, 1);
-    animation-fill-mode: forwards;
-  }
-
-  .animate-dialog-content-in {
-    animation: dialog-content-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .animate-dialog-content-out {
-    animation: dialog-content-out 150ms cubic-bezier(0.4, 0, 1, 1);
-    animation-fill-mode: forwards;
-  }
-
-  /* Interactive animations */
-  .animate-bounce {
-    animation: bounce 1s ease-in-out infinite;
+  /* Only the animations you actually need */
+  .animate-spin {
+    animation: spin 1s linear infinite;
   }
 
   .animate-pulse {
     animation: pulse 2s ease-in-out infinite;
   }
 
-  .animate-spin {
-    animation: spin 1s linear infinite;
-  }
-
   .animate-shake {
     animation: shake 400ms ease-in-out;
-  }
-
-  /* Loading animations */
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      var(--color-muted) 0%,
-      var(--color-accent) 50%,
-      var(--color-muted) 100%
-    );
-    background-size: 1000px 100%;
-    animation: shimmer 2s ease-in-out infinite;
-  }
-
-  /* Dialog/Popover animations */
-  .animate-slide-fade-in {
-    animation: slide-fade-in 200ms ease-out;
-  }
-
-  .animate-slide-fade-out {
-    animation: slide-fade-out 200ms ease-out;
   }
 }
 
 /* ============================================
-   FOCUS RING UTILITIES
-   Consistent, accessible focus states
+   FOCUS RINGS
+   Critical for accessibility
    ============================================ */
 
 @layer utilities {
-  /* Standard focus ring */
   .focus-ring {
     outline: none;
     transition: box-shadow 150ms ease-in-out;
@@ -439,7 +116,6 @@
       0 0 0 4px var(--color-ring);
   }
 
-  /* Inset focus ring (for buttons, cards) */
   .focus-ring-inset {
     outline: none;
     transition: box-shadow 150ms ease-in-out;
@@ -449,7 +125,6 @@
     box-shadow: inset 0 0 0 2px var(--color-ring);
   }
 
-  /* Primary focus ring (matches primary color) */
   .focus-ring-primary {
     outline: none;
     transition: box-shadow 150ms ease-in-out;
@@ -464,11 +139,9 @@
 
 /* ============================================
    HOVER EFFECTS
-   Consistent hover behaviors
    ============================================ */
 
 @layer utilities {
-  /* Lift on hover (for cards) */
   .hover-lift {
     transition:
       transform 200ms ease-out,
@@ -480,7 +153,6 @@
     box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
   }
 
-  /* Scale on hover (for buttons, interactive elements) */
   .hover-scale {
     transition: transform 200ms ease-out;
   }
@@ -489,16 +161,6 @@
     transform: scale(1.02);
   }
 
-  /* Brighten on hover */
-  .hover-brighten {
-    transition: filter 200ms ease-out;
-  }
-
-  .hover-brighten:hover {
-    filter: brightness(1.1);
-  }
-
-  /* Glow on hover */
   .hover-glow {
     transition: box-shadow 200ms ease-out;
   }
@@ -510,7 +172,6 @@
 
 /* ============================================
    SKELETON LOADING
-   For loading states
    ============================================ */
 
 @layer components {
@@ -546,6 +207,138 @@
     height: 2.5rem;
     width: 8rem;
   }
+}
+
+/* ============================================
+   VUE TRANSITION CLASSES
+   For use with <Transition> and <TransitionGroup>
+   ============================================ */
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Slide-fade transition (recommended for modals/dialogs) */
+.slide-fade-enter-active {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-fade-leave-active {
+  transition: all 150ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Scale transition (for popovers/tooltips) */
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Slide transitions (all directions) */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+/* List transitions (for TransitionGroup) */
+.list-enter-active,
+.list-leave-active {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Smooth list reordering */
+.list-move {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure leaving items are taken out of layout flow */
+.list-leave-active {
+  position: absolute;
+}
+
+/* Dialog/Modal transition */
+.dialog-enter-active {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dialog-leave-active {
+  transition: all 150ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.dialog-enter-from,
+.dialog-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-2%);
+}
+
+/* Route transitions */
+.page-enter-active,
+.page-leave-active {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
 }
 
 /* ============================================
