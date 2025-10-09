@@ -4,10 +4,13 @@
  * Defines the application's routing structure using Vue Router.
  * Uses HTML5 history mode for clean URLs without hash fragments.
  *
- * Routes:
- * - / (home): Main landing page (eager loaded)
- * - /about: About page (lazy loaded)
- * - /components: Component showcase page (lazy loaded)
+ * Routes organized by purpose:
+ * - / (home): Dashboard/activity view
+ * - /components: Interactive component gallery (NEW)
+ * - /showcase: Original component showcase
+ * - /theme: Theming demo
+ * - /transitions: Vue transitions demo
+ * - /about: About page
  *
  * Lazy-loaded routes are code-split into separate chunks,
  * improving initial page load performance.
@@ -25,30 +28,55 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: {
+        title: 'Dashboard',
+        description: 'Activity and deployment overview',
+      },
     },
     {
-      path: '/about',
-      name: 'about',
-      // Lazy-loaded route: generates separate chunk (About.[hash].js)
-      component: () => import('../views/AboutView.vue'),
+      path: '/components',
+      name: 'components',
+      component: () => import('../views/ComponentsView.vue'),
+      meta: {
+        title: 'Components',
+        description: 'Interactive gallery of all 40+ UI components',
+      },
     },
     {
       path: '/showcase',
       name: 'showcase',
-      // Component showcase with all migrated Park UI components
       component: () => import('../views/ComponentShowcaseView.vue'),
+      meta: {
+        title: 'Showcase',
+        description: 'Component showcase with Park UI integration',
+      },
     },
     {
       path: '/theme',
       name: 'theme',
-      // Tailwind CSS v4 theming ecosystem demo
       component: () => import('../views/ThemeDemo.vue'),
+      meta: {
+        title: 'Theme',
+        description: 'Tailwind CSS v4 theming ecosystem demo',
+      },
     },
     {
       path: '/transitions',
       name: 'transitions',
-      // Vue Transition API demonstrations
       component: () => import('../components/TransitionDemo.vue'),
+      meta: {
+        title: 'Transitions',
+        description: 'Vue Transition API demonstrations',
+      },
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/AboutView.vue'),
+      meta: {
+        title: 'About',
+        description: 'About Facts Ark design system',
+      },
     },
   ],
 })

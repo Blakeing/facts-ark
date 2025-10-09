@@ -7,11 +7,13 @@ import {
   X,
   Home,
   ChevronRight,
-  Boxes,
+  Package,
   Book,
   Info,
   Palette,
   Sparkles,
+  BookOpen,
+  ExternalLink,
 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
@@ -20,56 +22,33 @@ interface NavigationItem {
   href?: string
   icon: unknown
   current: boolean
-  children?: { name: string; href: string; current?: boolean }[]
-}
-
-interface Team {
-  id: number
-  name: string
-  href: string
-  initial: string
-  current: boolean
+  children?: { name: string; href: string; external?: boolean }[]
 }
 
 interface Props {
   open?: boolean
   navigation?: NavigationItem[]
-  teams?: Team[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   open: false,
   navigation: () => [
-    { name: 'Home', href: '/', icon: Home, current: true },
+    { name: 'Dashboard', href: '/', icon: Home, current: true },
+    { name: 'Components', href: '/components', icon: Package, current: false },
+    { name: 'Showcase', href: '/showcase', icon: BookOpen, current: false },
+    { name: 'Theme', href: '/theme', icon: Palette, current: false },
+    { name: 'Transitions', href: '/transitions', icon: Sparkles, current: false },
     { name: 'About', href: '/about', icon: Info, current: false },
-    { name: 'Component Showcase', href: '/showcase', icon: Palette, current: false },
-    { name: 'Theme Demo', href: '/theme', icon: Palette, current: false },
-    { name: 'Transitions Demo', href: '/transitions', icon: Sparkles, current: false },
-    {
-      name: 'Storybook',
-      icon: Boxes,
-      current: false,
-      href: 'http://localhost:6007',
-    },
     {
       name: 'Documentation',
       icon: Book,
       current: false,
       children: [
-        { name: 'Getting Started', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/GETTING_STARTED_CLOSED_COMPONENTS.md' },
-        { name: 'Component Architecture', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/COMPONENT_ARCHITECTURE.md' },
-        { name: 'Component Folder Structure', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/COMPONENT_FOLDER_STRUCTURE.md' },
-        { name: 'Closed Components', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/CLOSED_COMPONENTS.md' },
-        { name: 'Tailwind Variants', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/TAILWIND_VARIANTS.md' },
-        { name: 'CN Utility', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/CN_UTILITY_GUIDE.md' },
-        { name: 'Select Component', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/SELECT_COMPONENT.md' },
+        { name: 'Storybook', href: 'http://localhost:6007', external: true },
+        { name: 'Getting Started', href: 'https://github.com/blakeing/facts-ark#readme', external: true },
+        { name: 'Component Status', href: 'https://github.com/blakeing/facts-ark/blob/main/docs/MISSING_COMPONENTS.md', external: true },
       ],
     },
-  ],
-  teams: () => [
-    { id: 1, name: 'Planetaria', href: '#', initial: 'P', current: false },
-    { id: 2, name: 'Protocol', href: '#', initial: 'P', current: false },
-    { id: 3, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
   ],
 })
 
@@ -151,12 +130,12 @@ const isOpen = computed({
                           <li v-for="subItem in item.children" :key="subItem.name">
                             <a
                               :href="subItem.href"
-                              :class="cn(
-                                'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring',
-                                subItem.current ? 'bg-muted font-medium' : 'hover:bg-muted'
-                              )"
+                              :target="subItem.external ? '_blank' : undefined"
+                              :rel="subItem.external ? 'noopener noreferrer' : undefined"
+                              class="flex items-center gap-2 rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring hover:bg-muted"
                             >
                               {{ subItem.name }}
+                              <ExternalLink v-if="subItem.external" class="size-3 text-muted-foreground ml-auto" />
                             </a>
                           </li>
                         </ul>
@@ -164,48 +143,6 @@ const isOpen = computed({
                     </Collapsible.Root>
                   </li>
                 </ul>
-              </li>
-              <li>
-                <div class="text-xs font-semibold leading-6 text-muted-foreground">Your teams</div>
-                <ul role="list" class="-mx-2 mt-2 space-y-1">
-                  <li v-for="team in teams" :key="team.name">
-                    <a
-                      :href="team.href"
-                      :class="cn(
-                        'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
-                        team.current
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'text-foreground hover:bg-muted'
-                      )"
-                    >
-                      <span
-                        :class="cn(
-                          'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-background text-[0.625rem] font-medium transition-all',
-                          team.current
-                            ? 'border-primary text-primary'
-                            : 'border-border text-muted-foreground group-hover:border-primary group-hover:text-primary group-hover:scale-110'
-                        )"
-                      >
-                        {{ team.initial }}
-                      </span>
-                      <span class="truncate">{{ team.name }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="-mx-6 mt-auto">
-                <a
-                  href="#"
-                  class="group flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-muted transition-colors-smooth focus-ring active:scale-[0.98]"
-                >
-                  <img
-                    class="size-8 rounded-full bg-muted outline -outline-offset-1 outline-border transition-transform group-hover:scale-110"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  />
-                  <span class="sr-only">Your profile</span>
-                  <span aria-hidden="true">Tom Cook</span>
-                </a>
               </li>
             </ul>
           </nav>
@@ -264,12 +201,12 @@ const isOpen = computed({
                       <li v-for="subItem in item.children" :key="subItem.name">
                         <a
                           :href="subItem.href"
-                          :class="cn(
-                            'block rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring',
-                            subItem.current ? 'bg-muted font-medium' : 'hover:bg-muted'
-                          )"
+                          :target="subItem.external ? '_blank' : undefined"
+                          :rel="subItem.external ? 'noopener noreferrer' : undefined"
+                          class="flex items-center gap-2 rounded-md py-2 pl-9 pr-2 text-sm leading-6 text-foreground transition-colors-smooth hover-scale focus-ring hover:bg-muted"
                         >
                           {{ subItem.name }}
+                          <ExternalLink v-if="subItem.external" class="size-3 text-muted-foreground ml-auto" />
                         </a>
                       </li>
                     </ul>
@@ -277,48 +214,6 @@ const isOpen = computed({
                 </Collapsible.Root>
               </li>
             </ul>
-          </li>
-          <li>
-            <div class="text-xs font-semibold leading-6 text-muted-foreground">Your teams</div>
-            <ul role="list" class="-mx-2 mt-2 space-y-1">
-              <li v-for="team in teams" :key="team.name">
-                <a
-                  :href="team.href"
-                  :class="cn(
-                    'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-colors-smooth focus-ring active:scale-[0.98]',
-                    team.current
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-foreground hover:bg-muted'
-                  )"
-                >
-                  <span
-                    :class="cn(
-                      'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-background text-[0.625rem] font-medium transition-all',
-                      team.current
-                        ? 'border-primary text-primary'
-                        : 'border-border text-muted-foreground group-hover:border-primary group-hover:text-primary group-hover:scale-110'
-                    )"
-                  >
-                    {{ team.initial }}
-                  </span>
-                  <span class="truncate">{{ team.name }}</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="-mx-6 mt-auto">
-            <a
-              href="#"
-              class="group flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-muted transition-colors-smooth focus-ring active:scale-[0.98]"
-            >
-              <img
-                class="size-8 rounded-full bg-muted outline -outline-offset-1 outline-border transition-transform group-hover:scale-110"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt=""
-              />
-              <span class="sr-only">Your profile</span>
-              <span aria-hidden="true">Tom Cook</span>
-            </a>
           </li>
         </ul>
       </nav>
