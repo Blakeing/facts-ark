@@ -3,6 +3,7 @@
  *
  * This file initializes the Vue 3 application with:
  * - Pinia for state management
+ * - Pinia Colada for data fetching
  * - Vue Router for navigation
  * - Tailwind CSS v4 for styling
  *
@@ -15,14 +16,21 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { PiniaColada } from '@pinia/colada'
 
 import App from './App.vue'
-import router from './router'
+import router from './app/router'
 
 const app = createApp(App)
 
+// Create Pinia instance
+const pinia = createPinia()
+
 // Enable Pinia store
-app.use(createPinia())
+app.use(pinia)
+
+// Enable Pinia Colada for data fetching
+app.use(PiniaColada)
 
 // Enable Vue Router
 app.use(router)
