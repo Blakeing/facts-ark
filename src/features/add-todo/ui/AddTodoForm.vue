@@ -8,7 +8,7 @@
 
 import { FieldInput } from '@/shared/ui/field'
 import { Button } from '@/shared/ui/button'
-import { Field } from '@/shared/ui/field'
+import { BaseFormField } from '@/shared/ui/form'
 import { useAddTodo } from '../model/useAddTodo'
 
 interface Emits {
@@ -17,8 +17,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const { title, description, isValid, canSubmit, isPending, isError, error, handleSubmit } =
-  useAddTodo()
+const { canSubmit, isPending, isError, error, handleSubmit } = useAddTodo()
 
 function onSubmit() {
   handleSubmit(() => {
@@ -30,34 +29,37 @@ function onSubmit() {
 <template>
   <form @submit.prevent="onSubmit" class="space-y-4">
     <!-- Title Field -->
-    <Field label="Title" required :invalid="!isValid && title.length > 0">
-      <FieldInput
-        v-model="title"
-        placeholder="What needs to be done?"
-        :disabled="isPending"
-        maxlength="200"
-        required
-      />
-      <template #helperText>
-        <span>{{ title.length }}/200 characters</span>
+    <BaseFormField name="title" label="Title" required>
+      <template #default="{ field }">
+        <FieldInput
+          placeholder="What needs to be done?"
+          :disabled="isPending"
+          maxlength="200"
+          required
+          v-bind="field"
+        />
       </template>
-      <template #errorText>
-        <span>Title must be between 1 and 200 characters</span>
+      <template #description="{ meta, value, errorMessage }">
+        <span v-if="errorMessage" class="text-xs text-fg-error">{{ errorMessage }}</span>
+        <span v-else-if="!meta.touched" class="text-xs text-muted-foreground">1-200 characters</span>
+        <span v-else class="text-xs text-muted-foreground">{{ value.length }}/200 characters</span>
       </template>
-    </Field>
+    </BaseFormField>
 
     <!-- Description Field -->
-    <Field label="Description (optional)">
-      <FieldInput
-        v-model="description"
-        placeholder="Add more details..."
-        :disabled="isPending"
-        maxlength="1000"
-      />
-      <template #helperText>
-        <span>{{ description.length }}/1000 characters</span>
+    <BaseFormField name="description" label="Description (optional)">
+      <template #default="{ field }">
+        <FieldInput
+          placeholder="Add more details..."
+          :disabled="isPending"
+          maxlength="1000"
+          v-bind="field"
+        />
       </template>
-    </Field>
+      <template #description="{ value }">
+        <span class="text-xs text-muted-foreground">{{ value.length }}/1000 characters</span>
+      </template>
+    </BaseFormField>
 
     <!-- Error Message -->
     <div v-if="isError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
@@ -72,23 +74,6 @@ function onSubmit() {
         <span>{{ error?.message || 'Failed to create todo' }}</span>
       </div>
     </div>
-
-    <!-- Debug Info -->
-    <pre class="mt-4 rounded bg-gray-100 p-2 text-xs ">{{
-      JSON.stringify(
-        {
-          title: title,
-          description: description,
-          titleLength: title.length,
-          isValid: isValid,
-          canSubmit: canSubmit,
-          isPending: isPending,
-          isError: isError,
-        },
-        null,
-        2
-      )
-    }}</pre>
 
     <!-- Submit Button -->
     <div class="flex justify-end">

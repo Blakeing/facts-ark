@@ -18,8 +18,9 @@ import EmptyState from '@/shared/ui/patterns/EmptyState.vue'
 import ErrorState from '@/shared/ui/patterns/ErrorState.vue'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
-import { Field, FieldInput } from '@/shared/ui/field'
+import { FieldInput } from '@/shared/ui/field'
 import { Button } from '@/shared/ui/button'
+import { BaseFormField } from '@/shared/ui/form'
 import { useAddTodo } from '@/features/add-todo'
 
 // Data fetching with Pinia Colada
@@ -27,8 +28,7 @@ const { data: todos, status, error, refresh } = useTodos()
 const isLoading = computed(() => status.value === 'pending')
 
 // Add todo form
-const { title, description, isValid, canSubmit, isPending, isError, handleSubmit } =
-  useAddTodo()
+const { canSubmit, isPending, isError, handleSubmit } = useAddTodo()
 
 // Filtering
 const { filteredTodos, currentFilter } = useFilterTodos(computed(() => todos.value || []))
@@ -66,33 +66,36 @@ const emptyMessage = computed(() => {
         <h2 class="text-lg font-semibold text-fg-default">Create New Todo</h2>
 
         <form @submit.prevent="handleSubmit()" class="space-y-4">
-          <Field label="Title" required :invalid="!isValid && title.length > 0">
-            <FieldInput
-              v-model="title"
-              placeholder="What needs to be done?"
-              :disabled="isPending"
-              maxlength="200"
-              required
-            />
-            <template #helperText>
-              <span>{{ title.length }}/200 characters</span>
+          <BaseFormField name="title" label="Title" required>
+            <template #default="{ field }">
+              <FieldInput
+                placeholder="What needs to be done?"
+                :disabled="isPending"
+                maxlength="200"
+                required
+                v-bind="field"
+              />
             </template>
-            <template #errorText>
-              <span>Title must be between 1 and 200 characters</span>
+            <template #description="{ meta, value, errorMessage }">
+              <span v-if="errorMessage" class="text-xs text-fg-error">{{ errorMessage }}</span>
+              <span v-else-if="!meta.touched" class="text-xs text-muted-foreground">1-200 characters</span>
+              <span v-else class="text-xs text-muted-foreground">{{ value.length }}/200 characters</span>
             </template>
-          </Field>
+          </BaseFormField>
 
-          <Field label="Description (optional)">
-            <FieldInput
-              v-model="description"
-              placeholder="Add more details..."
-              :disabled="isPending"
-              maxlength="1000"
-            />
-            <template #helperText>
-              <span>{{ description.length }}/1000 characters</span>
+          <BaseFormField name="description" label="Description (optional)">
+            <template #default="{ field }">
+              <FieldInput
+                placeholder="Add more details..."
+                :disabled="isPending"
+                maxlength="1000"
+                v-bind="field"
+              />
             </template>
-          </Field>
+            <template #description="{ value }">
+              <span class="text-xs text-muted-foreground">{{ value.length }}/1000 characters</span>
+            </template>
+          </BaseFormField>
 
           <div v-if="isError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
             Failed to create todo

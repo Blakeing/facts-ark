@@ -8,6 +8,7 @@
 // Types
 export { TodoStatus } from './model/types'
 export type { Todo, CreateTodoDto, UpdateTodoDto, TodoFilter, TodoStats } from './model/types'
+export { createTodoSchema, type CreateTodoFormValues } from './model/validation'
 
 // Store
 export { useTodoStore } from './model/store'

@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<ComboboxProps<T>>(), {
   itemToValue: (item: T) => (item as ComboboxItem).value,
 })
 
-const emits = defineEmits<ComboboxRootEmits>()
+const emits = defineEmits<ComboboxRootEmits<string>>()
 
 // Setup filter
 const filters = useFilter({ sensitivity: 'base' })

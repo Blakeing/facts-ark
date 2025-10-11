@@ -5,13 +5,24 @@
  * Demonstrates the simpler Vue-native approach.
  */
 
-import { ref, computed } from 'vue'
-import { useCreateTodo } from '@/entities/todo'
-import type { CreateTodoDto } from '@/entities/todo'
+import { computed, ref } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import {
+  useCreateTodo,
+  createTodoSchema,
+  type CreateTodoFormValues,
+  type CreateTodoDto,
+} from '@/entities/todo'
 
 export function useAddTodo() {
-  const title = ref('')
-  const description = ref('')
+  const form = useForm<CreateTodoFormValues>({
+    validationSchema: toTypedSchema(createTodoSchema),
+    initialValues: {
+      title: '',
+      description: '',
+    },
+  })
 
   const mutation = useCreateTodo()
   const hasBeenCalled = ref(false)
@@ -23,55 +34,59 @@ export function useAddTodo() {
   })
   const isError = computed(() => mutation.status.value === 'error')
 
-  const isValid = computed(() => {
-    return title.value.trim().length > 0 && title.value.trim().length <= 200
-  })
+  const isValid = computed(() => form.meta.value.valid)
 
   const canSubmit = computed(() => {
     return isValid.value && !isPending.value
   })
 
   async function handleSubmit(onSuccess?: () => void) {
-    if (!canSubmit.value) return
+    const submit = form.handleSubmit(async (values) => {
+      const dto: CreateTodoDto = {
+        title: values.title,
+        description: values.description || undefined,
+      }
 
-    const dto: CreateTodoDto = {
-      title: title.value.trim(),
-      description: description.value.trim() || undefined,
-    }
-
-    try {
       hasBeenCalled.value = true
-      await mutation.mutate(dto)
-      // Clear form on success
-      title.value = ''
-      description.value = ''
-      hasBeenCalled.value = false
-      onSuccess?.()
-    } catch (err) {
-      // Error is handled by Pinia Colada
-      hasBeenCalled.value = false
-      console.error('Failed to create todo:', err)
-    }
+      try {
+        await mutation.mutate(dto)
+        await form.resetForm({
+          values: {
+            title: '',
+            description: '',
+          },
+        })
+        onSuccess?.()
+      } catch (err) {
+        console.error('Failed to create todo:', err)
+        throw err
+      } finally {
+        hasBeenCalled.value = false
+      }
+    })
+
+    await submit()
   }
 
   function clearForm() {
-    title.value = ''
-    description.value = ''
+    form.resetForm({
+      values: {
+        title: '',
+        description: '',
+      },
+    })
   }
 
   return {
-    // Form state
-    title,
-    description,
-
-    // Computed
+    form,
+    errors: form.errors,
+    values: form.values,
+    meta: form.meta,
     isValid,
     canSubmit,
     isPending,
     isError,
     error: mutation.error,
-
-    // Actions
     handleSubmit,
     clearForm,
   }
