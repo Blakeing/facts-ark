@@ -58,7 +58,7 @@ export function useToggleTodo() {
   // Use asyncStatus for checking if operation is in progress
   const isPending = computed(() => toggleTodoMutation.asyncStatus.value === 'loading')
 
-  async function toggleTodo(id: number, onSuccess?: () => void) {
+  async function toggleTodo(id: string, onSuccess?: () => void) {
     try {
       await toggleTodoMutation.mutateAsync(id)
       toast.success({

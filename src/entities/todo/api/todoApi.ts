@@ -25,7 +25,7 @@ export async function fetchTodos(): Promise<ApiResponse<Todo[]>> {
 /**
  * Fetch a single todo by ID
  */
-export async function fetchTodoById(id: number): Promise<ApiResponse<Todo>> {
+export async function fetchTodoById(id: string): Promise<ApiResponse<Todo>> {
   return apiClient.get<Todo>(`/todos/${id}`)
 }
 
@@ -55,7 +55,7 @@ export async function createTodo(dto: CreateTodoDto): Promise<ApiResponse<Todo>>
 /**
  * Update an existing todo
  */
-export async function updateTodo(id: number, dto: UpdateTodoDto): Promise<ApiResponse<Todo>> {
+export async function updateTodo(id: string, dto: UpdateTodoDto): Promise<ApiResponse<Todo>> {
   // Client-side validation
   if (dto.title !== undefined) {
     apiClient.validateRequired(dto.title, 'title')
@@ -77,14 +77,14 @@ export async function updateTodo(id: number, dto: UpdateTodoDto): Promise<ApiRes
 /**
  * Delete a todo
  */
-export async function deleteTodo(id: number): Promise<ApiResponse<void>> {
+export async function deleteTodo(id: string): Promise<ApiResponse<void>> {
   return apiClient.delete<void>(`/todos/${id}`)
 }
 
 /**
  * Toggle todo status (pending <-> completed)
  */
-export async function toggleTodoStatus(id: number): Promise<ApiResponse<Todo>> {
+export async function toggleTodoStatus(id: string): Promise<ApiResponse<Todo>> {
   // Fetch current todo, toggle status, then update
   const { data: todo } = await apiClient.get<Todo>(`/todos/${id}`)
   const newStatus = todo.status === TodoStatus.COMPLETED ? TodoStatus.PENDING : TodoStatus.COMPLETED

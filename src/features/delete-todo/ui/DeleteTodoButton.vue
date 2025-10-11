@@ -13,7 +13,7 @@ import { useDeleteTodo } from '../model/useDeleteTodo'
 import { useToast } from '@/shared/ui/toast'
 
 interface Props {
-  todoId: number
+  todoId: string
   variant?: 'solid' | 'outline' | 'ghost' | 'secondary'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   confirmDelete?: boolean

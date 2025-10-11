@@ -40,7 +40,7 @@ export function useAddTodo() {
       const previousTodos = queryCache.getQueryData([todoQueriesKeys.list]) as Todo[] | undefined
 
       const optimisticTodo: Todo = {
-        id: -Date.now(),
+        id: `temp-${Date.now()}`,
         title: dto.title,
         description: dto.description,
         status: TodoStatus.PENDING,

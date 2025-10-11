@@ -13,6 +13,12 @@ const mockErrorValue = ref<unknown>(null)
 
 vi.mock('../model/useAddTodo', () => ({
   useAddTodo: () => ({
+    form: {
+      handleSubmit: vi.fn((fn) => fn),
+      values: { title: '', description: '' },
+      errors: {},
+      meta: { valid: false, touched: false },
+    },
     canSubmit: computed(() => mockCanSubmitValue.value),
     isPending: computed(() => mockIsPendingValue.value),
     isError: computed(() => mockIsErrorValue.value),
@@ -21,8 +27,16 @@ vi.mock('../model/useAddTodo', () => ({
   }),
 }))
 
-// Mock BaseFormField to simplify testing
+// Mock BaseForm and BaseFormField to simplify testing
 vi.mock('@/shared/ui/form', () => ({
+  BaseForm: {
+    props: ['form', 'onSubmit'],
+    template: `
+      <form @submit.prevent="onSubmit">
+        <slot />
+      </form>
+    `,
+  },
   BaseFormField: {
     props: ['name', 'label', 'required'],
     template: `

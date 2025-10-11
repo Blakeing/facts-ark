@@ -43,7 +43,7 @@ export function useDeleteTodo() {
   const isPending = computed(() => deleteTodoMutation.asyncStatus.value === 'loading')
   const isError = computed(() => deleteTodoMutation.status.value === 'error')
 
-  async function deleteTodo(id: number, onSuccess?: () => void) {
+  async function deleteTodo(id: string, onSuccess?: () => void) {
     await deleteTodoMutation.mutateAsync(id)
     onSuccess?.()
   }

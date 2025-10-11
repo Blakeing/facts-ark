@@ -13,7 +13,7 @@ import * as todoApi from './todoApi'
 export const todoQueriesKeys = {
   all: 'todos',
   list: 'todos-list',
-  detail: (id: number) => `todos-detail-${id}`,
+  detail: (id: string) => `todos-detail-${id}`,
   stats: 'todos-stats',
 }
 
@@ -33,7 +33,7 @@ export function useTodos() {
 /**
  * Fetch a single todo by ID
  */
-export function useTodoById(id: MaybeRefOrGetter<number>) {
+export function useTodoById(id: MaybeRefOrGetter<string>) {
   return useQuery({
     key: () => [todoQueriesKeys.detail(toValue(id))],
     query: async () => {
