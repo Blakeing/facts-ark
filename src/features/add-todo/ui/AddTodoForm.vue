@@ -8,7 +8,7 @@
 
 import { FieldInput } from '@/shared/ui/field'
 import { Button } from '@/shared/ui/button'
-import { BaseFormField } from '@/shared/ui/form'
+import { BaseForm, BaseFormField } from '@/shared/ui/form'
 import { useAddTodo } from '../model/useAddTodo'
 
 interface Emits {
@@ -17,7 +17,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const { canSubmit, isPending, isError, error, handleSubmit } = useAddTodo()
+const { form, canSubmit, isPending, isError, error, handleSubmit } = useAddTodo()
 
 function onSubmit() {
   handleSubmit(() => {
@@ -27,7 +27,7 @@ function onSubmit() {
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit" class="space-y-4">
+  <BaseForm :form="form" :on-submit="onSubmit" class="space-y-4">
     <!-- Title Field -->
     <BaseFormField name="title" label="Title" required>
       <template #default="{ field }">
@@ -81,6 +81,6 @@ function onSubmit() {
         {{ isPending ? 'Creating...' : 'Add Todo' }}
       </Button>
     </div>
-  </form>
+  </BaseForm>
 </template>
 

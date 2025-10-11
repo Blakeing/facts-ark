@@ -5,17 +5,15 @@
  * Provides a Vue-native alternative to Vue Query with simpler API.
  */
 
-import { useQuery, useMutation, useQueryCache } from '@pinia/colada'
-import type { MaybeRefOrGetter } from 'vue'
-import { toValue } from 'vue'
+import { useQuery } from '@pinia/colada'
+import { toValue, type MaybeRefOrGetter } from 'vue'
 import * as todoApi from './todoApi'
-import type { CreateTodoDto, UpdateTodoDto } from '../model/types'
 
 // Query keys
 export const todoQueriesKeys = {
   all: 'todos',
   list: 'todos-list',
-  detail: (id: string) => `todos-detail-${id}`,
+  detail: (id: number) => `todos-detail-${id}`,
   stats: 'todos-stats',
 }
 
@@ -35,7 +33,7 @@ export function useTodos() {
 /**
  * Fetch a single todo by ID
  */
-export function useTodoById(id: MaybeRefOrGetter<string>) {
+export function useTodoById(id: MaybeRefOrGetter<number>) {
   return useQuery({
     key: () => [todoQueriesKeys.detail(toValue(id))],
     query: async () => {
@@ -54,98 +52,6 @@ export function useTodoStats() {
     query: async () => {
       const response = await todoApi.fetchTodoStats()
       return response.data
-    },
-  })
-}
-
-/**
- * Create a new todo
- */
-export function useCreateTodo() {
-  const queryCache = useQueryCache()
-
-  return useMutation({
-    mutation: async (dto: CreateTodoDto) => {
-      const response = await todoApi.createTodo(dto)
-      return response.data
-    },
-    onSettled: () => {
-      // Invalidate todos list
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
-    },
-  })
-}
-
-/**
- * Update a todo
- */
-export function useUpdateTodo() {
-  const queryCache = useQueryCache()
-
-  return useMutation({
-    mutation: async ({ id, dto }: { id: string; dto: UpdateTodoDto }) => {
-      const response = await todoApi.updateTodo(id, dto)
-      return response.data
-    },
-    onSettled: (_data, _error, { id }) => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.detail(id)] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
-    },
-  })
-}
-
-/**
- * Delete a todo
- */
-export function useDeleteTodo() {
-  const queryCache = useQueryCache()
-
-  return useMutation({
-    mutation: async (id: string) => {
-      await todoApi.deleteTodo(id)
-      return id
-    },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
-    },
-  })
-}
-
-/**
- * Toggle todo status
- */
-export function useToggleTodo() {
-  const queryCache = useQueryCache()
-
-  return useMutation({
-    mutation: async (id: string) => {
-      const response = await todoApi.toggleTodoStatus(id)
-      return response.data
-    },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
-    },
-  })
-}
-
-/**
- * Clear all completed todos
- */
-export function useClearCompleted() {
-  const queryCache = useQueryCache()
-
-  return useMutation({
-    mutation: async () => {
-      const response = await todoApi.clearCompletedTodos()
-      return response.data
-    },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
     },
   })
 }

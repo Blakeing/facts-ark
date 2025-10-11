@@ -1,33 +1,99 @@
 /**
  * API Client
  *
- * Base API client with error handling and response formatting.
- * In a real application, this would handle fetch requests to a backend.
- * For this demo, it wraps the mock database.
+ * HTTP client wrapper using axios for API requests.
+ * Provides consistent error handling and response formatting.
  */
 
+import httpClient from './http'
 import { ApiException, type ApiResponse } from './types'
+import type { AxiosResponse } from 'axios'
 
 export class ApiClient {
   /**
-   * Wraps an async operation with consistent error handling
+   * GET request
    */
-  async execute<T>(operation: () => Promise<T>): Promise<ApiResponse<T>> {
+  async get<T>(url: string): Promise<ApiResponse<T>> {
     try {
-      const data = await operation()
+      const response: AxiosResponse<T> = await httpClient.get(url)
       return {
-        data,
-        status: 200,
+        data: response.data,
+        status: response.status,
       }
     } catch (error) {
-      if (error instanceof ApiException) {
-        throw error
-      }
-
-      // Convert unknown errors to ApiException
-      const message = error instanceof Error ? error.message : 'Unknown error occurred'
-      throw new ApiException(message, 'UNKNOWN_ERROR', 500)
+      throw this.handleError(error)
     }
+  }
+
+  /**
+   * POST request
+   */
+  async post<T>(url: string, data?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse<T> = await httpClient.post(url, data)
+      return {
+        data: response.data,
+        status: response.status,
+      }
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * PUT request
+   */
+  async put<T>(url: string, data?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse<T> = await httpClient.put(url, data)
+      return {
+        data: response.data,
+        status: response.status,
+      }
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * PATCH request
+   */
+  async patch<T>(url: string, data?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse<T> = await httpClient.patch(url, data)
+      return {
+        data: response.data,
+        status: response.status,
+      }
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * DELETE request
+   */
+  async delete<T>(url: string): Promise<ApiResponse<T>> {
+    try {
+      const response: AxiosResponse<T> = await httpClient.delete(url)
+      return {
+        data: response.data,
+        status: response.status,
+      }
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  }
+
+  /**
+   * Handle errors consistently
+   */
+  private handleError(error: unknown): ApiException {
+    if (error instanceof ApiException) {
+      return error
+    }
+    const message = error instanceof Error ? error.message : 'Unknown error occurred'
+    return new ApiException(message, 'UNKNOWN_ERROR', 500)
   }
 
   /**

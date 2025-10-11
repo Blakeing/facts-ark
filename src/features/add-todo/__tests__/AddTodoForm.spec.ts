@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
-import { h } from 'vue'
 import AddTodoForm from '../ui/AddTodoForm.vue'
 
 // Mock the useAddTodo composable

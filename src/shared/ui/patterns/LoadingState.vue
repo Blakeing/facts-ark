@@ -11,7 +11,7 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   variant: 'spinner',
   size: 'md',
 })

@@ -1,69 +1,67 @@
 /**
  * Date Utilities
  *
- * Common date formatting and manipulation functions.
+ * Common date formatting and manipulation functions using date-fns.
  */
+
+import { formatDistanceToNow, format, formatISO, isToday as isTodayFns, isValid } from 'date-fns'
 
 /**
- * Formats a date to a relative time string (e.g., "2 hours ago")
+ * Safely converts a value to a Date object
  */
-export function formatRelativeTime(date: Date | string): string {
-  const now = new Date()
-  const past = new Date(date)
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000)
-
-  if (diffInSeconds < 60) {
-    return 'just now'
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60)
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24)
-  if (diffInDays < 30) {
-    return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'} ago`
-  }
-
-  const diffInMonths = Math.floor(diffInDays / 30)
-  if (diffInMonths < 12) {
-    return `${diffInMonths} ${diffInMonths === 1 ? 'month' : 'months'} ago`
-  }
-
-  const diffInYears = Math.floor(diffInMonths / 12)
-  return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`
+function toDate(date: Date | string | undefined | null): Date | null {
+  if (!date) return null
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return isValid(dateObj) ? dateObj : null
 }
 
 /**
- * Formats a date to a localized string
+ * Formats a date to a relative time string (e.g., "2 hours ago")
+ * Returns fallback text if date is invalid
  */
-export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  return dateObj.toLocaleDateString(undefined, options)
+export function formatRelativeTime(
+  date: Date | string | undefined | null,
+  fallback = 'Unknown date',
+): string {
+  const dateObj = toDate(date)
+  if (!dateObj) return fallback
+  return formatDistanceToNow(dateObj, { addSuffix: true })
+}
+
+/**
+ * Formats a date with a custom pattern
+ * Returns fallback text if date is invalid
+ * @param date - Date to format
+ * @param pattern - Format pattern (default: 'PP' for localized date)
+ * @param fallback - Text to return if date is invalid
+ * @see https://date-fns.org/docs/format
+ */
+export function formatDate(
+  date: Date | string | undefined | null,
+  pattern = 'PP',
+  fallback = 'Invalid date',
+): string {
+  const dateObj = toDate(date)
+  if (!dateObj) return fallback
+  return format(dateObj, pattern)
 }
 
 /**
  * Formats a date to ISO string for API communication
+ * Returns current date ISO string if date is invalid
  */
-export function toISOString(date: Date): string {
-  return date.toISOString()
+export function toISOString(date: Date | string | undefined | null): string {
+  const dateObj = toDate(date)
+  if (!dateObj) return new Date().toISOString()
+  return formatISO(dateObj)
 }
 
 /**
  * Checks if a date is today
+ * Returns false if date is invalid
  */
-export function isToday(date: Date | string): boolean {
-  const now = new Date()
-  const target = new Date(date)
-  return (
-    now.getDate() === target.getDate() &&
-    now.getMonth() === target.getMonth() &&
-    now.getFullYear() === target.getFullYear()
-  )
+export function isToday(date: Date | string | undefined | null): boolean {
+  const dateObj = toDate(date)
+  if (!dateObj) return false
+  return isTodayFns(dateObj)
 }

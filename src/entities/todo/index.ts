@@ -14,17 +14,7 @@ export { createTodoSchema, type CreateTodoFormValues } from './model/validation'
 export { useTodoStore } from './model/store'
 
 // API (Pinia Colada)
-export {
-  useTodos,
-  useTodoById,
-  useTodoStats,
-  useCreateTodo,
-  useUpdateTodo,
-  useDeleteTodo,
-  useToggleTodo,
-  useClearCompleted,
-  todoQueriesKeys,
-} from './api/todoQueries'
+export { useTodos, useTodoById, useTodoStats, todoQueriesKeys } from './api/todoQueries'
 
 // UI
 export { default as TodoItem } from './ui/TodoItem.vue'

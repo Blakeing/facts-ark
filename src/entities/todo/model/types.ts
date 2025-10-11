@@ -11,7 +11,7 @@ export enum TodoStatus {
 }
 
 export interface Todo {
-  id: string
+  id: number
   title: string
   description?: string
   status: TodoStatus

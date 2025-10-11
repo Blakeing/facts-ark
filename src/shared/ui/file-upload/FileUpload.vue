@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { useForwardPropsEmits } from '@ark-ui/vue'
 import { FileUpload } from '@ark-ui/vue/file-upload'
-import { Upload, X, FileIcon, ImageIcon } from 'lucide-vue-next'
+import { Upload, X, FileIcon } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { useOmitProps } from '@/shared/lib/useOmitProps'
 import { fileUploadVariants } from './file-upload.variants'
@@ -67,14 +67,6 @@ const forwarded = useForwardPropsEmits(arkProps, emits)
 
 const styles = computed(() => fileUploadVariants())
 
-// Helper to format file size
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
-}
 </script>
 
 <template>

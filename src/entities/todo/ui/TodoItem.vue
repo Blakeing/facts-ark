@@ -10,24 +10,23 @@ import { computed } from 'vue'
 import { formatRelativeTime } from '@/shared/lib/date'
 import type { Todo } from '../model/types'
 import { Badge } from '@/shared/ui/badge'
+import { Button } from '@/shared/ui/button'
+import { Checkbox } from '@/shared/ui/checkbox'
+import { PencilIcon, Trash2Icon } from 'lucide-vue-next'
 
-interface Props {
-  todo: Todo
-  isSelected?: boolean
-}
+const props = withDefaults(
+  defineProps<{ todo: Todo; isSelected?: boolean }>(),
+  {
+    isSelected: false,
+  },
+)
 
-interface Emits {
-  (e: 'toggle', id: string): void
-  (e: 'delete', id: string): void
-  (e: 'edit', id: string): void
-  (e: 'select', id: string): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isSelected: false,
-})
-
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  (e: 'toggle', id: Todo['id']): void
+  (e: 'delete', id: Todo['id']): void
+  (e: 'edit', id: Todo['id']): void
+  (e: 'select', id: Todo['id']): void
+}>()
 
 const isCompleted = computed(() => props.todo.status === 'completed')
 const formattedDate = computed(() => formatRelativeTime(props.todo.createdAt))
@@ -41,29 +40,11 @@ const formattedDate = computed(() => formatRelativeTime(props.todo.createdAt))
     <!-- Checkbox Slot -->
     <div class="pt-0.5">
       <slot name="checkbox" :todo="todo">
-        <button
-          type="button"
-          class="flex h-5 w-5 items-center justify-center rounded border border-border transition-colors hover:border-accent-default"
-          :class="{
-            'border-accent-default bg-accent-default': isCompleted,
-          }"
-          @click="emit('toggle', todo.id)"
-        >
-          <svg
-            v-if="isCompleted"
-            class="h-3 w-3 text-fg-on-accent"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="3"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </button>
+        <Checkbox
+          :checked="isCompleted"
+          aria-label="Toggle todo completion"
+          @update:checked="emit('toggle', todo.id)"
+        />
       </slot>
     </div>
 
@@ -108,36 +89,26 @@ const formattedDate = computed(() => formatRelativeTime(props.todo.createdAt))
     <!-- Actions Slot -->
     <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
       <slot name="actions" :todo="todo">
-        <button
+        <Button
           type="button"
-          class="rounded p-1.5 text-fg-muted transition-colors hover:bg-bg-muted hover:text-fg-default"
+          variant="ghost"
+          size="sm"
+          class="h-8 w-8 p-0"
           @click="emit('edit', todo.id)"
           title="Edit"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            />
-          </svg>
-        </button>
-        <button
+          <PencilIcon class="h-4 w-4" />
+        </Button>
+        <Button
           type="button"
-          class="rounded p-1.5 text-fg-muted transition-colors hover:bg-bg-error-subtle hover:text-fg-error"
+          variant="ghost"
+          size="sm"
+          class="h-8 w-8 p-0 text-fg-muted hover:text-fg-error"
           @click="emit('delete', todo.id)"
           title="Delete"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </button>
+          <Trash2Icon class="h-4 w-4" />
+        </Button>
       </slot>
     </div>
   </div>

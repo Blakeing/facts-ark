@@ -15,6 +15,50 @@ pnpm dev
 pnpm build
 ```
 
+## 💻 Development
+
+The application uses **json-server** for local API development, providing a full REST API with data persistence.
+
+### Running the Application
+
+**Option 1: Run everything together (recommended)**
+
+```bash
+pnpm dev:all
+```
+
+**Option 2: Run separately**
+
+```bash
+# Terminal 1 - Vite dev server (port 5173)
+pnpm dev
+
+# Terminal 2 - json-server API (port 3001)
+pnpm dev:api
+```
+
+### API Server
+
+- **Port**: 3001
+- **Endpoints**: `/todos`
+- **Data**: Stored in `db.json` (persists between sessions)
+- **Features**: Full CRUD, filtering, pagination, sorting
+
+To reset your local data, copy the seed data:
+
+```bash
+cp db.example.json db.json
+```
+
+### Environment Variables
+
+Update `.env` if needed:
+
+```env
+VITE_API_BASE_URL=http://localhost:3001
+VITE_API_TIMEOUT=10000
+```
+
 ## 🛠️ Tech Stack
 
 - **Vue 3** + TypeScript
@@ -82,7 +126,9 @@ src/
 ## 🧹 Scripts
 
 ```bash
-pnpm dev          # Start dev server
+pnpm dev          # Start Vite dev server
+pnpm dev:api      # Start json-server API
+pnpm dev:all      # Start both dev server and API
 pnpm build        # Build for production
 pnpm preview      # Preview production build
 pnpm lint         # Lint code (oxlint + eslint)

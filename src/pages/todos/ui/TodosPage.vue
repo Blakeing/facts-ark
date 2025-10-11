@@ -6,8 +6,8 @@
  * Demonstrates the Vue-native data fetching approach.
  */
 
-import { computed } from 'vue'
-import { useTodos, TodoItem } from '@/entities/todo'
+import { computed, ref } from 'vue'
+import { useTodos, TodoItem, type Todo } from '@/entities/todo'
 import { ToggleTodo } from '@/features/toggle-todo'
 import { DeleteTodoButton } from '@/features/delete-todo'
 import { useFilterTodos } from '@/features/filter-todos'
@@ -20,18 +20,33 @@ import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { FieldInput } from '@/shared/ui/field'
 import { Button } from '@/shared/ui/button'
-import { BaseFormField } from '@/shared/ui/form'
+import { BaseForm, BaseFormField } from '@/shared/ui/form'
 import { useAddTodo } from '@/features/add-todo'
+import { EditTodoDialog } from '@/features/edit-todo'
+import { ClearCompletedButton } from '@/features/clear-completed'
 
 // Data fetching with Pinia Colada
 const { data: todos, status, error, refresh } = useTodos()
 const isLoading = computed(() => status.value === 'pending')
 
 // Add todo form
-const { canSubmit, isPending, isError, handleSubmit } = useAddTodo()
+const { form, canSubmit, isPending, isError, handleSubmit } = useAddTodo()
 
 // Filtering
 const { filteredTodos, currentFilter } = useFilterTodos(computed(() => todos.value || []))
+
+const editingTodo = ref<Todo | null>(null)
+const isEditDialogOpen = ref(false)
+
+function openEdit(todo: Todo) {
+  editingTodo.value = todo
+  isEditDialogOpen.value = true
+}
+
+function closeEdit() {
+  editingTodo.value = null
+  isEditDialogOpen.value = false
+}
 
 const emptyMessage = computed(() => {
   if (currentFilter.value === 'completed') {
@@ -65,7 +80,7 @@ const emptyMessage = computed(() => {
       <div class="space-y-4">
         <h2 class="text-lg font-semibold text-fg-default">Create New Todo</h2>
 
-        <form @submit.prevent="handleSubmit()" class="space-y-4">
+        <BaseForm :form="form" :on-submit="() => handleSubmit()" class="space-y-4">
           <BaseFormField name="title" label="Title" required>
             <template #default="{ field }">
               <FieldInput
@@ -106,15 +121,18 @@ const emptyMessage = computed(() => {
               {{ isPending ? 'Creating...' : 'Add Todo' }}
             </Button>
           </div>
-        </form>
+        </BaseForm>
       </div>
     </Card>
 
     <!-- Todo List Section -->
     <div class="space-y-4">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-semibold text-fg-default">Your Todos</h2>
-        <TodoFilters :todos="todos || []" />
+        <div class="flex items-center gap-2">
+          <TodoFilters :todos="todos || []" />
+          <ClearCompletedButton />
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -154,7 +172,7 @@ const emptyMessage = computed(() => {
       <!-- Todo List -->
       <div v-else class="space-y-3">
         <Card v-for="todo in filteredTodos" :key="todo.id" variant="outline" class="p-0">
-          <TodoItem :todo="todo">
+          <TodoItem :todo="todo" @edit="openEdit(todo)">
             <template #checkbox="{ todo: todoItem }">
               <ToggleTodo :todo="todoItem" />
             </template>
@@ -165,6 +183,8 @@ const emptyMessage = computed(() => {
         </Card>
       </div>
     </div>
+
+    <EditTodoDialog v-if="editingTodo" v-model:open="isEditDialogOpen" :todo="editingTodo" @cancel="closeEdit" @success="closeEdit" />
 
     <!-- Comparison Info -->
     <Card variant="filled" class="mt-8">

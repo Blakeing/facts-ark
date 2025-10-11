@@ -1,0 +1,28 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "title": "Learn Vue 3 Composition API",
+      "description": "Study the new composition API patterns",
+      "status": "completed",
+      "createdAt": "2025-01-01T10:00:00.000Z",
+      "updatedAt": "2025-01-01T12:00:00.000Z",
+      "completedAt": "2025-01-01T12:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Build component library with Ark UI",
+      "description": "Create reusable components using Ark UI primitives",
+      "status": "pending",
+      "createdAt": "2025-01-02T09:00:00.000Z",
+      "updatedAt": "2025-01-02T09:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "title": "Set up Pinia Colada for data fetching",
+      "status": "pending",
+      "createdAt": "2025-01-03T14:00:00.000Z",
+      "updatedAt": "2025-01-03T14:00:00.000Z"
+    }
+  ]
+}

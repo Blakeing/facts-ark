@@ -1,21 +1,28 @@
 /**
  * Add Todo Feature - ViewModel (Pinia Colada)
  *
- * Alternate implementation using Pinia Colada.
- * Demonstrates the simpler Vue-native approach.
+ * Handles form state and todo creation with optimistic updates.
  */
 
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { useMutation, useQueryCache } from '@pinia/colada'
 import {
-  useCreateTodo,
   createTodoSchema,
+  TodoStatus,
   type CreateTodoFormValues,
   type CreateTodoDto,
+  type Todo,
 } from '@/entities/todo'
+import * as todoApi from '@/entities/todo/api/todoApi'
+import { todoQueriesKeys } from '@/entities/todo/api/todoQueries'
+import { useToast } from '@/shared/ui/toast'
 
 export function useAddTodo() {
+  const queryCache = useQueryCache()
+  const { toast } = useToast()
+
   const form = useForm<CreateTodoFormValues>({
     validationSchema: toTypedSchema(createTodoSchema),
     initialValues: {
@@ -24,14 +31,43 @@ export function useAddTodo() {
     },
   })
 
-  const mutation = useCreateTodo()
-  const hasBeenCalled = ref(false)
+  const mutation = useMutation({
+    mutation: async (dto: CreateTodoDto) => {
+      const response = await todoApi.createTodo(dto)
+      return response.data
+    },
+    onMutate: async (dto: CreateTodoDto) => {
+      const previousTodos = queryCache.getQueryData([todoQueriesKeys.list]) as Todo[] | undefined
 
-  // Pinia Colada mutations start with status 'pending' even before being called
-  // We need to track if we've actually triggered the mutation
-  const isPending = computed(() => {
-    return hasBeenCalled.value && mutation.status.value === 'pending'
+      const optimisticTodo: Todo = {
+        id: -Date.now(),
+        title: dto.title,
+        description: dto.description,
+        status: TodoStatus.PENDING,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      queryCache.setQueryData([todoQueriesKeys.list], (old: Todo[] | undefined) => {
+        if (!old) return [optimisticTodo]
+        return [optimisticTodo, ...old]
+      })
+
+      return { previousTodos }
+    },
+    onError: (_error: Error, _variables: CreateTodoDto, context?: { previousTodos?: Todo[] }) => {
+      if (context?.previousTodos) {
+        queryCache.setQueryData([todoQueriesKeys.list], context.previousTodos)
+      }
+    },
+    onSettled: () => {
+      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
+      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
+    },
   })
+
+  // Use asyncStatus for checking if operation is in progress
+  const isPending = computed(() => mutation.asyncStatus.value === 'loading')
   const isError = computed(() => mutation.status.value === 'error')
 
   const isValid = computed(() => form.meta.value.valid)
@@ -47,21 +83,25 @@ export function useAddTodo() {
         description: values.description || undefined,
       }
 
-      hasBeenCalled.value = true
       try {
-        await mutation.mutate(dto)
+        await mutation.mutateAsync(dto)
         await form.resetForm({
           values: {
             title: '',
             description: '',
           },
         })
+        toast.success({
+          title: 'Todo created',
+          description: 'Your todo has been added to the list.',
+        })
         onSuccess?.()
       } catch (err) {
-        console.error('Failed to create todo:', err)
+        toast.error({
+          title: 'Failed to create todo',
+          description: err instanceof Error ? err.message : 'Unknown error occurred',
+        })
         throw err
-      } finally {
-        hasBeenCalled.value = false
       }
     })
 
