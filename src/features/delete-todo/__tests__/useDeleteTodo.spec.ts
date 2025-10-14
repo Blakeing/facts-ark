@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useDeleteTodo } from '../model/useDeleteTodo'
-import * as todoApi from '@/entities/todo/api/todoApi'
+import * as todoApi from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
 describe('useDeleteTodo', () => {

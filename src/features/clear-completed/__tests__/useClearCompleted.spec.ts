@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useClearCompleted } from '../model/useClearCompleted'
-import * as todoApi from '@/entities/todo/api/todoApi'
+import * as todoApi from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
 const mockToast = {
@@ -30,7 +30,8 @@ describe('useClearCompleted', () => {
     await promise
 
     expect(todoApi.clearCompletedTodos).toHaveBeenCalled()
-    expect(mockToast.success).toHaveBeenCalledWithExactlyOnceWith({
+    expect(mockToast.success).toHaveBeenCalledOnce()
+    expect(mockToast.success).toHaveBeenCalledWith({
       title: 'Completed todos cleared',
       description: '2 completed todos removed.',
     })
@@ -46,9 +47,10 @@ describe('useClearCompleted', () => {
 
     await expect(clearCompleted()).rejects.toThrow('Network error')
 
-    expect(mockToast.error).toHaveBeenCalledExactlyOnceWith({
+    expect(mockToast.error).toHaveBeenCalledOnce()
+    expect(mockToast.error).toHaveBeenCalledWith({
       title: 'Failed to clear todos',
-      description: 'Network error',
+      description: 'An error occurred while clearing completed todos.',
     })
 
     unmount()

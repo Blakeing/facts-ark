@@ -1,8 +1,7 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
-import { flushPromises } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAddTodo } from '../model/useAddTodo'
-import * as todoApi from '@/entities/todo/api/todoApi'
+import * as todoApi from '@/entities/todo'
 import { TodoStatus, type Todo } from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
@@ -19,12 +18,6 @@ vi.mock('@/shared/ui/toast', () => ({
 describe('useAddTodo', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'))
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
   })
 
   it('exposes form and computed properties', () => {
@@ -52,31 +45,25 @@ describe('useAddTodo', () => {
       .mockResolvedValue({ data: createdTodo, status: 201 })
 
     const [addTodo, unmount] = withSetup(() => useAddTodo())
-    Object.defineProperty(addTodo.meta.value, 'valid', { value: true, writable: true })
     addTodo.form.setFieldValue('title', 'Test')
 
-    // Don't await - just trigger it
-    const promise = addTodo.handleSubmit()
+    // Submit the form (validation runs internally)
+    await addTodo.handleSubmit()
 
-    // Wait for all promises to resolve
-    await flushPromises()
-
-    expect(createTodoSpy).toHaveBeenCalledWithExactlyOnceWith({
+    expect(createTodoSpy).toHaveBeenCalledExactlyOnceWith({
       title: 'Test',
       description: undefined,
     })
 
     unmount()
-
-    // Clean up the promise
-    await promise.catch(() => {})
   })
 
   it('does not call API when form is invalid', async () => {
     const createTodoSpy = vi.spyOn(todoApi, 'createTodo')
 
     const [addTodo, unmount] = withSetup(() => useAddTodo())
-    Object.defineProperty(addTodo.meta.value, 'valid', { value: false, writable: true })
+    // Set invalid title (empty after trim)
+    addTodo.form.setFieldValue('title', '   ')
 
     await addTodo.handleSubmit().catch(() => {})
 

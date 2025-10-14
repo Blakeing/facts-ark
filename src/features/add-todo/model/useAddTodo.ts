@@ -2,27 +2,24 @@
  * Add Todo Feature - ViewModel (Pinia Colada)
  *
  * Handles form state and todo creation with optimistic updates.
+ * Now using mutation factory pattern to reduce boilerplate.
  */
 
 import { computed } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import { useMutation, useQueryCache } from '@pinia/colada'
 import {
   createTodoSchema,
   TodoStatus,
+  createTodo,
+  todoQueriesKeys,
   type CreateTodoFormValues,
   type CreateTodoDto,
   type Todo,
 } from '@/entities/todo'
-import * as todoApi from '@/entities/todo/api/todoApi'
-import { todoQueriesKeys } from '@/entities/todo/api/todoQueries'
-import { useToast } from '@/shared/ui/toast'
+import { createMutationFactory } from '@/shared/lib/mutation'
 
 export function useAddTodo() {
-  const queryCache = useQueryCache()
-  const { toast } = useToast()
-
   const form = useForm<CreateTodoFormValues>({
     validationSchema: toTypedSchema(createTodoSchema),
     initialValues: {
@@ -31,14 +28,13 @@ export function useAddTodo() {
     },
   })
 
-  const mutation = useMutation({
-    mutation: async (dto: CreateTodoDto) => {
-      const response = await todoApi.createTodo(dto)
+  // Use mutation factory pattern - much cleaner!
+  const mutation = createMutationFactory({
+    mutationFn: async (dto: CreateTodoDto) => {
+      const response = await createTodo(dto)
       return response.data
     },
-    onMutate: async (dto: CreateTodoDto) => {
-      const previousTodos = queryCache.getQueryData([todoQueriesKeys.list]) as Todo[] | undefined
-
+    optimisticUpdate: (cache, dto: CreateTodoDto) => {
       const optimisticTodo: Todo = {
         id: `temp-${Date.now()}`,
         title: dto.title,
@@ -48,32 +44,27 @@ export function useAddTodo() {
         updatedAt: new Date().toISOString(),
       }
 
-      queryCache.setQueryData([todoQueriesKeys.list], (old: Todo[] | undefined) => {
-        if (!old) return [optimisticTodo]
-        return [optimisticTodo, ...old]
-      })
+      const rollbackData = cache.optimisticAdd([...todoQueriesKeys.list], optimisticTodo)
 
-      return { previousTodos }
-    },
-    onError: (_error: Error, _variables: CreateTodoDto, context?: { previousTodos?: Todo[] }) => {
-      if (context?.previousTodos) {
-        queryCache.setQueryData([todoQueriesKeys.list], context.previousTodos)
+      return {
+        rollback: () => cache.rollback([...todoQueriesKeys.list], rollbackData),
       }
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
+    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
+    successToast: {
+      title: 'Todo created',
+      description: 'Your todo has been added to the list.',
+    },
+    errorToast: {
+      title: 'Failed to create todo',
+      description: 'An error occurred while creating the todo.',
     },
   })
-
-  // Use asyncStatus for checking if operation is in progress
-  const isPending = computed(() => mutation.asyncStatus.value === 'loading')
-  const isError = computed(() => mutation.status.value === 'error')
 
   const isValid = computed(() => form.meta.value.valid)
 
   const canSubmit = computed(() => {
-    return isValid.value && !isPending.value
+    return isValid.value && !mutation.isPending.value
   })
 
   async function handleSubmit(onSuccess?: () => void) {
@@ -83,26 +74,14 @@ export function useAddTodo() {
         description: values.description || undefined,
       }
 
-      try {
-        await mutation.mutateAsync(dto)
-        await form.resetForm({
-          values: {
-            title: '',
-            description: '',
-          },
-        })
-        toast.success({
-          title: 'Todo created',
-          description: 'Your todo has been added to the list.',
-        })
-        onSuccess?.()
-      } catch (err) {
-        toast.error({
-          title: 'Failed to create todo',
-          description: err instanceof Error ? err.message : 'Unknown error occurred',
-        })
-        throw err
-      }
+      await mutation.mutate(dto)
+      await form.resetForm({
+        values: {
+          title: '',
+          description: '',
+        },
+      })
+      onSuccess?.()
     })
 
     await submit()
@@ -124,8 +103,8 @@ export function useAddTodo() {
     meta: form.meta,
     isValid,
     canSubmit,
-    isPending,
-    isError,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
     error: mutation.error,
     handleSubmit,
     clearForm,

@@ -12,14 +12,14 @@
  * @see {@link https://vuejs.org/guide/quick-start.html}
  */
 
-import './assets/main.css'
+import '../assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
 
 import App from './App.vue'
-import router from './app/router'
+import router from './router'
 
 const app = createApp(App)
 

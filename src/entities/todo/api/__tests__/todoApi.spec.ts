@@ -51,12 +51,9 @@ describe('todoApi', () => {
 
     const response = await todoApi.createTodo({ title: 'Test', description: 'Details' })
 
-    expect(apiClient.validateRequired).toHaveBeenCalledWith('Test', 'title')
-    expect(apiClient.validateLength).toHaveBeenCalledWith('Test', 'title', 1, 200)
-    expect(apiClient.validateLength).toHaveBeenCalledWith('Details', 'description', 0, 1000)
     expect(apiClient.post).toHaveBeenCalledWith(
       '/todos',
-      expect.objectContaining({ title: 'Test' }),
+      expect.objectContaining({ title: 'Test', description: 'Details' }),
     )
     expect(response.data).toEqual(todo)
   })
@@ -66,8 +63,6 @@ describe('todoApi', () => {
 
     const response = await todoApi.updateTodo('1', { title: 'Updated' })
 
-    expect(apiClient.validateRequired).toHaveBeenCalledWith('Updated', 'title')
-    expect(apiClient.validateLength).toHaveBeenCalledWith('Updated', 'title', 1, 200)
     expect(apiClient.patch).toHaveBeenCalledWith(
       '/todos/1',
       expect.objectContaining({ title: 'Updated' }),

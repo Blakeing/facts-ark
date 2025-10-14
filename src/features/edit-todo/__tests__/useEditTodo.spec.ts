@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useEditTodo } from '../model/useEditTodo'
-import * as todoApi from '@/entities/todo/api/todoApi'
+import * as todoApi from '@/entities/todo'
 import { TodoStatus, type Todo } from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
@@ -48,16 +48,17 @@ describe('useEditTodo', () => {
     vi.spyOn(todoApi, 'updateTodo').mockResolvedValue({ data: updatedTodo, status: 200 })
 
     const [{ form, handleSubmit }, unmount] = withSetup(() => useEditTodo(originalTodo))
-    Object.defineProperty(form.meta.value, 'valid', { value: true, writable: true })
     form.setFieldValue('title', 'Updated title')
 
     await handleSubmit()
 
-    expect(todoApi.updateTodo).toHaveBeenCalledWithExactlyOnceWith('1', {
+    expect(todoApi.updateTodo).toHaveBeenCalledOnce()
+    expect(todoApi.updateTodo).toHaveBeenCalledWith('1', {
       title: 'Updated title',
     })
 
-    expect(mockToast.success).toHaveBeenCalledExactlyOnceWith({
+    expect(mockToast.success).toHaveBeenCalledOnce()
+    expect(mockToast.success).toHaveBeenCalledWith({
       title: 'Todo updated',
       description: 'Changes saved successfully.',
     })
@@ -68,9 +69,10 @@ describe('useEditTodo', () => {
   it('does not submit when form is invalid', async () => {
     const updateTodoSpy = vi.spyOn(todoApi, 'updateTodo')
     const [{ handleSubmit, form }, unmount] = withSetup(() => useEditTodo(originalTodo))
-    Object.defineProperty(form.meta.value, 'valid', { value: false, writable: true })
+    // Set invalid title (empty after trim)
+    form.setFieldValue('title', '   ')
 
-    await handleSubmit()
+    await handleSubmit().catch(() => {})
 
     expect(updateTodoSpy).not.toHaveBeenCalled()
 
@@ -81,14 +83,14 @@ describe('useEditTodo', () => {
     vi.spyOn(todoApi, 'updateTodo').mockRejectedValue(new Error('Network error'))
 
     const [{ form, handleSubmit }, unmount] = withSetup(() => useEditTodo(originalTodo))
-    Object.defineProperty(form.meta.value, 'valid', { value: true, writable: true })
     form.setFieldValue('title', 'Updated title')
 
     await expect(handleSubmit()).rejects.toThrow('Network error')
 
-    expect(mockToast.error).toHaveBeenCalledExactlyOnceWith({
+    expect(mockToast.error).toHaveBeenCalledOnce()
+    expect(mockToast.error).toHaveBeenCalledWith({
       title: 'Failed to update todo',
-      description: 'Network error',
+      description: 'An error occurred while updating the todo.',
     })
 
     unmount()

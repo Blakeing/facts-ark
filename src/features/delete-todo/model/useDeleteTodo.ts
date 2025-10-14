@@ -2,56 +2,45 @@
  * Delete Todo Feature - ViewModel
  *
  * Business logic for deleting todos.
+ * Now using mutation factory pattern to reduce boilerplate.
  */
 
-import { computed } from 'vue'
-import { useMutation, useQueryCache } from '@pinia/colada'
-import { type Todo } from '@/entities/todo'
-import * as todoApi from '@/entities/todo/api/todoApi'
-import { todoQueriesKeys } from '@/entities/todo/api/todoQueries'
+import { deleteTodo as deleteTodoApi, todoQueriesKeys, type Todo } from '@/entities/todo'
+import { createMutationFactory } from '@/shared/lib/mutation'
 
 export function useDeleteTodo() {
-  const queryCache = useQueryCache()
-
-  const deleteTodoMutation = useMutation({
-    mutation: async (id: Todo['id']) => {
-      await todoApi.deleteTodo(id)
+  const mutation = createMutationFactory({
+    mutationFn: async (id: Todo['id']) => {
+      await deleteTodoApi(id)
       return id
     },
-    onMutate: async (id: Todo['id']) => {
-      const previousTodos = queryCache.getQueryData([todoQueriesKeys.list]) as Todo[] | undefined
+    optimisticUpdate: (cache, id: Todo['id']) => {
+      const rollbackData = cache.optimisticRemove<Todo>(todoQueriesKeys.list, id)
 
-      queryCache.setQueryData([todoQueriesKeys.list], (old: Todo[] | undefined) => {
-        if (!old) return old
-        return old.filter((todo) => todo.id !== id)
-      })
-
-      return { previousTodos }
-    },
-    onError: (_error: Error, _variables: Todo['id'], context?: { previousTodos?: Todo[] }) => {
-      if (context?.previousTodos) {
-        queryCache.setQueryData([todoQueriesKeys.list], context.previousTodos)
+      return {
+        rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
+    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
+    successToast: {
+      title: 'Todo deleted',
+      description: 'The todo has been successfully deleted.',
+    },
+    errorToast: {
+      title: 'Failed to delete todo',
+      description: 'An error occurred while deleting the todo.',
     },
   })
 
-  // Use asyncStatus for checking if operation is in progress
-  const isPending = computed(() => deleteTodoMutation.asyncStatus.value === 'loading')
-  const isError = computed(() => deleteTodoMutation.status.value === 'error')
-
   async function deleteTodo(id: string, onSuccess?: () => void) {
-    await deleteTodoMutation.mutateAsync(id)
+    await mutation.mutate(id)
     onSuccess?.()
   }
 
   return {
     deleteTodo,
-    isPending,
-    isError,
-    error: deleteTodoMutation.error,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
+    error: mutation.error,
   }
 }

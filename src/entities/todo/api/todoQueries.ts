@@ -9,12 +9,12 @@ import { useQuery } from '@pinia/colada'
 import { toValue, type MaybeRefOrGetter } from 'vue'
 import * as todoApi from './todoApi'
 
-// Query keys
+// Query keys - type-safe and consistent
 export const todoQueriesKeys = {
-  all: 'todos',
-  list: 'todos-list',
-  detail: (id: string) => `todos-detail-${id}`,
-  stats: 'todos-stats',
+  all: ['todos'] as const,
+  list: ['todos', 'list'] as const,
+  detail: (id: string) => ['todos', 'detail', id] as const,
+  stats: ['todos', 'stats'] as const,
 }
 
 /**
@@ -22,7 +22,7 @@ export const todoQueriesKeys = {
  */
 export function useTodos() {
   return useQuery({
-    key: () => [todoQueriesKeys.list],
+    key: () => [...todoQueriesKeys.list],
     query: async () => {
       const response = await todoApi.fetchTodos()
       return response.data
@@ -35,7 +35,7 @@ export function useTodos() {
  */
 export function useTodoById(id: MaybeRefOrGetter<string>) {
   return useQuery({
-    key: () => [todoQueriesKeys.detail(toValue(id))],
+    key: () => [...todoQueriesKeys.detail(toValue(id))],
     query: async () => {
       const response = await todoApi.fetchTodoById(toValue(id))
       return response.data
@@ -48,7 +48,7 @@ export function useTodoById(id: MaybeRefOrGetter<string>) {
  */
 export function useTodoStats() {
   return useQuery({
-    key: () => [todoQueriesKeys.stats],
+    key: () => [...todoQueriesKeys.stats],
     query: async () => {
       const response = await todoApi.fetchTodoStats()
       return response.data

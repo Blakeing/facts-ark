@@ -1,65 +1,42 @@
-import { computed } from 'vue'
-import { useMutation, useQueryCache } from '@pinia/colada'
-import { TodoStatus, type Todo } from '@/entities/todo'
-import * as todoApi from '@/entities/todo/api/todoApi'
-import { todoQueriesKeys } from '@/entities/todo/api/todoQueries'
-import { useToast } from '@/shared/ui/toast'
+import { clearCompletedTodos, TodoStatus, todoQueriesKeys, type Todo } from '@/entities/todo'
+import { createMutationFactory } from '@/shared/lib/mutation'
 
 export function useClearCompleted() {
-  const queryCache = useQueryCache()
-  const { toast } = useToast()
-
-  const mutation = useMutation({
-    mutation: async () => {
-      const response = await todoApi.clearCompletedTodos()
+  const mutation = createMutationFactory({
+    mutationFn: async () => {
+      const response = await clearCompletedTodos()
       return response.data
     },
-    onMutate: async () => {
-      const previousTodos = queryCache.getQueryData([todoQueriesKeys.list]) as Todo[] | undefined
+    optimisticUpdate: (cache) => {
+      const rollbackData = cache.optimisticFilter<Todo>(
+        todoQueriesKeys.list,
+        (todo) => todo.status !== TodoStatus.COMPLETED,
+      )
 
-      queryCache.setQueryData([todoQueriesKeys.list], (old: Todo[] | undefined) => {
-        if (!old) return old
-        return old.filter((todo) => todo.status !== TodoStatus.COMPLETED)
-      })
-
-      return { previousTodos }
-    },
-    onError: (_error: Error, _variables: void, context?: { previousTodos?: Todo[] }) => {
-      if (context?.previousTodos) {
-        queryCache.setQueryData([todoQueriesKeys.list], context.previousTodos)
+      return {
+        rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    onSettled: () => {
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.list] })
-      queryCache.invalidateQueries({ key: [todoQueriesKeys.stats] })
+    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
+    successToast: (count) => ({
+      title: 'Completed todos cleared',
+      description: `${count} completed todo${count === 1 ? '' : 's'} removed.`,
+    }),
+    errorToast: {
+      title: 'Failed to clear todos',
+      description: 'An error occurred while clearing completed todos.',
     },
   })
 
-  // Use asyncStatus for checking if operation is in progress
-  const isPending = computed(() => mutation.asyncStatus.value === 'loading')
-  const isError = computed(() => mutation.status.value === 'error')
-
   async function clearCompleted(onSuccess?: (count: number) => void) {
-    try {
-      const count = await mutation.mutateAsync()
-      toast.success({
-        title: 'Completed todos cleared',
-        description: `${count} completed todo${count === 1 ? '' : 's'} removed.`,
-      })
-      onSuccess?.(count)
-    } catch (err) {
-      toast.error({
-        title: 'Failed to clear todos',
-        description: err instanceof Error ? err.message : 'Unknown error occurred',
-      })
-      throw err
-    }
+    const count = await mutation.mutate(undefined as any)
+    onSuccess?.(count)
   }
 
   return {
     clearCompleted,
-    isPending,
-    isError,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
     error: mutation.error,
   }
 }

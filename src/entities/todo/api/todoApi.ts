@@ -7,6 +7,8 @@
 
 import { apiClient } from '@/shared/api/client'
 import type { ApiResponse } from '@/shared/api/types'
+import { createRequestBuilder } from '@/shared/api/builders'
+import { ValidationStrategy, required, stringLength } from '@/shared/lib/validation'
 import {
   TodoStatus,
   type Todo,
@@ -15,31 +17,36 @@ import {
   type TodoStats,
 } from '../model/types'
 
+// Validation strategies
+const createTodoValidation = new ValidationStrategy()
+  .add('title', required('title'))
+  .add('title', stringLength('title', 1, 200))
+  .add('description', stringLength('description', 0, 1000))
+
+const updateTodoValidation = new ValidationStrategy()
+  .add('title', stringLength('title', 1, 200))
+  .add('description', stringLength('description', 0, 1000))
+
 /**
  * Fetch all todos
  */
 export async function fetchTodos(): Promise<ApiResponse<Todo[]>> {
-  return apiClient.get<Todo[]>('/todos')
+  return createRequestBuilder(apiClient).get('/todos').execute<Todo[]>()
 }
 
 /**
  * Fetch a single todo by ID
  */
 export async function fetchTodoById(id: string): Promise<ApiResponse<Todo>> {
-  return apiClient.get<Todo>(`/todos/${id}`)
+  return createRequestBuilder(apiClient).get(`/todos/${id}`).execute<Todo>()
 }
 
 /**
  * Create a new todo
  */
 export async function createTodo(dto: CreateTodoDto): Promise<ApiResponse<Todo>> {
-  // Client-side validation
-  apiClient.validateRequired(dto.title, 'title')
-  apiClient.validateLength(dto.title, 'title', 1, 200)
-
-  if (dto.description) {
-    apiClient.validateLength(dto.description, 'description', 0, 1000)
-  }
+  // Client-side validation using strategy pattern
+  createTodoValidation.validate(dto as unknown as Record<string, unknown>)
 
   const newTodo = {
     title: dto.title,
@@ -49,21 +56,21 @@ export async function createTodo(dto: CreateTodoDto): Promise<ApiResponse<Todo>>
     updatedAt: new Date().toISOString(),
   }
 
-  return apiClient.post<Todo>('/todos', newTodo)
+  return createRequestBuilder(apiClient).post('/todos').withBody(newTodo).execute<Todo>()
 }
 
 /**
  * Update an existing todo
  */
 export async function updateTodo(id: string, dto: UpdateTodoDto): Promise<ApiResponse<Todo>> {
-  // Client-side validation
-  if (dto.title !== undefined) {
-    apiClient.validateRequired(dto.title, 'title')
-    apiClient.validateLength(dto.title, 'title', 1, 200)
-  }
+  // Client-side validation using strategy pattern
+  // Only validate fields that are present
+  const fieldsToValidate: Record<string, unknown> = {}
+  if (dto.title !== undefined) fieldsToValidate.title = dto.title
+  if (dto.description !== undefined) fieldsToValidate.description = dto.description
 
-  if (dto.description !== undefined && dto.description) {
-    apiClient.validateLength(dto.description, 'description', 0, 1000)
+  if (Object.keys(fieldsToValidate).length > 0) {
+    updateTodoValidation.validate(fieldsToValidate)
   }
 
   const updates = {
@@ -71,14 +78,14 @@ export async function updateTodo(id: string, dto: UpdateTodoDto): Promise<ApiRes
     updatedAt: new Date().toISOString(),
   }
 
-  return apiClient.patch<Todo>(`/todos/${id}`, updates)
+  return createRequestBuilder(apiClient).patch(`/todos/${id}`).withBody(updates).execute<Todo>()
 }
 
 /**
  * Delete a todo
  */
 export async function deleteTodo(id: string): Promise<ApiResponse<void>> {
-  return apiClient.delete<void>(`/todos/${id}`)
+  return createRequestBuilder(apiClient).delete(`/todos/${id}`).execute<void>()
 }
 
 /**
@@ -86,7 +93,7 @@ export async function deleteTodo(id: string): Promise<ApiResponse<void>> {
  */
 export async function toggleTodoStatus(id: string): Promise<ApiResponse<Todo>> {
   // Fetch current todo, toggle status, then update
-  const { data: todo } = await apiClient.get<Todo>(`/todos/${id}`)
+  const { data: todo } = await createRequestBuilder(apiClient).get(`/todos/${id}`).execute<Todo>()
   const newStatus = todo.status === TodoStatus.COMPLETED ? TodoStatus.PENDING : TodoStatus.COMPLETED
   const updates: Partial<Todo> = {
     status: newStatus,
@@ -99,7 +106,7 @@ export async function toggleTodoStatus(id: string): Promise<ApiResponse<Todo>> {
     updates.completedAt = undefined
   }
 
-  return apiClient.patch<Todo>(`/todos/${id}`, updates)
+  return createRequestBuilder(apiClient).patch(`/todos/${id}`).withBody(updates).execute<Todo>()
 }
 
 /**
@@ -107,7 +114,7 @@ export async function toggleTodoStatus(id: string): Promise<ApiResponse<Todo>> {
  */
 export async function fetchTodoStats(): Promise<ApiResponse<TodoStats>> {
   // json-server doesn't have aggregation, calculate client-side
-  const { data: todos } = await apiClient.get<Todo[]>('/todos')
+  const { data: todos } = await createRequestBuilder(apiClient).get('/todos').execute<Todo[]>()
   const total = todos.length
   const completed = todos.filter((t) => t.status === TodoStatus.COMPLETED).length
   const pending = total - completed
@@ -123,11 +130,11 @@ export async function fetchTodoStats(): Promise<ApiResponse<TodoStats>> {
  */
 export async function clearCompletedTodos(): Promise<ApiResponse<number>> {
   // json-server doesn't support bulk delete, delete one by one
-  const { data: todos } = await apiClient.get<Todo[]>('/todos')
+  const { data: todos } = await createRequestBuilder(apiClient).get('/todos').execute<Todo[]>()
   const completedTodos = todos.filter((t) => t.status === TodoStatus.COMPLETED)
 
   for (const todo of completedTodos) {
-    await apiClient.delete(`/todos/${todo.id}`)
+    await createRequestBuilder(apiClient).delete(`/todos/${todo.id}`).execute<void>()
   }
 
   return {

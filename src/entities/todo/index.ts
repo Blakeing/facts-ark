@@ -16,5 +16,17 @@ export { useTodoStore } from './model/store'
 // API (Pinia Colada)
 export { useTodos, useTodoById, useTodoStats, todoQueriesKeys } from './api/todoQueries'
 
+// API Functions
+export {
+  fetchTodos,
+  fetchTodoById,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  toggleTodoStatus,
+  fetchTodoStats,
+  clearCompletedTodos,
+} from './api/todoApi'
+
 // UI
 export { default as TodoItem } from './ui/TodoItem.vue'

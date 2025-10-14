@@ -1,16 +1,23 @@
 /**
  * HTTP Client
  *
- * Axios instance with interceptors for request/response handling.
- * Provides centralized error handling and authentication.
+ * Axios instance wired through the interceptor chain to provide
+ * authentication, logging, retry logic, and error translation.
  */
 
 import axios from 'axios'
-import type { AxiosInstance, AxiosError, AxiosResponse } from 'axios'
-import { ApiException } from './types'
+import type { AxiosInstance } from 'axios'
+import {
+  InterceptorChain,
+  AuthInterceptor,
+  LoggingInterceptor,
+  RetryInterceptor,
+  ErrorTransformInterceptor,
+} from '@/shared/api/interceptors'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 const timeout = Number(import.meta.env.VITE_API_TIMEOUT) || 10000
+const isDev = import.meta.env.DEV
 
 export const httpClient: AxiosInstance = axios.create({
   baseURL,
@@ -20,39 +27,13 @@ export const httpClient: AxiosInstance = axios.create({
   },
 })
 
-// Request interceptor
-httpClient.interceptors.request.use(
-  (config) => {
-    // Add auth token if available
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error),
-)
+// Configure interceptor chain
+const interceptorChain = new InterceptorChain(httpClient)
+  .addRequest(new AuthInterceptor(), 0)
+  .addRequest(new LoggingInterceptor({ isDev }), 10)
+  .addResponse(new RetryInterceptor({ maxRetries: 3, retryDelay: 1000 }, httpClient), 0)
+  .addResponse(new ErrorTransformInterceptor(), 10)
 
-// Response interceptor
-httpClient.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  (error: AxiosError) => {
-    // Convert axios errors to ApiException
-    if (error.response) {
-      // Server responded with error status
-      const { status, data } = error.response
-      const errorData = data as { message?: string; code?: string }
-      const message = errorData?.message || error.message
-      const code = errorData?.code || 'API_ERROR'
-      throw new ApiException(message, code, status)
-    } else if (error.request) {
-      // Request made but no response
-      throw new ApiException('Network error: No response from server', 'NETWORK_ERROR', 0)
-    } else {
-      // Something else happened
-      throw new ApiException(error.message, 'UNKNOWN_ERROR', 0)
-    }
-  },
-)
+interceptorChain.install()
 
 export default httpClient

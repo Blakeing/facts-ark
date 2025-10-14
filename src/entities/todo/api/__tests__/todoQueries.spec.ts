@@ -36,10 +36,10 @@ describe('todoQueries', () => {
     vi.mocked(todoApi.fetchTodos).mockResolvedValue({ data: [], status: 200 })
 
     const query = useTodos()
-    const [key] = query.options.key()
+    const key = query.options.key()
     await query.options.query()
 
-    expect(key).toEqual(todoQueriesKeys.list)
+    expect(key).toEqual([...todoQueriesKeys.list])
     expect(todoApi.fetchTodos).toHaveBeenCalled()
   })
 
@@ -47,10 +47,10 @@ describe('todoQueries', () => {
     vi.mocked(todoApi.fetchTodoById).mockResolvedValue({ data: { id: '1' }, status: 200 } as any)
 
     const query = useTodoById(ref('1'))
-    const [key] = query.options.key()
+    const key = query.options.key()
     await query.options.query()
 
-    expect(key).toBe(todoQueriesKeys.detail('1'))
+    expect(key).toEqual([...todoQueriesKeys.detail('1')])
     expect(todoApi.fetchTodoById).toHaveBeenCalledWith('1')
   })
 
@@ -61,10 +61,10 @@ describe('todoQueries', () => {
     })
 
     const query = useTodoStats()
-    const [key] = query.options.key()
+    const key = query.options.key()
     await query.options.query()
 
-    expect(key).toEqual(todoQueriesKeys.stats)
+    expect(key).toEqual([...todoQueriesKeys.stats])
     expect(todoApi.fetchTodoStats).toHaveBeenCalled()
   })
 })

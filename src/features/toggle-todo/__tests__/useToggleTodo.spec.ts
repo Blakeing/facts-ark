@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useToggleTodo } from '../model/useToggleTodo'
-import * as todoApi from '@/entities/todo/api/todoApi'
+import * as todoApi from '@/entities/todo'
 import { TodoStatus, type Todo } from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
@@ -45,7 +45,9 @@ describe('useToggleTodo', () => {
 
     await promise
 
+    expect(todoApi.toggleTodoStatus).toHaveBeenCalledOnce()
     expect(todoApi.toggleTodoStatus).toHaveBeenCalledWith('1')
+    expect(mockToast.success).toHaveBeenCalledOnce()
     expect(mockToast.success).toHaveBeenCalledWith({
       title: 'Todo updated',
       description: 'Status toggled successfully.',
@@ -62,9 +64,10 @@ describe('useToggleTodo', () => {
 
     await expect(toggleTodo('1')).rejects.toThrow('Network error')
 
+    expect(mockToast.error).toHaveBeenCalledOnce()
     expect(mockToast.error).toHaveBeenCalledWith({
       title: 'Failed to update todo',
-      description: 'Network error',
+      description: 'An error occurred while toggling the todo status.',
     })
 
     unmount()
