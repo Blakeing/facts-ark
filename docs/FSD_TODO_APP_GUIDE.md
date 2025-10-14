@@ -10,7 +10,9 @@ This document provides a comprehensive guide to the Feature-Sliced Design (FSD) 
 - [Directory Structure](#directory-structure)
 - [Layer Responsibilities](#layer-responsibilities)
 - [MVVM Pattern Implementation](#mvvm-pattern-implementation)
+- [State Management Overview](#state-management-overview)
 - [Data Fetching Comparison](#data-fetching-comparison)
+- [XState Integration](#xstate-integration)
 - [Key Patterns](#key-patterns)
 - [Usage Examples](#usage-examples)
 - [Migration Guidance](#migration-guidance)
@@ -379,6 +381,107 @@ export function useAddTodo() {
 }
 ```
 
+## State Management Overview
+
+The application uses three complementary state management solutions:
+
+### 1. Pinia - UI State
+
+**Purpose**: Simple, transient UI state
+
+**Use for**:
+
+- Current filter selection
+- Selected todo IDs
+- Search query
+- Sidebar open/closed
+- Theme preferences
+
+**Example**:
+
+```typescript
+// entities/todo/model/store.ts
+export const useTodoStore = defineStore('todo', () => {
+  const currentFilter = ref<TodoFilter>('all')
+  const selectedTodoIds = ref<Set<string>>(new Set())
+
+  return { currentFilter, selectedTodoIds }
+})
+```
+
+### 2. Pinia Colada - Server State
+
+**Purpose**: Data fetching, caching, and synchronization
+
+**Use for**:
+
+- CRUD operations
+- Server data caching
+- Optimistic updates
+- Query invalidation
+
+**Example**:
+
+```typescript
+// entities/todo/api/todoQueries.ts
+export function useTodos() {
+  return useQuery({
+    key: () => ['todos'],
+    query: async () => {
+      const response = await fetchTodos()
+      return response.data
+    },
+  })
+}
+```
+
+### 3. XState - Complex Workflows
+
+**Purpose**: Complex state machines and workflows
+
+**Use for**:
+
+- Multi-step forms/wizards
+- Entity lifecycle management (draft → pending → completed → archived)
+- Complex UI flows with dependencies
+- Orchestrating async operations
+- Business process workflows
+
+**Example**:
+
+```typescript
+// entities/todo/model/machines/todo-lifecycle.machine.ts
+export const todoLifecycleMachine = setup({ ... }).createMachine({
+  initial: 'pending',
+  states: {
+    pending: {
+      on: {
+        START: 'in_progress',
+        ARCHIVE: 'archived'
+      }
+    },
+    in_progress: {
+      on: {
+        COMPLETE: 'completed',
+        BLOCK: 'blocked'
+      }
+    },
+    // ... more states
+  }
+})
+```
+
+**When to use what**:
+
+| Use Case                 | Solution     | Example                   |
+| ------------------------ | ------------ | ------------------------- |
+| Current tab/filter       | Pinia        | `currentFilter`           |
+| Todo list data           | Pinia Colada | `useTodos()`              |
+| Multi-step todo creation | XState       | `formWizardMachine`       |
+| Selected items           | Pinia        | `selectedTodoIds`         |
+| Create/update todo       | Pinia Colada | `useMutationCreateTodo()` |
+| Todo approval workflow   | XState       | `todoLifecycleMachine`    |
+
 ## Data Fetching Comparison
 
 ### Vue Query (TanStack Query)
@@ -464,6 +567,167 @@ const { data, status, error, refetch } = useColadaTodos()
 - Want simpler, more intuitive API
 - Prefer smaller bundle size
 - Already heavily invested in Pinia
+
+## XState Integration
+
+XState is integrated for managing complex workflows and state machines that go beyond simple data fetching or UI state.
+
+### When to Use XState
+
+✅ **Use XState for:**
+
+- Multi-step forms with complex validation
+- Entity lifecycle management (draft → review → approved)
+- Complex UI flows (onboarding, checkout)
+- Workflows with rollback/undo
+- Coordinating multiple async operations
+- State machines with guards and actions
+
+❌ **Don't use XState for:**
+
+- Simple toggles or flags (use Pinia)
+- Data fetching (use Pinia Colada)
+- Basic form state (use VeeValidate)
+
+### Example: Todo Lifecycle Machine
+
+The todo entity includes an extended lifecycle machine demonstrating XState's power:
+
+```typescript
+import { useTodoMachine } from '@/entities/todo'
+
+// In a component
+const { state, send, isPending, isInProgress, progress } = useTodoMachine({
+  todo: myTodo,
+})
+
+// Check current state
+console.log(state.value) // 'pending' | 'in_progress' | 'completed' | etc.
+
+// Send events
+send({ type: 'START' }) // Start working on todo
+send({ type: 'UPDATE_PROGRESS', progress: 50 }) // Update progress
+send({ type: 'BLOCK', reason: 'Waiting on dependencies' }) // Block todo
+
+// React to state
+if (isPending.value) {
+  // Show "Start" button
+} else if (isInProgress.value) {
+  // Show progress bar and "Complete" button
+}
+```
+
+**State flow:**
+
+```
+draft → pending → in_progress → review → completed → archived
+                      ↓
+                   blocked
+```
+
+### Example: Multi-Step Form Wizard
+
+The `multi-step-form` feature demonstrates a complex form wizard:
+
+```typescript
+import { useFormWizard } from '@/features/multi-step-form'
+
+const wizard = useFormWizard()
+
+// Navigation
+wizard.next() // Go to next step
+wizard.back() // Go back
+wizard.goToStep(2) // Jump to specific step
+
+// Update form data
+wizard.updateBasicInfo({ title: 'New Task', category: 'work' })
+wizard.updateDetails({ description: 'Details...', priority: 'high' })
+
+// Check state
+console.log(wizard.currentStep.value) // 1, 2, 3, 4
+console.log(wizard.progress.value) // 0-100
+console.log(wizard.canGoNext.value) // true/false
+
+// Submit
+if (wizard.isReview.value) {
+  wizard.submit()
+}
+```
+
+**State flow:**
+
+```
+step1 (Basic Info) → step2 (Details) → step3 (Additional) → review → submitting → success
+  ↓                    ↓                   ↓
+back                 back                back
+```
+
+### XState Architecture
+
+XState follows FSD layers:
+
+```
+src/
+├── shared/lib/machines/          # Shared utilities
+│   ├── machine-factory.ts        # Factory helpers
+│   ├── guards/                   # Reusable guards
+│   ├── actions/                  # Reusable actions
+│   └── utils/                    # Devtools, persistence
+│
+├── entities/*/model/machines/    # Entity lifecycle machines
+│   └── todo-lifecycle.machine.ts
+│
+├── features/*/model/machines/    # Feature workflow machines
+│   └── form-wizard.machine.ts
+│
+└── widgets/*/model/              # Orchestration
+    └── useTodoWorkflow.ts
+```
+
+### Visual Debugging
+
+XState includes a visual inspector for debugging:
+
+1. Run dev server: `pnpm dev`
+2. Visit https://stately.ai/inspect
+3. Your machines appear automatically
+4. Features:
+   - Visual state diagram
+   - Real-time state updates
+   - Event history
+   - Time-travel debugging
+
+### Integration with Pinia Colada
+
+XState machines can trigger Pinia Colada mutations:
+
+```typescript
+import { useMutationCreateTodo } from '@/entities/todo'
+
+export function useFormWithSubmission() {
+  const { mutate } = useMutationCreateTodo()
+
+  const actor = createActor(formMachine)
+
+  actor.subscribe((snapshot) => {
+    if (snapshot.matches('submitting')) {
+      mutate(snapshot.context.data, {
+        onSuccess: () => actor.send({ type: 'SUCCESS' }),
+        onError: (error) => actor.send({ type: 'ERROR', error }),
+      })
+    }
+  })
+
+  return { actor }
+}
+```
+
+### Documentation
+
+For comprehensive XState guides:
+
+- [XState Integration Guide](./XSTATE_INTEGRATION_GUIDE.md) - Setup and when to use
+- [XState Patterns](./XSTATE_PATTERNS.md) - Common patterns and recipes
 
 ## Key Patterns
 

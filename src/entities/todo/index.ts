@@ -13,6 +13,23 @@ export { createTodoSchema, type CreateTodoFormValues } from './model/validation'
 // Store
 export { useTodoStore } from './model/store'
 
+// State Machine
+export { todoLifecycleMachine } from './model/machines/todo-lifecycle.machine'
+export type {
+  TodoLifecycleMachine,
+  TodoLifecycleActor,
+  TodoLifecycleSnapshot,
+} from './model/machines/todo-lifecycle.machine'
+export type {
+  TodoMachineContext,
+  TodoMachineEvent,
+  TodoMachineInput,
+  TodoMachineOutput,
+  TodoWorkflowState,
+} from './model/machines/types'
+export { useTodoMachine } from './model/useTodoMachine'
+export type { UseTodoMachineReturn } from './model/useTodoMachine'
+
 // API (Pinia Colada)
 export { useTodos, useTodoById, useTodoStats, todoQueriesKeys } from './api/todoQueries'
 

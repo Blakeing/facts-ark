@@ -17,6 +17,7 @@ import '../assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
+import { initInspector } from '@/shared/lib/machines'
 
 import App from './App.vue'
 import router from './router'
@@ -34,6 +35,11 @@ app.use(PiniaColada)
 
 // Enable Vue Router
 app.use(router)
+
+// Initialize XState inspector (dev only)
+if (import.meta.env.DEV) {
+  initInspector()
+}
 
 // Mount the app
 app.mount('#app')

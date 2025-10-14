@@ -15,6 +15,7 @@ import {
   BookOpen,
   ExternalLink,
   CheckSquare,
+  Workflow,
 } from 'lucide-vue-next'
 import { cn } from '@/shared/lib/utils'
 
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
     { name: 'Theme', href: '/theme', icon: Palette, current: false },
     { name: 'Transitions', href: '/transitions', icon: Sparkles, current: false },
     { name: 'Todos (FSD)', href: '/todos', icon: CheckSquare, current: false },
+    { name: 'XState Wizard', href: '/wizard', icon: Workflow, current: false },
     { name: 'About', href: '/about', icon: Info, current: false },
     {
       name: 'Documentation',

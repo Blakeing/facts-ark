@@ -10,6 +10,8 @@
  * - /showcase: Original component showcase
  * - /theme: Theming demo
  * - /transitions: Vue transitions demo
+ * - /todos: FSD todo app demo
+ * - /wizard: XState multi-step form wizard demo (NEW)
  * - /about: About page
  *
  * Lazy-loaded routes are code-split into separate chunks,
@@ -85,6 +87,15 @@ const router = createRouter({
       meta: {
         title: 'Todos',
         description: 'Feature-Sliced Design todo app with Pinia Colada',
+      },
+    },
+    {
+      path: '/wizard',
+      name: 'wizard',
+      component: () => import('../../pages/wizard/ui/WizardPage.vue'),
+      meta: {
+        title: 'Form Wizard',
+        description: 'Multi-step form powered by XState',
       },
     },
   ],
