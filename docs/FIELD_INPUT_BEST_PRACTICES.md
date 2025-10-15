@@ -2,15 +2,16 @@
 
 ## Overview
 
-This guide explains the relationship between `Field` and `Input` components and when to use each.
+This comprehensive guide covers the relationship between `Field` and `Input` components, when to use each, and best practices for form implementation in Facts Ark.
 
-## Components
+## Component Architecture
 
 ### 1. **Field** (Form Field Wrapper)
+
 - **Purpose**: Container component that provides complete form field structure
 - **Source**: Ark UI's Field component
 - **Features**:
-  - Label with required indicator (*)
+  - Label with required indicator (\*)
   - Helper text (hints/instructions)
   - Error messages
   - Full accessibility (ARIA attributes, proper IDs)
@@ -18,6 +19,7 @@ This guide explains the relationship between `Field` and `Input` components and 
   - Context provider for child inputs
 
 ### 2. **Input** (Styled Input Element)
+
 - **Purpose**: Standalone styled `<input>` HTML element
 - **Source**: Custom component
 - **Features**:
@@ -28,6 +30,7 @@ This guide explains the relationship between `Field` and `Input` components and 
   - Dark mode support via semantic tokens
 
 ### 3. **FieldInput** (Recommended - Best of Both)
+
 - **Purpose**: Specialized input that integrates with Field context
 - **Source**: Custom wrapper combining Ark UI Field.Input + Input styling
 - **Features**:
@@ -36,109 +39,159 @@ This guide explains the relationship between `Field` and `Input` components and 
   - Proper ID and ARIA attribute management
   - All styling features from Input component
 
+## ✅ Recommended Pattern: FieldInput
+
+### Why FieldInput over standalone Input?
+
+According to Ark UI Storybook best practices:
+
+> **BEST PRACTICE: Use FieldInput for seamless integration**
+> FieldInput automatically:
+>
+> - Connects to Field's accessibility context
+> - Inherits invalid state for error styling
+> - Gets proper IDs and ARIA attributes
+
+### Component Architecture
+
+```
+Field.vue (wrapper)
+  └── FieldInput.vue (input with context)
+      └── Field.Context (Ark UI context)
+          └── Field.Input (Ark UI input)
+```
+
+**FieldInput** wraps Ark UI's `Field.Input` with:
+
+- Automatic accessibility IDs
+- Context-aware validation styling
+- ARIA attributes from parent Field
+- Our custom `inputVariants` styling
+
 ## Usage Patterns
 
-### ✅ BEST PRACTICE: Use FieldInput inside Field
-
-This is the **recommended pattern** for most forms:
+### ✅ Best Practice (Using FieldInput)
 
 ```vue
-<script setup>
-import { Field, FieldInput } from '@/components/ui/field'
+<script setup lang="ts">
+import { Field, FieldInput } from '@/shared/ui/field'
+import { ref } from 'vue'
+
+const title = ref('')
+const isValid = computed(() => title.value.length > 0)
+</script>
+
+<template>
+  <Field label="Title" required :invalid="!isValid">
+    <FieldInput v-model="title" placeholder="Enter title..." maxlength="200" />
+    <template #helperText>
+      <span>{{ title.length }}/200 characters</span>
+    </template>
+    <template #errorText>
+      <span>Title is required</span>
+    </template>
+  </Field>
+</template>
+```
+
+### ✅ Also Works (Standalone Input)
+
+```vue
+<script setup lang="ts">
+import { Field } from '@/shared/ui/field'
+import { Input } from '@/shared/ui/input'
 import { ref } from 'vue'
 
 const email = ref('')
 </script>
 
 <template>
-  <Field
-    label="Email"
-    required
-    helperText="We'll send a confirmation email"
-    :invalid="emailError"
-    errorText="Please enter a valid email"
-  >
-    <FieldInput
-      v-model="email"
-      type="email"
-      placeholder="you@example.com"
-    />
+  <Field label="Email" required>
+    <Input v-model="email" type="email" placeholder="you@example.com" />
   </Field>
 </template>
 ```
 
-**Why this is best:**
-- ✅ Automatic accessibility
-- ✅ Auto-detection of error state from Field
-- ✅ No need to pass `invalid` prop to input
-- ✅ Proper ID management
-- ✅ Custom styling from our design system
+**Note:** This works but doesn't get automatic accessibility features from Field context.
 
-### Alternative: Use Field with Ark UI's Built-in Input
+## Key Features
 
-```vue
-<template>
-  <Field label="Username">
-    <Field.Input type="text" />
-  </Field>
-</template>
-```
+### 1. Slot Support (Both Props and Slots)
 
-**Use when:**
-- You want minimal styling
-- You're okay with Ark UI's default input appearance
-- You don't need custom size variants
+Our enhanced Field component supports both:
 
-### Standalone Input (Rare Cases)
+**Props (simple, static text):**
 
 ```vue
-<template>
-  <!-- Simple search bar without labels -->
-  <Input v-model="search" placeholder="Search..." />
-</template>
+<Field
+  label="Email"
+  helperText="We'll never share your email"
+  :invalid="hasError"
+  errorText="Email is required"
+>
+  <FieldInput type="email" />
+</Field>
 ```
 
-**Use when:**
-- No label/helper text needed
-- Simple standalone inputs (search bars, filters)
-- You're building a custom field wrapper
-
-### Legacy: Field with standalone Input
+**Slots (dynamic, reactive content):**
 
 ```vue
-<template>
-  <Field label="Email" :invalid="hasError">
-    <Input
-      v-model="email"
-      type="email"
-      variant="error"  <!-- Manual error state -->
-    />
-  </Field>
-</template>
+<Field label="Password" :invalid="tooShort">
+  <FieldInput type="password" />
+  <template #helperText>
+    {{ password.length }}/50 characters
+  </template>
+  <template #errorText>
+    <span v-if="tooShort">Must be at least 8 characters</span>
+    <span v-else>Password is required</span>
+  </template>
+</Field>
 ```
 
-**Still works, but FieldInput is better because:**
-- ❌ Need to manually sync error state
-- ❌ Need to pass `variant="error"` manually
-- ❌ More verbose
+### 2. Automatic Error Styling
+
+When `Field` has `:invalid="true"`:
+
+- FieldInput automatically applies error styling
+- ErrorText shows (hides HelperText)
+- Input gets red border from `variant: 'error'`
+
+### 3. Accessibility Built-in
+
+FieldInput provides:
+
+- `aria-invalid` when Field is invalid
+- `aria-describedby` linking to helper/error text
+- Proper `id` and `for` attributes
+- Required indicator (`*`)
+
+### 4. v-model Support
+
+Both Input and FieldInput fully support `v-model`:
+
+```vue
+<FieldInput v-model="title" />
+<!-- or -->
+<Input v-model="title" />
+```
 
 ## Complete Form Example
 
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Field, FieldInput } from '@/components/ui/field'
-import { Textarea } from '@/components/ui/textarea'
+import { Field, FieldInput } from '@/shared/ui/field'
+import { Textarea } from '@/shared/ui/textarea'
 
 const form = ref({
   name: '',
   email: '',
-  message: ''
+  message: '',
 })
 
 const errors = ref({
   name: false,
-  email: false
+  email: false,
 })
 
 const validate = () => {
@@ -156,11 +209,7 @@ const validate = () => {
       :errorText="errors.name ? 'Name must be at least 2 characters' : undefined"
       helperText="Enter your first and last name"
     >
-      <FieldInput
-        v-model="form.name"
-        type="text"
-        placeholder="John Doe"
-      />
+      <FieldInput v-model="form.name" type="text" placeholder="John Doe" />
     </Field>
 
     <Field
@@ -169,22 +218,11 @@ const validate = () => {
       :invalid="errors.email"
       :errorText="errors.email ? 'Please enter a valid email' : undefined"
     >
-      <FieldInput
-        v-model="form.email"
-        type="email"
-        placeholder="john@example.com"
-      />
+      <FieldInput v-model="form.email" type="email" placeholder="john@example.com" />
     </Field>
 
-    <Field
-      label="Message"
-      helperText="Optional: Tell us what you're interested in"
-    >
-      <Textarea
-        v-model="form.message"
-        placeholder="Your message..."
-        :rows="4"
-      />
+    <Field label="Message" helperText="Optional: Tell us what you're interested in">
+      <Textarea v-model="form.message" placeholder="Your message..." :rows="4" />
     </Field>
 
     <button type="submit">Submit</button>
@@ -226,40 +264,88 @@ FieldInput automatically detects the `invalid` prop from Field:
 </Field>
 ```
 
+## Real-World Examples
+
+### Character Counter (Dynamic Slot)
+
+```vue
+<Field label="Bio" :invalid="tooLong">
+  <FieldInput v-model="bio" maxlength="500" />
+  <template #helperText>
+    <span>{{ bio.length }}/500 characters</span>
+  </template>
+  <template #errorText>
+    <span>Bio is too long</span>
+  </template>
+</Field>
+```
+
+### Conditional Error Messages (Dynamic Slot)
+
+```vue
+<Field label="Password" :invalid="hasPasswordError">
+  <FieldInput type="password" v-model="password" />
+  <template #errorText>
+    <span v-if="password.length === 0">Password is required</span>
+    <span v-else-if="password.length < 8">Must be at least 8 characters</span>
+    <span v-else-if="!hasNumber">Must contain a number</span>
+    <span v-else-if="!hasSpecial">Must contain a special character</span>
+  </template>
+</Field>
+```
+
+### Simple Static Text (Props)
+
+```vue
+<Field label="Email" required helperText="We'll send you a confirmation email">
+  <FieldInput type="email" v-model="email" />
+</Field>
+```
+
+## Debug Pattern
+
+When debugging forms, add a `<pre>` tag to see live values:
+
+```vue
+<pre class="mt-4 rounded bg-gray-100 p-2 text-xs dark:bg-gray-800">{{
+  JSON.stringify(
+    {
+      title: title,
+      titleLength: title.length,
+      isValid: isValid,
+      canSubmit: canSubmit,
+      isPending: isPending,
+    },
+    null,
+    2
+  )
+}}</pre>
+```
+
+This helps verify:
+
+- ✅ v-model is working (value updates)
+- ✅ Computed properties are reactive
+- ✅ Validation logic is correct
+- ✅ State updates in real-time
+
 ## When Each Component is Necessary
 
-| Scenario | Use Field? | Use Input or FieldInput? |
-|----------|-----------|-------------------------|
-| Form field with label | ✅ Yes | ✅ FieldInput (inside Field) |
-| Form field with validation | ✅ Yes | ✅ FieldInput (inside Field) |
-| Simple search bar | ❌ No | ✅ Input (standalone) |
-| Filter input | ❌ No | ✅ Input (standalone) |
-| Quick text input in toolbar | ❌ No | ✅ Input (standalone) |
-| Complex form | ✅ Yes | ✅ FieldInput (inside Field) |
-
-## Summary
-
-### Are both Field and Input necessary?
-**Yes!** They serve complementary roles:
-- **Field** = Structure + Labels + Accessibility + Validation UI
-- **Input** = Styled HTML input element
-- **FieldInput** = Best of both (Field context + Input styling)
-
-### What should I use?
-**Use FieldInput inside Field** for 90% of use cases. It gives you:
-- Complete accessibility
-- Automatic error state detection
-- Beautiful styling
-- Consistent form UX
-
-### When to use standalone Input?
-Only for simple inputs without labels, like search bars or filters.
+| Scenario                    | Use Field? | Use Input or FieldInput?     |
+| --------------------------- | ---------- | ---------------------------- |
+| Form field with label       | ✅ Yes     | ✅ FieldInput (inside Field) |
+| Form field with validation  | ✅ Yes     | ✅ FieldInput (inside Field) |
+| Simple search bar           | ❌ No      | ✅ Input (standalone)        |
+| Filter input                | ❌ No      | ✅ Input (standalone)        |
+| Quick text input in toolbar | ❌ No      | ✅ Input (standalone)        |
+| Complex form                | ✅ Yes     | ✅ FieldInput (inside Field) |
 
 ## Migration Guide
 
 If you have existing code using `Field` with standalone `Input`:
 
 **Before:**
+
 ```vue
 <Field label="Email" :invalid="hasError">
   <Input v-model="email" :variant="hasError ? 'error' : 'default'" />
@@ -267,6 +353,7 @@ If you have existing code using `Field` with standalone `Input`:
 ```
 
 **After:**
+
 ```vue
 <Field label="Email" :invalid="hasError">
   <FieldInput v-model="email" />
@@ -274,3 +361,51 @@ If you have existing code using `Field` with standalone `Input`:
 ```
 
 The error state is automatically handled! 🎉
+
+## Migration Checklist
+
+When creating forms with Field:
+
+- [ ] Import `Field` and `FieldInput` from `@/shared/ui/field`
+- [ ] Use `FieldInput` instead of standalone `Input` for better integration
+- [ ] Use slots for dynamic content (character counts, conditional errors)
+- [ ] Use props for static content (simple labels, fixed helper text)
+- [ ] Test `v-model` reactivity with debug pre tag
+- [ ] Verify error states show/hide correctly
+- [ ] Check accessibility with screen reader
+
+## Summary
+
+### Are both Field and Input necessary?
+
+**Yes!** They serve complementary roles:
+
+- **Field** = Structure + Labels + Accessibility + Validation UI
+- **Input** = Styled HTML input element
+- **FieldInput** = Best of both (Field context + Input styling)
+
+### What should I use?
+
+**Use FieldInput inside Field** for 90% of use cases. It gives you:
+
+- Complete accessibility
+- Automatic error state detection
+- Beautiful styling
+- Consistent form UX
+
+### When to use standalone Input?
+
+Only for simple inputs without labels, like search bars or filters.
+
+## References
+
+- **Ark UI Field Docs**: [https://ark-ui.com/vue/docs/components/field](https://ark-ui.com/vue/docs/components/field)
+- **Our Implementation**: `src/shared/ui/field/Field.vue`
+- **Storybook Examples**: `src/shared/ui/field/Field.stories.ts`
+- **FieldInput Component**: `src/shared/ui/field/FieldInput.vue`
+
+---
+
+**Status:** ✅ Verified against Ark UI best practices  
+**Implementation:** Production-ready  
+**Pattern:** FieldInput + Slots for dynamic content
