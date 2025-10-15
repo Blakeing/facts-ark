@@ -2,13 +2,12 @@ import { useFormMachine, createFormMachineWithMutation } from '@/shared/lib/form
 import { contactSchema } from './contactSchema'
 
 /**
- * Unified form composable for contact form
+ * Form composable for contact form
  *
- * Uses:
- * - Zod schema for validation (contactSchema)
- * - XState machine for state management
- * - VeeValidate for UI integration
- * - Mutation factory for automatic handling
+ * Architecture:
+ * - VeeValidate: Handles all field state and validation (via contactSchema)
+ * - XState: Orchestrates submission flow only
+ * - Mutation factory: Handles API calls and toast notifications
  *
  * Features:
  * - Auto-resets after successful submission
@@ -22,16 +21,14 @@ import { contactSchema } from './contactSchema'
  * <form @submit="handleSubmit">
  *   <TextField name="name" label="Name" required />
  *   <TextField name="email" label="Email" type="email" required />
- *   <Button type="submit" :disabled="!form.meta.value.valid">
+ *   <Button type="submit" :disabled="!isValid || isSubmitting">
  *     Send Message
  *   </Button>
  * </form>
  */
 export function useContactForm() {
-  // Create form machine with integrated mutation factory
+  // Create submission machine with integrated mutation factory
   const { machine } = createFormMachineWithMutation({
-    schema: contactSchema,
-    initialData: {},
     mutationFn: async (values) => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))

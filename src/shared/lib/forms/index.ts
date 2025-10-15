@@ -1,9 +1,9 @@
 export { useFormMachine } from './useFormMachine'
+export { useWizard } from './useWizard'
 export { createFormMachine } from './createFormMachine'
-export { createWizardMachine } from './createWizardMachine'
 export { createFormMachineWithMutation } from './createFormMachineWithMutation'
 
 export type { UseFormMachineOptions } from './useFormMachine'
+export type { UseWizardOptions, WizardStep as WizardStepConfig } from './useWizard'
 export type { FormMachineConfig } from './createFormMachine'
-export type { WizardMachineConfig, WizardStep } from './createWizardMachine'
 export type { FormMachineWithMutationConfig } from './createFormMachineWithMutation'

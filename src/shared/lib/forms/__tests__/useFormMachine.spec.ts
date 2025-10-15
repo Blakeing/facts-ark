@@ -20,7 +20,7 @@ describe('useFormMachine', () => {
   })
 
   it('initializes VeeValidate form with Zod schema', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -37,7 +37,7 @@ describe('useFormMachine', () => {
   })
 
   it('initializes with provided initial values', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const initialValues = {
       title: 'Test Todo',
       description: 'Test Description',
@@ -60,7 +60,7 @@ describe('useFormMachine', () => {
   })
 
   it('machine starts in idle state', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -73,8 +73,8 @@ describe('useFormMachine', () => {
     unmount()
   })
 
-  it('updates form values and syncs to machine context', async () => {
-    const machine = createFormMachine({ schema: testSchema })
+  it('updates form values in VeeValidate (source of truth)', async () => {
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -85,15 +85,18 @@ describe('useFormMachine', () => {
     formMachine.form.setFieldValue('title', 'New Title')
     await nextTick()
 
+    // VeeValidate is the source of truth for field values
     expect(formMachine.form.values.title).toBe('New Title')
-    // The form data should be synced to the machine context
-    expect(formMachine.state.value.context.formData.title).toBe('New Title')
+    expect(formMachine.values.value.title).toBe('New Title')
+
+    // XState context does NOT store form data anymore
+    expect(formMachine.state.value.context.formData).toBeUndefined()
 
     unmount()
   })
 
   it('exposes computed properties correctly', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -122,7 +125,6 @@ describe('useFormMachine', () => {
 
   it('handles form submission and calls onSubmit callback', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
       onSubmit: onSubmitMock,
     })
 
@@ -134,7 +136,6 @@ describe('useFormMachine', () => {
           title: 'Test Todo',
           priority: 'medium' as const,
         },
-        onSubmit: onSubmitMock,
       }),
     )
 
@@ -142,7 +143,7 @@ describe('useFormMachine', () => {
     await nextTick()
     await nextTick()
 
-    expect(onSubmitMock).toHaveBeenCalledWith({
+    expect(onSubmitMock).toHaveBeenCalledExactlyOnceWith({
       title: 'Test Todo',
       priority: 'medium',
     })
@@ -157,7 +158,6 @@ describe('useFormMachine', () => {
     })
 
     const machine = createFormMachine({
-      schema: testSchema,
       onSubmit: async () => {
         // Wait for test to check state
         await submitPromise
@@ -172,19 +172,17 @@ describe('useFormMachine', () => {
           title: 'Test',
           priority: 'medium' as const,
         },
-        onSubmit: async () => {
-          await submitPromise
-        },
       }),
     )
 
-    // Submit form
+    // Submit form - triggers XState transition
     const handleSubmitPromise = formMachine.handleSubmit()
-    await nextTick()
-    await nextTick()
+
+    // Wait for state to update - need to wait for async operation
+    await new Promise((resolve) => setTimeout(resolve, 10))
     await nextTick()
 
-    // Should be submitting
+    // Should be submitting (XState manages submission state)
     expect(formMachine.isSubmitting.value).toBe(true)
     expect(formMachine.canSubmit.value).toBe(false)
 
@@ -198,7 +196,6 @@ describe('useFormMachine', () => {
 
   it('prevents submission when form is invalid', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
       onSubmit: onSubmitMock,
     })
 
@@ -224,7 +221,7 @@ describe('useFormMachine', () => {
   })
 
   it('matches() helper function works correctly', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -239,7 +236,7 @@ describe('useFormMachine', () => {
   })
 
   it('exposes field manipulation methods', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -256,7 +253,7 @@ describe('useFormMachine', () => {
   })
 
   it('exposes form-level control methods', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -275,7 +272,7 @@ describe('useFormMachine', () => {
   })
 
   it('field count helpers work correctly', async () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,
@@ -300,7 +297,7 @@ describe('useFormMachine', () => {
   })
 
   it('validates form data with Zod schema', async () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const [formMachine, unmount] = withSetup(() =>
       useFormMachine({
         schema: testSchema,

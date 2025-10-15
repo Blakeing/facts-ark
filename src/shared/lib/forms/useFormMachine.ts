@@ -26,22 +26,22 @@ export interface UseFormMachineOptions<TSchema extends z.ZodType> {
 /**
  * Unified form composable that integrates XState + Zod + VeeValidate
  *
- * Provides a consistent pattern for all forms:
- * - Zod for validation rules
- * - XState for state management & flow
- * - VeeValidate for UI integration
+ * Architecture:
+ * - VeeValidate: Single source of truth for all field state, validation, and errors
+ * - XState: Orchestrates submission flow (idle → submitting → success/error)
+ * - Zod: Schema used by VeeValidate for validation
  *
  * @example
  * const { form, handleSubmit, state, isValid } = useFormMachine({
  *   schema: todoSchema,
- *   machine: todoFormMachine,
+ *   machine: submissionMachine,
  *   onSubmit: async (values) => {
  *     await createTodo(values)
  *   }
  * })
  */
 export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachineOptions<TSchema>) {
-  // VeeValidate form with Zod schema
+  // VeeValidate form with Zod schema - this is the single source of truth
   const form = useForm({
     validationSchema: toTypedSchema(options.schema),
     // Initial state (cast to any for type compatibility)
@@ -51,9 +51,10 @@ export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachin
     initialErrors: options.initialErrors as any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     initialTouched: options.initialTouched as any,
+    validateOnMount: options.validateOnMount,
   })
 
-  // XState machine
+  // XState machine for submission flow orchestration only
   const { snapshot, send, actorRef } = useMachine(options.machine)
   const state = snapshot
 
@@ -71,49 +72,19 @@ export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachin
     return current.value === targetState
   }
 
-  // Sync VeeValidate values to XState context
-  watch(
-    () => form.values,
-    (values) => {
-      send({ type: 'UPDATE_FORM_DATA', data: values })
-    },
-    { deep: true },
-  )
+  // Handle submit - VeeValidate validates, then XState manages submission flow
+  const handleSubmit = form.handleSubmit(async (values) => {
+    // Only submit if form is valid (VeeValidate has already validated)
+    if (form.meta.value.valid) {
+      send({ type: 'SUBMIT', data: values })
+      await options.onSubmit?.(values)
+    }
+  })
 
-  // Sync VeeValidate meta state to XState
-  watch(
-    () => form.meta.value,
-    (meta) => {
-      send({
-        type: 'UPDATE_FORM_META',
-        meta: {
-          dirty: meta.dirty,
-          touched: meta.touched,
-          valid: meta.valid,
-          pending: meta.pending,
-        },
-      })
-    },
-    { deep: true },
-  )
-
-  // Sync XState errors to VeeValidate
-  watch(
-    () => state.value.context?.errors,
-    (errors) => {
-      if (errors) {
-        // Cast for type compatibility with VeeValidate
-        form.setErrors(errors as Record<string, string>)
-      }
-    },
-    { deep: true },
-  )
-
-  // Watch for machine reset to sync VeeValidate form
+  // Auto-reset form when machine transitions from success back to idle
   watch(
     () => state.value.value,
     (newState, oldState) => {
-      // Auto-reset VeeValidate when machine transitions from success to idle
       if (oldState === 'success' && newState === 'idle') {
         form.resetForm({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,28 +94,21 @@ export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachin
     },
   )
 
-  // Handle submit
-  const handleSubmit = form.handleSubmit(async (values) => {
-    send({ type: 'SUBMIT', data: values })
-    await options.onSubmit?.(values)
-  })
-
   return {
     // Core objects
-    form, // Full VeeValidate form API
-    state, // XState machine state
+    form, // Full VeeValidate form API (source of truth)
+    state, // XState machine state (submission flow only)
     send, // Send events to machine
     actorRef, // XState actor reference
     handleSubmit, // Form submission
 
-    // Convenience computed values
+    // Convenience computed values from VeeValidate
     values: computed(() => form.values as z.infer<TSchema>),
     errors: computed(() => form.errors.value),
     meta: computed(() => form.meta.value),
 
     // Field-level access (VeeValidate features!)
     getFieldState: (name: string) => {
-      // VeeValidate doesn't expose getFieldState in v4, use meta instead
       const fieldMeta = form.meta.value
       // @ts-expect-error - VeeValidate meta type compatibility
       const touchedMap = fieldMeta.touched as Record<string, boolean>
@@ -160,13 +124,13 @@ export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachin
       }
     },
 
-    // Field manipulation
+    // Field manipulation (from VeeValidate)
     setFieldValue: form.setFieldValue,
     setFieldTouched: form.setFieldTouched,
     setFieldError: form.setFieldError,
     resetField: form.resetField,
 
-    // Form-level controls
+    // Form-level controls (from VeeValidate)
     resetForm: form.resetForm,
     validate: form.validate,
     validateField: form.validateField,
@@ -174,12 +138,15 @@ export function useFormMachine<TSchema extends z.ZodType>(options: UseFormMachin
     setValues: form.setValues,
     setTouched: form.setTouched,
 
-    // State checks
+    // State checks (VeeValidate for validation, XState for submission)
     isValid: computed(() => form.meta.value.valid),
     isDirty: computed(() => form.meta.value.dirty),
     isTouched: computed(() => form.meta.value.touched),
     isPending: computed(() => form.meta.value.pending),
-    isSubmitting: computed(() => matches('submitting') || matches('success')),
+    isSubmitting: computed(() => matches('submitting')),
+    isSuccess: computed(() => matches('success')),
+    isError: computed(() => matches('error')),
+    submitError: computed(() => state.value.context?.submitError ?? null),
     canSubmit: computed(
       () => form.meta.value.valid && !matches('submitting') && !matches('success'),
     ),

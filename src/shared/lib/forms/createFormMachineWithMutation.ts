@@ -1,46 +1,38 @@
 /**
  * Form Machine with Mutation Factory Integration
  *
- * Combines XState form machine with Pinia Colada mutation factory
+ * Combines XState form submission machine with Pinia Colada mutation factory
  * for automatic query invalidation, optimistic updates, and error handling.
+ *
+ * Note: This only handles submission flow. VeeValidate handles validation and field state.
  *
  * @example
  * ```ts
  * const { machine, mutation } = createFormMachineWithMutation({
- *   schema: todoSchema,
- *   initialData: { priority: 'medium' },
  *   mutationFn: async (data) => {
  *     const response = await createTodo(data)
  *     return response.data
  *   },
  *   invalidateKeys: [todoKeys.list, todoKeys.stats],
- *   successToast: { title: 'Todo created!' },
- *   errorToast: { title: 'Failed to create todo' },
+ *   loadingToast: {
+ *     loading: 'Creating todo...',
+ *     success: 'Todo created!',
+ *     error: 'Failed to create todo'
+ *   }
  * })
  * ```
  */
 
-import type { z } from 'zod'
 import { createFormMachine } from './createFormMachine'
 import { createMutationFactory } from '../mutation'
 import type { QueryKey } from '@/shared/lib/cache'
 import type { OptimisticUpdateFn, ToastConfig } from '../mutation/MutationConfig.types'
 
-export interface FormMachineWithMutationConfig<TSchema extends z.ZodType, TResponse> {
-  /**
-   * Zod schema for form validation
-   */
-  schema: TSchema
-
-  /**
-   * Initial form data
-   */
-  initialData?: Partial<z.infer<TSchema>>
-
+export interface FormMachineWithMutationConfig<TData, TResponse> {
   /**
    * Mutation function to execute on form submission
    */
-  mutationFn: (data: z.infer<TSchema>) => Promise<TResponse>
+  mutationFn: (data: TData) => Promise<TResponse>
 
   /**
    * Query keys to invalidate after successful mutation
@@ -50,17 +42,17 @@ export interface FormMachineWithMutationConfig<TSchema extends z.ZodType, TRespo
   /**
    * Optional optimistic update function
    */
-  optimisticUpdate?: OptimisticUpdateFn<z.infer<TSchema>, TResponse>
+  optimisticUpdate?: OptimisticUpdateFn<TData, TResponse>
 
   /**
    * Success toast configuration (optional if using loadingToast)
    */
-  successToast?: ToastConfig | ((data: TResponse, variables: z.infer<TSchema>) => ToastConfig)
+  successToast?: ToastConfig | ((data: TResponse, variables: TData) => ToastConfig)
 
   /**
    * Error toast configuration (optional if using loadingToast)
    */
-  errorToast?: ToastConfig | ((error: Error, variables: z.infer<TSchema>) => ToastConfig)
+  errorToast?: ToastConfig | ((error: Error, variables: TData) => ToastConfig)
 
   /**
    * Promise-based loading toast (replaces successToast/errorToast)
@@ -75,31 +67,31 @@ export interface FormMachineWithMutationConfig<TSchema extends z.ZodType, TRespo
   /**
    * Additional onSuccess handler
    */
-  onSuccess?: (data: TResponse, variables: z.infer<TSchema>) => void | Promise<void>
+  onSuccess?: (data: TResponse, variables: TData) => void | Promise<void>
 
   /**
    * Additional onError handler
    */
-  onError?: (error: Error, variables: z.infer<TSchema>) => void | Promise<void>
+  onError?: (error: Error, variables: TData) => void | Promise<void>
 }
 
 /**
- * Creates a form machine integrated with mutation factory
+ * Creates a form submission machine integrated with mutation factory
  *
  * This provides:
+ * - Submission flow orchestration (idle → submitting → success/error)
  * - Automatic query invalidation on success
  * - Optimistic updates with rollback on error
  * - Toast notifications
- * - Form auto-reset after success
  * - Unified error handling
+ *
+ * Note: Form validation and field state are handled by VeeValidate.
  */
-export function createFormMachineWithMutation<TSchema extends z.ZodType, TResponse>(
-  config: FormMachineWithMutationConfig<TSchema, TResponse>,
+export function createFormMachineWithMutation<TData = unknown, TResponse = unknown>(
+  config: FormMachineWithMutationConfig<TData, TResponse>,
 ) {
-  type FormData = z.infer<TSchema>
-
   // Create mutation with factory
-  const mutation = createMutationFactory<TResponse, FormData, Error>({
+  const mutation = createMutationFactory<TResponse, TData, Error>({
     mutationFn: config.mutationFn,
     invalidateKeys: config.invalidateKeys,
     optimisticUpdate: config.optimisticUpdate,
@@ -110,13 +102,11 @@ export function createFormMachineWithMutation<TSchema extends z.ZodType, TRespon
     onError: config.onError,
   })
 
-  // Create form machine that uses the mutation
+  // Create form submission machine that uses the mutation
   const machine = createFormMachine({
-    schema: config.schema,
-    initialData: config.initialData,
-    onSubmit: async (data: FormData) => {
+    onSubmit: async (data: unknown) => {
       // Execute mutation which handles invalidation, toasts, etc.
-      await mutation.mutate(data)
+      await mutation.mutate(data as TData)
     },
   })
 

@@ -1,89 +1,48 @@
 import { setup, assign, fromPromise } from 'xstate'
-import type { z } from 'zod'
 
-export interface FormMachineConfig<TSchema extends z.ZodType> {
-  schema: TSchema
-  initialData?: Partial<z.infer<TSchema>>
-  onSubmit?: (data: z.infer<TSchema>) => Promise<void>
+export interface FormMachineConfig {
+  onSubmit?: (data: unknown) => Promise<void>
 }
 
 /**
- * Factory for creating standardized form state machines
+ * Factory for creating standardized form submission state machines
+ *
+ * This machine only orchestrates the submission flow, NOT form data or validation.
+ * VeeValidate handles all field-level state and validation.
  *
  * Creates a machine with standard states:
- * - idle: Form is ready for input
- * - validating: Validating form data
+ * - idle: Ready to submit
  * - submitting: Submitting to server
  * - success: Submission successful
+ * - error: Submission failed
  *
  * @example
- * const todoFormMachine = createFormMachine({
- *   schema: todoSchema,
- *   initialData: { priority: 'medium' },
+ * const submissionMachine = createFormMachine({
  *   onSubmit: async (data) => {
  *     await api.createTodo(data)
  *   }
  * })
  */
-export function createFormMachine<TSchema extends z.ZodType>(config: FormMachineConfig<TSchema>) {
-  type FormData = z.infer<TSchema>
-
+export function createFormMachine(config: FormMachineConfig) {
   return setup({
     types: {
       context: {} as {
-        formData: FormData
-        errors: Record<string, string[]>
         submitError: string | null
       },
-      events: {} as
-        | { type: 'UPDATE_FORM_DATA'; data: Partial<FormData> }
-        | {
-            type: 'UPDATE_FORM_META'
-            meta: { dirty: boolean; touched: boolean; valid: boolean; pending: boolean }
-          }
-        | { type: 'SUBMIT'; data: FormData }
-        | { type: 'RESET' },
+      events: {} as { type: 'SUBMIT'; data: unknown } | { type: 'RESET' },
     },
 
     actions: {
-      updateFormData: assign({
-        formData: ({ context, event }) => ({
-          ...context.formData,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(event as any).data,
-        }),
-      }),
-
-      validateForm: assign(({ context }) => {
-        const result = config.schema.safeParse(context.formData)
-        if (!result.success) {
-          return {
-            errors: result.error.flatten().fieldErrors as Record<string, string[]>,
-          }
-        }
-        return { errors: {} }
-      }),
-
-      clearErrors: assign({ errors: {}, submitError: null }),
+      clearError: assign({ submitError: null }),
 
       setSubmitError: assign({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         submitError: ({ event }) => (event as any).error?.message || 'Submission failed',
       }),
-
-      resetForm: assign({
-        formData: config.initialData || ({} as FormData),
-        errors: {},
-        submitError: null,
-      }),
-    },
-
-    guards: {
-      isValid: ({ context }) => Object.keys(context.errors).length === 0,
     },
 
     actors: {
-      submitForm: fromPromise(async ({ input }: { input: FormData }) => {
+      submitForm: fromPromise(async ({ input }: { input: unknown }) => {
         if (config.onSubmit) {
           await config.onSubmit(input)
         }
@@ -94,50 +53,28 @@ export function createFormMachine<TSchema extends z.ZodType>(config: FormMachine
     id: 'formMachine',
     initial: 'idle',
     context: {
-      formData: config.initialData || ({} as FormData),
-      errors: {},
       submitError: null,
     },
 
     states: {
       idle: {
         on: {
-          UPDATE_FORM_DATA: {
-            actions: ['updateFormData', 'validateForm'],
-          },
-          UPDATE_FORM_META: {
-            // Just receive meta updates from VeeValidate
-          },
           SUBMIT: {
-            target: 'validating',
+            target: 'submitting',
           },
         },
       },
 
-      validating: {
-        entry: 'validateForm',
-        always: [{ target: 'submitting', guard: 'isValid' }, { target: 'idle' }],
-      },
-
       submitting: {
-        // @ts-expect-error - XState invoke input type inference issue
+        entry: 'clearError',
         invoke: {
           src: 'submitForm',
-          input: ({
-            context,
-          }: {
-            context: {
-              formData: FormData
-              errors: Record<string, string[]>
-              submitError: string | null
-            }
-          }) => context.formData,
+          input: ({ event }: { event: { type: 'SUBMIT'; data: unknown } }) => event.data,
           onDone: {
             target: 'success',
-            actions: 'clearErrors',
           },
           onError: {
-            target: 'idle',
+            target: 'error',
             actions: 'setSubmitError',
           },
         },
@@ -146,15 +83,25 @@ export function createFormMachine<TSchema extends z.ZodType>(config: FormMachine
       success: {
         after: {
           500: {
-            // Auto-reset after 500ms to allow multiple submissions
+            // Auto-transition back to idle after brief success state
             target: 'idle',
-            actions: 'resetForm',
           },
         },
         on: {
           RESET: {
             target: 'idle',
-            actions: 'resetForm',
+          },
+        },
+      },
+
+      error: {
+        on: {
+          SUBMIT: {
+            target: 'submitting',
+          },
+          RESET: {
+            target: 'idle',
+            actions: 'clearError',
           },
         },
       },

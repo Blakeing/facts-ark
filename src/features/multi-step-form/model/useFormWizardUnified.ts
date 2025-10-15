@@ -1,51 +1,50 @@
-import { useFormMachine, createWizardMachine } from '@/shared/lib/forms'
-import {
-  todoBasicInfoSchema,
-  todoDetailsSchema,
-  todoAdditionalSchema,
-  todoSchema,
-} from '@/entities/todo'
+import { useWizard } from '@/shared/lib/forms'
+import { todoSchema } from '@/entities/todo'
 import { useToast } from '@/shared/ui'
 
 /**
- * Unified wizard composable using XState + Zod + VeeValidate
+ * Wizard composable using lightweight VeeValidate-based wizard
  *
- * This replaces the old useFormWizard with the unified pattern.
+ * This uses the new simplified wizard pattern - no XState complexity,
+ * just VeeValidate for validation and simple step navigation.
  *
  * @example
- * const { form, state, send, isValid } = useFormWizardUnified()
+ * const { form, currentStepId, next, back, handleComplete, canGoNext } = useFormWizardUnified()
  *
  * // In template:
- * <form @submit.prevent="handleSubmit">
- *   <div v-if="state.value.matches('step1')">
+ * <form @submit.prevent="handleComplete">
+ *   <div v-if="currentStepId === 'step1'">
  *     <TextField name="title" label="Title" required />
  *     <SelectField name="category" label="Category" :items="[...]" />
- *     <Button @click="send({ type: 'NEXT' })">Next</Button>
+ *     <Button @click="next" :disabled="!canGoNext">Next</Button>
  *   </div>
  * </form>
  */
 export function useFormWizardUnified() {
   const { toast } = useToast()
 
-  // Create wizard machine
-  const machine = createWizardMachine({
+  // Use lightweight wizard composable
+  const wizard = useWizard({
+    schema: todoSchema,
     steps: [
       {
         id: 'step1',
-        schema: todoBasicInfoSchema,
         fields: ['title', 'category'],
       },
       {
         id: 'step2',
-        schema: todoDetailsSchema,
         fields: ['description', 'priority'],
       },
       {
         id: 'step3',
-        schema: todoAdditionalSchema,
         fields: ['tags', 'notes'],
       },
     ],
+    initialValues: {
+      status: 'draft' as const,
+      priority: 'medium' as const,
+      category: 'work' as const,
+    },
     onComplete: async (data) => {
       console.log('Wizard complete:', data)
       // Use vue-sonner API: toast.success(title, { description })
@@ -55,20 +54,9 @@ export function useFormWizardUnified() {
     },
   })
 
-  // Use unified form machine
-  const formMachine = useFormMachine({
-    schema: todoSchema,
-    machine,
-    initialValues: {
-      status: 'draft' as const,
-      priority: 'medium' as const,
-      category: 'work' as const,
-    },
-  })
-
   return {
-    ...formMachine,
+    ...wizard,
     // Alias for clarity in wizard context
-    isCompleting: formMachine.isSubmitting,
+    isCompleting: false, // No submission state in simple wizard
   }
 }

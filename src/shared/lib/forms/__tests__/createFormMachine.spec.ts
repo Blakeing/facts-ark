@@ -1,13 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { createActor, waitFor } from 'xstate'
-import { z } from 'zod'
 import { createFormMachine } from '../createFormMachine'
-
-const testSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().optional(),
-  count: z.number().min(0).optional(),
-})
 
 describe('createFormMachine', () => {
   beforeEach(() => {
@@ -15,7 +8,7 @@ describe('createFormMachine', () => {
   })
 
   it('creates a machine with initial idle state', () => {
-    const machine = createFormMachine({ schema: testSchema })
+    const machine = createFormMachine({})
     const actor = createActor(machine)
     actor.start()
 
@@ -24,71 +17,9 @@ describe('createFormMachine', () => {
     actor.stop()
   })
 
-  it('initializes with provided initial data', () => {
-    const initialData = {
-      title: 'Initial Title',
-      description: 'Initial Description',
-      count: 5,
-    }
-
+  it('transitions to submitting on SUBMIT event', () => {
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData,
-    })
-    const actor = createActor(machine)
-    actor.start()
-
-    const context = actor.getSnapshot().context
-    expect(context.formData.title).toBe('Initial Title')
-    expect(context.formData.description).toBe('Initial Description')
-    expect(context.formData.count).toBe(5)
-
-    actor.stop()
-  })
-
-  it('updates form data on UPDATE_FORM_DATA event', () => {
-    const machine = createFormMachine({ schema: testSchema })
-    const actor = createActor(machine)
-    actor.start()
-
-    actor.send({
-      type: 'UPDATE_FORM_DATA',
-      data: { title: 'Updated Title' },
-    })
-
-    const context = actor.getSnapshot().context
-    expect(context.formData.title).toBe('Updated Title')
-
-    actor.stop()
-  })
-
-  it('merges partial data on UPDATE_FORM_DATA', () => {
-    const machine = createFormMachine({
-      schema: testSchema,
-      initialData: {
-        title: 'Original',
-        description: 'Original Desc',
-      },
-    })
-    const actor = createActor(machine)
-    actor.start()
-
-    actor.send({
-      type: 'UPDATE_FORM_DATA',
-      data: { title: 'New Title' },
-    })
-
-    const context = actor.getSnapshot().context
-    expect(context.formData.title).toBe('New Title')
-    expect(context.formData.description).toBe('Original Desc')
-
-    actor.stop()
-  })
-
-  it('transitions to validating on SUBMIT event', () => {
-    const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: 'Valid Title' },
+      onSubmit: async () => {},
     })
     const actor = createActor(machine)
     actor.start()
@@ -98,39 +29,15 @@ describe('createFormMachine', () => {
       data: { title: 'Valid Title' },
     })
 
-    // Should transition through validating to submitting
-    expect(['validating', 'submitting', 'success']).toContain(actor.getSnapshot().value)
+    // Should transition to submitting
+    expect(['submitting', 'success']).toContain(actor.getSnapshot().value)
 
     actor.stop()
   })
 
-  it('validates form data and stores errors in context', () => {
-    const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: '' }, // Invalid
-    })
-    const actor = createActor(machine)
-    actor.start()
-
-    // Trigger validation through UPDATE_FORM_DATA
-    actor.send({
-      type: 'UPDATE_FORM_DATA',
-      data: { title: '' },
-    })
-
-    const context = actor.getSnapshot().context
-    expect(context.errors).toBeDefined()
-    // Empty title should produce validation error
-    expect(context.errors.title).toBeDefined()
-
-    actor.stop()
-  })
-
-  it('calls onSubmit callback when form is valid', async () => {
+  it('calls onSubmit callback with submitted data', async () => {
     const onSubmit = vi.fn()
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: 'Valid Title' },
       onSubmit,
     })
     const actor = createActor(machine)
@@ -151,8 +58,6 @@ describe('createFormMachine', () => {
 
   it('transitions to success state after successful submission', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: 'Valid Title' },
       onSubmit: async () => {
         // Simulate async operation
         await new Promise((resolve) => setTimeout(resolve, 10))
@@ -174,11 +79,9 @@ describe('createFormMachine', () => {
     actor.stop()
   })
 
-  it('handles submission errors and returns to idle', async () => {
+  it('handles submission errors and transitions to error state', async () => {
     const errorMessage = 'Submission failed'
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: 'Valid Title' },
       onSubmit: async () => {
         throw new Error(errorMessage)
       },
@@ -191,20 +94,18 @@ describe('createFormMachine', () => {
       data: { title: 'Valid Title' },
     })
 
-    // Wait for error handling to complete and return to idle
-    await waitFor(actor, (snapshot) => snapshot.value === 'idle', { timeout: 1000 })
+    // Wait for error handling to complete
+    await waitFor(actor, (snapshot) => snapshot.value === 'error', { timeout: 1000 })
 
     const context = actor.getSnapshot().context
-    expect(actor.getSnapshot().value).toBe('idle')
+    expect(actor.getSnapshot().value).toBe('error')
     expect(context.submitError).toBe(errorMessage)
 
     actor.stop()
   })
 
-  it('resets form on RESET event from success state', async () => {
+  it('transitions to idle on RESET event from success state', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: 'Initial' },
       onSubmit: async () => {},
     })
     const actor = createActor(machine)
@@ -218,62 +119,48 @@ describe('createFormMachine', () => {
 
     await waitFor(actor, (snapshot) => snapshot.value === 'success', { timeout: 1000 })
 
-    // Reset form
+    // Reset to idle
     actor.send({ type: 'RESET' })
 
-    const context = actor.getSnapshot().context
     expect(actor.getSnapshot().value).toBe('idle')
-    expect(context.formData.title).toBe('Initial')
-    expect(context.errors).toEqual({})
-    expect(context.submitError).toBeNull()
+    expect(actor.getSnapshot().context.submitError).toBeNull()
 
     actor.stop()
   })
 
-  it('does not transition to submitting if validation fails', async () => {
-    const onSubmit = vi.fn()
+  it('clears error on RESET from error state', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: '' }, // Invalid
-      onSubmit,
+      onSubmit: async () => {
+        throw new Error('Test error')
+      },
     })
     const actor = createActor(machine)
     actor.start()
 
     actor.send({
       type: 'SUBMIT',
-      data: { title: '' },
+      data: { title: 'Test' },
     })
 
-    // Wait a bit to ensure no transition happens
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await waitFor(actor, (snapshot) => snapshot.value === 'error', { timeout: 1000 })
 
-    // Should still be in idle after validation fails
+    expect(actor.getSnapshot().context.submitError).toBe('Test error')
+
+    actor.send({ type: 'RESET' })
+
     expect(actor.getSnapshot().value).toBe('idle')
-    expect(onSubmit).not.toHaveBeenCalled()
+    expect(actor.getSnapshot().context.submitError).toBeNull()
 
     actor.stop()
   })
 
-  it('clears errors on successful submission', async () => {
+  it('auto-transitions from success to idle after 500ms', async () => {
     const machine = createFormMachine({
-      schema: testSchema,
-      initialData: { title: '' },
       onSubmit: async () => {},
     })
     const actor = createActor(machine)
     actor.start()
 
-    // Set invalid data to generate errors
-    actor.send({
-      type: 'UPDATE_FORM_DATA',
-      data: { title: '' },
-    })
-
-    let context = actor.getSnapshot().context
-    expect(Object.keys(context.errors).length).toBeGreaterThan(0)
-
-    // Now submit with valid data
     actor.send({
       type: 'SUBMIT',
       data: { title: 'Valid Title' },
@@ -281,31 +168,44 @@ describe('createFormMachine', () => {
 
     await waitFor(actor, (snapshot) => snapshot.value === 'success', { timeout: 1000 })
 
-    context = actor.getSnapshot().context
-    expect(context.errors).toEqual({})
-    expect(context.submitError).toBeNull()
+    // Wait for auto-transition
+    await waitFor(actor, (snapshot) => snapshot.value === 'idle', { timeout: 1000 })
+
+    expect(actor.getSnapshot().value).toBe('idle')
 
     actor.stop()
   })
 
-  it('handles UPDATE_FORM_META event', () => {
-    const machine = createFormMachine({ schema: testSchema })
+  it('can retry submission from error state', async () => {
+    let failFirst = true
+    const machine = createFormMachine({
+      onSubmit: async () => {
+        if (failFirst) {
+          failFirst = false
+          throw new Error('First attempt failed')
+        }
+      },
+    })
     const actor = createActor(machine)
     actor.start()
 
-    // Send meta update
+    // First attempt fails
     actor.send({
-      type: 'UPDATE_FORM_META',
-      meta: {
-        dirty: true,
-        touched: true,
-        valid: true,
-        pending: false,
-      },
+      type: 'SUBMIT',
+      data: { title: 'Test' },
     })
 
-    // Machine should remain in idle state
-    expect(actor.getSnapshot().value).toBe('idle')
+    await waitFor(actor, (snapshot) => snapshot.value === 'error', { timeout: 1000 })
+
+    // Retry submission
+    actor.send({
+      type: 'SUBMIT',
+      data: { title: 'Test' },
+    })
+
+    await waitFor(actor, (snapshot) => snapshot.value === 'success', { timeout: 1000 })
+
+    expect(actor.getSnapshot().value).toBe('success')
 
     actor.stop()
   })

@@ -17,7 +17,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const { form, handleSubmit, isSending, canSubmit, state } = useContactForm()
+const { form, handleSubmit, isSending, canSubmit, isSuccess, submitError } = useContactForm()
 
 // Helper to show character count
 const nameValue = computed(() => form.values.name || '')
@@ -26,7 +26,7 @@ const messageValue = computed(() => form.values.message || '')
 
 async function onSubmit() {
   await handleSubmit()
-  if (state.value.value === 'success') {
+  if (isSuccess.value) {
     emit('success')
   }
 }
@@ -77,7 +77,7 @@ async function onSubmit() {
     />
 
     <!-- Error Message -->
-    <div v-if="state.value.context?.submitError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
+    <div v-if="submitError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
       <div class="flex items-start gap-2">
         <svg class="mt-0.5 h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -86,7 +86,7 @@ async function onSubmit() {
             clip-rule="evenodd"
           />
         </svg>
-        <span>{{ state.value.context.submitError }}</span>
+        <span>{{ submitError }}</span>
       </div>
     </div>
 

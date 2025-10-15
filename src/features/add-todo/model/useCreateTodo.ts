@@ -3,13 +3,12 @@ import { todoSchema, todoQueriesKeys } from '@/entities/todo'
 import { createTodo } from '@/entities/todo'
 
 /**
- * Unified form composable for creating todos
+ * Form composable for creating todos
  *
- * Uses:
- * - Zod schema for validation (todoSchema)
- * - XState machine for state management
- * - VeeValidate for UI integration
- * - Mutation factory for automatic query invalidation
+ * Architecture:
+ * - VeeValidate: Handles all field state and validation (via todoSchema)
+ * - XState: Orchestrates submission flow only
+ * - Mutation factory: Handles API calls, query invalidation, and toasts
  *
  * Features:
  * - Auto-resets after successful submission
@@ -23,21 +22,15 @@ import { createTodo } from '@/entities/todo'
  * // In template:
  * <form @submit="handleSubmit">
  *   <TextField name="title" label="Title" required />
- *   <Button type="submit" :disabled="!form.meta.value.valid || isCreating">
+ *   <Button type="submit" :disabled="!isValid || isCreating">
  *     Create Todo
  *   </Button>
  * </form>
  */
 export function useCreateTodo() {
-  // Create form machine with integrated mutation factory
+  // Create submission machine with integrated mutation factory
   const { machine } = createFormMachineWithMutation({
-    schema: todoSchema,
-    initialData: {
-      status: 'draft' as const,
-      priority: 'medium' as const,
-      category: 'work' as const,
-    },
-    mutationFn: async (values) => {
+    mutationFn: async (values: { title: string; description?: string }) => {
       const response = await createTodo({
         title: values.title,
         description: values.description,
