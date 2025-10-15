@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 import Select from './Select.vue'
+import { Field } from '../field'
 
 const meta = {
-  title: 'UI/Select',
+  title: 'Forms/Primitives/Select',
   component: Select,
   tags: ['autodocs'],
   argTypes: {
@@ -11,10 +12,6 @@ const meta = {
       control: 'select',
       options: ['sm', 'md', 'lg'],
       description: 'Size of the select',
-    },
-    label: {
-      control: 'text',
-      description: 'Label for the select',
     },
     placeholder: {
       control: 'text',
@@ -48,18 +45,19 @@ export const Default: Story = {
     items: frameworks,
   },
   render: (args) => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       return { args, selected, frameworks }
     },
     template: `
-      <Select
-        v-bind="args"
-        v-model="selected"
-        :items="frameworks"
-        label="Framework"
-      />
+      <Field label="Framework">
+        <Select
+          v-bind="args"
+          v-model="selected"
+          :items="frameworks"
+        />
+      </Field>
     `,
   }),
 }
@@ -69,18 +67,19 @@ export const WithSelection: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>(['vue'])
       return { selected, frameworks }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="frameworks"
-        label="Framework"
-        placeholder="Select a framework"
-      />
+      <Field label="Framework">
+        <Select
+          v-model="selected"
+          :items="frameworks"
+          placeholder="Select a framework"
+        />
+      </Field>
     `,
   }),
 }
@@ -90,7 +89,7 @@ export const WithDescriptions: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       const items = [
@@ -109,12 +108,13 @@ export const WithDescriptions: Story = {
       return { selected, items }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="items"
-        label="Framework"
-        placeholder="Choose your framework"
-      />
+      <Field label="Framework">
+        <Select
+          v-model="selected"
+          :items="items"
+          placeholder="Choose your framework"
+        />
+      </Field>
     `,
   }),
 }
@@ -124,7 +124,7 @@ export const WithAvatars: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       const people = [
@@ -150,12 +150,13 @@ export const WithAvatars: Story = {
       return { selected, people }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="people"
-        label="Assign to"
-        placeholder="Select a person"
-      />
+      <Field label="Assign to">
+        <Select
+          v-model="selected"
+          :items="people"
+          placeholder="Select a person"
+        />
+      </Field>
     `,
   }),
 }
@@ -165,7 +166,7 @@ export const WithStatus: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       const users = [
@@ -177,12 +178,13 @@ export const WithStatus: Story = {
       return { selected, users }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="users"
-        label="User"
-        placeholder="Select a user"
-      />
+      <Field label="User">
+        <Select
+          v-model="selected"
+          :items="users"
+          placeholder="Select a user"
+        />
+      </Field>
     `,
   }),
 }
@@ -192,7 +194,7 @@ export const Grouped: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       const technologies = [
@@ -224,12 +226,13 @@ export const Grouped: Story = {
       return { selected, technologies }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="technologies"
-        label="Technology"
-        placeholder="Select a technology"
-      />
+      <Field label="Technology">
+        <Select
+          v-model="selected"
+          :items="technologies"
+          placeholder="Select a technology"
+        />
+      </Field>
     `,
   }),
 }
@@ -239,18 +242,19 @@ export const Disabled: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       return { selected, frameworks }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="frameworks"
-        label="Framework"
-        disabled
-      />
+      <Field label="Framework">
+        <Select
+          v-model="selected"
+          :items="frameworks"
+          disabled
+        />
+      </Field>
     `,
   }),
 }
@@ -260,18 +264,19 @@ export const Small: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       return { selected, frameworks }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="frameworks"
-        label="Framework"
-        size="sm"
-      />
+      <Field label="Framework">
+        <Select
+          v-model="selected"
+          :items="frameworks"
+          size="sm"
+        />
+      </Field>
     `,
   }),
 }
@@ -281,18 +286,19 @@ export const Large: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       return { selected, frameworks }
     },
     template: `
-      <Select
-        v-model="selected"
-        :items="frameworks"
-        label="Framework"
-        size="lg"
-      />
+      <Field label="Framework">
+        <Select
+          v-model="selected"
+          :items="frameworks"
+          size="lg"
+        />
+      </Field>
     `,
   }),
 }
@@ -302,19 +308,20 @@ export const Interactive: Story = {
     items: frameworks,
   },
   render: () => ({
-    components: { Select },
+    components: { Select, Field },
     setup() {
       const selected = ref<string[]>([])
       return { selected, frameworks }
     },
     template: `
       <div class="flex flex-col gap-3">
-        <Select
-          v-model="selected"
-          :items="frameworks"
-          label="Favorite Framework"
-          placeholder="Choose one"
-        />
+        <Field label="Favorite Framework">
+          <Select
+            v-model="selected"
+            :items="frameworks"
+            placeholder="Choose one"
+          />
+        </Field>
         <p class="text-sm text-gray-600">
           Selected: {{ selected[0] || 'None' }}
         </p>

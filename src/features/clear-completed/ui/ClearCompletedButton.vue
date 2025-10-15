@@ -23,8 +23,8 @@ function handleClear() {
     <Button
       variant="outline"
       size="sm"
-      :disabled="completedCount === 0 || isPending"
-      :loading="isPending"
+      :disabled="completedCount === 0 || isPending.value"
+      :loading="isPending.value"
       @click="openConfirm = true"
       type="button"
     >
@@ -37,7 +37,7 @@ function handleClear() {
       :description="`Are you sure you want to delete ${completedCount} completed todo${completedCount === 1 ? '' : 's'}? This action cannot be undone.`"
       confirm-text="Clear All"
       variant="danger"
-      :loading="isPending"
+      :loading="isPending.value"
       @confirm="handleClear"
       @cancel="openConfirm = false"
     />

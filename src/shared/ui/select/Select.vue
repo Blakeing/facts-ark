@@ -57,16 +57,11 @@ const emits = defineEmits<SelectRootEmits<SelectItem>>()
 // Filter out custom props before forwarding to Ark UI
 const arkProps = useOmitProps(
   props,
-  ['items', 'label', 'placeholder', 'size', 'indicatorPosition', 'class'] as const
+  ['items', 'placeholder', 'size', 'indicatorPosition', 'class'] as const
 )
 const forwarded = useForwardPropsEmits(arkProps, emits)
 
-const styles = computed(() =>
-  selectVariants({
-    size: props.size,
-    indicatorPosition: props.indicatorPosition,
-  })
-)
+const styles = computed(() => selectVariants({ size: props.size, indicatorPosition: props.indicatorPosition }))
 
 // Get the currently selected item for display
 const selectedItem = computed(() => {
@@ -101,10 +96,11 @@ const collection = computed(() => {
 </script>
 
 <template>
-  <Select.Root v-bind="forwarded" :collection="collection" :class="cn(styles.root(), props.class)">
-    <Select.Label v-if="props.label" :class="styles.label()">
-      {{ props.label }}
-    </Select.Label>
+  <Select.Root
+    v-bind="forwarded"
+    :collection="collection"
+    :class="cn(styles.root(), props.class)"
+  >
     <Select.Control :class="styles.control()">
       <Select.Trigger :class="styles.trigger()">
         <span class="col-start-1 row-start-1 flex items-center gap-3 pr-6">

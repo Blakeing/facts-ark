@@ -26,7 +26,7 @@ const { toggleTodo, isPending } = useToggleTodo()
 const isLoading = computed(() => isPending.value)
 
 function handleToggle() {
-  toggleTodo(props.todo.id, () => {
+  toggleTodo(props.todo.id, props.todo.status, () => {
     emit('toggle')
   })
 }

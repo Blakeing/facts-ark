@@ -18,10 +18,9 @@ import EmptyState from '@/shared/ui/patterns/EmptyState.vue'
 import ErrorState from '@/shared/ui/patterns/ErrorState.vue'
 import { Card } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
-import { FieldInput } from '@/shared/ui/field'
+import { TextField, Textarea } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
-import { BaseForm, BaseFormField } from '@/shared/ui/form'
-import { useAddTodo } from '@/features/add-todo'
+import { useCreateTodo } from '@/features/add-todo'
 import { EditTodoDialog } from '@/features/edit-todo'
 import { ClearCompletedButton } from '@/features/clear-completed'
 
@@ -29,8 +28,12 @@ import { ClearCompletedButton } from '@/features/clear-completed'
 const { data: todos, status, error, refresh } = useTodos()
 const isLoading = computed(() => status.value === 'pending')
 
-// Add todo form
-const { form, canSubmit, isPending, isError, handleSubmit } = useAddTodo()
+// Add todo form - using unified pattern with auto-reset and auto-invalidation
+const { form, handleSubmit, isSubmitting, canSubmit, state } = useCreateTodo()
+
+// Helper to show character count
+const titleValue = computed(() => form.values.title || '')
+const descriptionValue = computed(() => form.values.description || '')
 
 // Filtering
 const { filteredTodos, currentFilter } = useFilterTodos(computed(() => todos.value || []))
@@ -80,48 +83,35 @@ const emptyMessage = computed(() => {
       <div class="space-y-4">
         <h2 class="text-lg font-semibold text-fg-default">Create New Todo</h2>
 
-        <BaseForm :form="form" :on-submit="() => handleSubmit()" class="space-y-4">
-          <BaseFormField name="title" label="Title" required>
-            <template #default="{ field }">
-              <FieldInput
-                placeholder="What needs to be done?"
-                :disabled="isPending"
-                maxlength="200"
-                required
-                v-bind="field"
-              />
-            </template>
-            <template #description="{ meta, value, errorMessage }">
-              <span v-if="errorMessage" class="text-xs text-fg-error">{{ errorMessage }}</span>
-              <span v-else-if="!meta.touched" class="text-xs text-muted-foreground">1-200 characters</span>
-              <span v-else class="text-xs text-muted-foreground">{{ value.length }}/200 characters</span>
-            </template>
-          </BaseFormField>
+        <form @submit="handleSubmit" class="space-y-4">
+          <TextField
+            name="title"
+            label="Title"
+            placeholder="What needs to be done?"
+            :disabled="isSubmitting"
+            required
+            :helper-text="`${titleValue.length}/200 characters`"
+          />
 
-          <BaseFormField name="description" label="Description (optional)">
-            <template #default="{ field }">
-              <FieldInput
-                placeholder="Add more details..."
-                :disabled="isPending"
-                maxlength="1000"
-                v-bind="field"
-              />
-            </template>
-            <template #description="{ value }">
-              <span class="text-xs text-muted-foreground">{{ value.length }}/1000 characters</span>
-            </template>
-          </BaseFormField>
+          <Textarea
+            name="description"
+            label="Description (optional)"
+            placeholder="Add more details..."
+            :disabled="isSubmitting"
+            :rows="3"
+            :helper-text="`${descriptionValue.length}/1000 characters`"
+          />
 
-          <div v-if="isError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
-            Failed to create todo
+          <div v-if="state.value.context?.submitError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
+            {{ state.value.context.submitError }}
           </div>
 
           <div class="flex justify-end">
-            <Button type="submit" variant="solid" :disabled="!canSubmit" :loading="isPending">
-              {{ isPending ? 'Creating...' : 'Add Todo' }}
+            <Button type="submit" variant="solid" :disabled="!canSubmit" :loading="isSubmitting">
+              {{ isSubmitting ? 'Creating...' : 'Add Todo' }}
             </Button>
           </div>
-        </BaseForm>
+        </form>
       </div>
     </Card>
 

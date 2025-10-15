@@ -1,115 +1,47 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { Toast, Toaster } from '@ark-ui/vue/toast'
-import { X, Info, CircleCheck, CircleAlert, TriangleAlert } from 'lucide-vue-next'
-import { withDefaults } from 'vue'
-import { toastVariants } from './toast.variants'
-import type { ToasterProps, ToastType } from './toast.types'
+import type { ToasterProps } from 'vue-sonner'
+import { Toaster as Sonner } from 'vue-sonner'
+import { getToastClasses } from './toast.variants'
 
 /**
- * A Toast component for displaying temporary notifications.
+ * Toast Component - shadcn-vue style with tailwind-variants
  *
- * This is a closed component that wraps Ark UI's Toast with consistent styling.
+ * Combines the best of both approaches:
+ * - Simple shadcn pattern (no custom components)
+ * - Tailwind-variants for organized, type-safe styling
  *
- * Features:
- * - Multiple toast types (success, error, warning, info)
- * - Automatic stacking and positioning
- * - Action buttons
- * - Customizable duration
- * - Keyboard accessible
- * - Automatic dismissal
+ * Styling is defined in toast.variants.ts and applied via
+ * vue-sonner's toastOptions.classes for consistency with
+ * our other components (Button, Card, etc.)
  *
- * @example
- * // In your component setup
- * import { createToaster } from '@ark-ui/vue/toast'
- * import { Toast } from '@/shared/ui/toast'
+ * IMPORTANT: Requires 'vue-sonner/style.css' import in main.css for:
+ * - Toast animations (slide in/out, fade)
+ * - Positioning and stacking
+ * - Transitions and transforms
  *
- * const toaster = createToaster({
- *   placement: 'bottom-end',
- *   overlap: true,
- *   gap: 16,
- * })
- *
- * // Create a toast
- * toaster.success({
- *   title: 'Success!',
- *   description: 'Your changes have been saved.',
- * })
- *
- * // In your template
- * <Toast :toaster="toaster" />
+ * @see https://github.com/xiaoluoboding/vue-sonner
+ * @see https://ui.shadcn.com/docs/components/sonner
  */
 
 const props = withDefaults(defineProps<ToasterProps>(), {
-  toaster: undefined,
+  position: 'bottom-right',
+  richColors: true,
+  duration: 5000,
+  closeButton: true,
+  closeButtonPosition: 'top-right',
 })
 
-// Icon map for different toast types
-const iconMap = {
-  success: CircleCheck,
-  error: CircleAlert,
-  warning: TriangleAlert,
-  info: Info,
-  default: Info,
-}
-
-const getToastType = (type?: string): ToastType => {
-  if (type && ['success', 'error', 'warning', 'info'].includes(type)) {
-    return type as ToastType
-  }
-  return 'default'
-}
-
-const getIcon = (type?: string) => {
-  const toastType = getToastType(type)
-  return iconMap[toastType]
-}
-
-const getStyles = (type?: string) => {
-  const toastType = getToastType(type)
-  return toastVariants({ type: toastType })
-}
+// Get toast classes from tailwind-variants
+const toastClasses = getToastClasses()
 </script>
 
 <template>
-  <Toaster v-if="props.toaster" :toaster="props.toaster">
-    <template #default="toast">
-      <Toast.Root :class="getStyles(toast.type).root()">
-        <!-- Icon based on toast type -->
-        <component
-          :is="getIcon(toast.type)"
-          :class="getStyles(toast.type).icon()"
-          aria-hidden="true"
-        />
-
-        <!-- Toast content -->
-        <div :class="getStyles(toast.type).content()">
-          <Toast.Title :class="getStyles(toast.type).title()">
-            {{ toast.title }}
-          </Toast.Title>
-          <Toast.Description
-            v-if="toast.description"
-            :class="getStyles(toast.type).description()"
-          >
-            {{ toast.description }}
-          </Toast.Description>
-        </div>
-
-        <!-- Action button (optional) -->
-        <Toast.ActionTrigger
-          v-if="toast.action"
-          :class="getStyles(toast.type).actionTrigger()"
-        >
-          {{ toast.action.label }}
-        </Toast.ActionTrigger>
-
-        <!-- Close button -->
-        <Toast.CloseTrigger :class="getStyles(toast.type).closeTrigger()">
-          <X class="size-4" />
-          <span class="sr-only">Close</span>
-        </Toast.CloseTrigger>
-      </Toast.Root>
-    </template>
-  </Toaster>
+  <Sonner
+    class="toaster group"
+    v-bind="props"
+    :toast-options="{
+      classes: toastClasses,
+    }"
+  />
 </template>
-

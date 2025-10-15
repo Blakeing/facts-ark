@@ -26,7 +26,7 @@ describe('useToggleTodo', () => {
     vi.useRealTimers()
   })
 
-  it('toggles todo successfully with success toast', async () => {
+  it('toggles todo successfully (silent - no success toast)', async () => {
     const toggledTodo: Todo = {
       id: '1',
       title: 'Test',
@@ -40,34 +40,30 @@ describe('useToggleTodo', () => {
 
     const [{ toggleTodo, isPending }, unmount] = withSetup(() => useToggleTodo())
 
-    const promise = toggleTodo('1')
+    const promise = toggleTodo('1', TodoStatus.PENDING)
     expect(isPending.value).toBe(true)
 
     await promise
 
-    expect(todoApi.toggleTodoStatus).toHaveBeenCalledOnce()
-    expect(todoApi.toggleTodoStatus).toHaveBeenCalledWith('1')
-    expect(mockToast.success).toHaveBeenCalledOnce()
-    expect(mockToast.success).toHaveBeenCalledWith({
-      title: 'Todo updated',
-      description: 'Status toggled successfully.',
-    })
+    expect(todoApi.toggleTodoStatus).toHaveBeenCalledTimes(1)
+    expect(todoApi.toggleTodoStatus).toHaveBeenCalledExactlyOnceWith('1', TodoStatus.PENDING)
+    // Silent optimistic - no success toast
+    expect(mockToast.success).not.toHaveBeenCalled()
     expect(isPending.value).toBe(false)
 
     unmount()
   })
 
-  it('shows error toast when mutation fails', async () => {
+  it('shows error toast when mutation fails (with rollback)', async () => {
     vi.spyOn(todoApi, 'toggleTodoStatus').mockRejectedValue(new Error('Network error'))
 
     const [{ toggleTodo }, unmount] = withSetup(() => useToggleTodo())
 
-    await expect(toggleTodo('1')).rejects.toThrow('Network error')
+    await expect(toggleTodo('1', TodoStatus.PENDING)).rejects.toThrow('Network error')
 
-    expect(mockToast.error).toHaveBeenCalledOnce()
-    expect(mockToast.error).toHaveBeenCalledWith({
-      title: 'Failed to update todo',
-      description: 'An error occurred while toggling the todo status.',
+    expect(mockToast.error).toHaveBeenCalledTimes(1)
+    expect(mockToast.error).toHaveBeenCalledExactlyOnceWith('Failed to update todo', {
+      description: 'Changes have been reverted. Please try again.',
     })
 
     unmount()
@@ -78,7 +74,7 @@ describe('useToggleTodo', () => {
 
     const [{ toggleTodo, isPending }, unmount] = withSetup(() => useToggleTodo())
 
-    await expect(toggleTodo('1')).rejects.toThrow()
+    await expect(toggleTodo('1', TodoStatus.PENDING)).rejects.toThrow()
 
     expect(isPending.value).toBe(false)
 

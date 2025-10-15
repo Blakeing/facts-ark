@@ -1,43 +1,79 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import { textareaVariants } from './textarea.variants'
+import { useField } from 'vee-validate'
+import { Field, FieldTextarea } from '../field'
 import type { TextareaProps } from './textarea.types'
 
 /**
- * A Park UI-inspired textarea component with semantic tokens.
+ * Textarea - Form-integrated textarea with VeeValidate
+ *
+ * This is a unified form component that automatically integrates with VeeValidate.
+ * Requires a `name` prop for form binding.
  *
  * @example
- * <Textarea v-model="value" placeholder="Enter text" />
- * <Textarea rows="5" resize="none" />
- * <Textarea size="lg" variant="error" />
+ * <Textarea
+ *   name="description"
+ *   label="Description"
+ *   placeholder="Enter description"
+ *   rows="4"
+ * />
+ *
+ * @example
+ * // With validation
+ * <Textarea
+ *   name="notes"
+ *   label="Notes"
+ *   required
+ * />
  */
 
 const props = withDefaults(defineProps<TextareaProps>(), {
   size: 'md',
-  variant: 'default',
   resize: 'vertical',
   rows: 3,
 })
 
-const textareaClass = computed(() =>
-  textareaVariants({
-    size: props.size,
-    variant: props.variant,
-    resize: props.resize,
-    class: props.class,
-  })
-)
+defineOptions({
+  inheritAttrs: false,
+})
+
+// VeeValidate integration
+const field = useField(() => props.name, {
+  validateOnValueUpdate: false,
+})
+
+// Separate Field props from Textarea props
+const fieldProps = computed(() => ({
+  label: props.label,
+  helperText: props.helperText,
+  errorText: field.errorMessage.value || props.errorText,
+  invalid: !field.meta.valid && field.meta.touched,
+  required: !!props.required,
+  disabled: !!props.disabled,
+  id: props.id,
+}))
+
+const textareaProps = computed(() => ({
+  size: props.size,
+  variant: props.variant,
+  resize: props.resize,
+  rows: props.rows,
+  placeholder: props.placeholder,
+  disabled: props.disabled,
+  readonly: props.readonly,
+  required: props.required,
+  class: props.class,
+  name: props.name,
+}))
 </script>
 
 <template>
-  <textarea
-    :class="textareaClass"
-    :disabled="props.disabled"
-    :readonly="props.readonly"
-    :required="props.required"
-    :placeholder="props.placeholder"
-    :rows="props.rows"
-    v-bind="$attrs"
-  />
+  <Field v-bind="fieldProps">
+    <FieldTextarea
+      v-model="field.value.value"
+      v-bind="{ ...textareaProps, ...$attrs }"
+      @blur="field.handleBlur"
+    />
+  </Field>
 </template>

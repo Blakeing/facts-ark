@@ -11,15 +11,15 @@ import { tv } from 'tailwind-variants/lite'
  * Textarea variants matching Park UI's design system
  *
  * Features:
- * - Semantic color tokens (matching Input component)
+ * - Semantic color tokens
  * - Proper focus states with ring
- * - Flexible resize options
- * - Accessible by default
+ * - Disabled and readonly states
+ * - Resize options
  */
 export const textareaVariants = tv({
   base: [
     // Layout
-    'flex w-full rounded-md',
+    'flex min-h-[80px] w-full rounded-md',
 
     // Border & Background
     'border border-input bg-background',
@@ -33,7 +33,7 @@ export const textareaVariants = tv({
     // Placeholder
     'placeholder:text-muted-foreground',
 
-    // Focus states (using new focus-ring system)
+    // Focus states
     'focus-ring',
 
     // Disabled state
@@ -42,14 +42,14 @@ export const textareaVariants = tv({
     // Readonly state
     'read-only:opacity-50',
 
-    // Animations & Transitions (using new design system)
+    // Animations & Transitions
     'transition-colors-smooth',
   ],
   variants: {
     size: {
-      sm: 'px-2 py-1.5 text-xs',
-      md: 'px-3 py-2 text-sm',
-      lg: 'px-4 py-3 text-base',
+      sm: 'min-h-[60px] px-2 py-1 text-xs',
+      md: 'min-h-[80px] px-3 py-2 text-sm',
+      lg: 'min-h-[100px] px-4 py-3 text-base',
     },
     variant: {
       default: '',
@@ -57,9 +57,9 @@ export const textareaVariants = tv({
     },
     resize: {
       none: 'resize-none',
-      both: 'resize',
       vertical: 'resize-y',
       horizontal: 'resize-x',
+      both: 'resize',
     },
   },
   defaultVariants: {

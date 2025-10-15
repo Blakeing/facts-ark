@@ -13,5 +13,5 @@ export default {
   darkMode: 'class',
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   // Tailwind v4 uses CSS-based configuration via @theme directive
-  // See src/assets/park-ui-tokens.css for theme customization
+  // See src/assets/tailwind-theme.css for theme customization
 } satisfies Config

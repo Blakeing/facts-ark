@@ -40,8 +40,32 @@ export function createMutationFactory<TData, TVariables, TError = Error>(
   const cacheFacade = new QueryCacheFacade(queryCache)
   const { toast } = useToast()
 
+  // Wrap mutation with promise toast if configured
+  const wrappedMutationFn = config.loadingToast
+    ? (variables: TVariables): Promise<TData> => {
+        const loadingToastConfig = config.loadingToast!
+        const promise = config.mutationFn(variables)
+
+        // Show promise toast and unwrap to get actual promise
+        toast.promise(promise, {
+          loading: loadingToastConfig.loading,
+          success: (data: TData) => {
+            const msg = loadingToastConfig.success
+            return typeof msg === 'function' ? msg(data) : msg
+          },
+          error: (error: TError) => {
+            const msg = loadingToastConfig.error
+            return typeof msg === 'function' ? msg(error) : msg
+          },
+        })
+
+        // Return the original promise for Pinia Colada
+        return promise
+      }
+    : config.mutationFn
+
   const mutation = useMutation({
-    mutation: config.mutationFn,
+    mutation: wrappedMutationFn,
 
     // Optimistic update with context preservation
     onMutate: async (variables: TVariables) => {
@@ -70,15 +94,14 @@ export function createMutationFactory<TData, TVariables, TError = Error>(
         await config.onSuccess(data, variables)
       }
 
-      // Show success toast
-      if (config.successToast) {
+      // Show success toast (skip if using loadingToast)
+      if (config.successToast && !config.loadingToast) {
         const toastConfig =
           typeof config.successToast === 'function'
             ? config.successToast(data, variables)
             : config.successToast
 
-        toast.success({
-          title: toastConfig.title,
+        toast.success(toastConfig.title, {
           description: toastConfig.description,
         })
       }
@@ -98,15 +121,14 @@ export function createMutationFactory<TData, TVariables, TError = Error>(
         await config.onError(error, variables)
       }
 
-      // Show error toast
-      if (config.errorToast && error) {
+      // Show error toast (skip if using loadingToast)
+      if (config.errorToast && error && !config.loadingToast) {
         const toastConfig =
           typeof config.errorToast === 'function'
             ? config.errorToast(error, variables)
             : config.errorToast
 
-        toast.error({
-          title: toastConfig.title,
+        toast.error(toastConfig.title, {
           description: toastConfig.description,
         })
       }

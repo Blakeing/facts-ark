@@ -10,6 +10,20 @@ export { TodoStatus } from './model/types'
 export type { Todo, CreateTodoDto, UpdateTodoDto, TodoFilter, TodoStats } from './model/types'
 export { createTodoSchema, type CreateTodoFormValues } from './model/validation'
 
+// Zod Schemas (Unified Form Architecture)
+export {
+  todoSchema,
+  todoBasicInfoSchema,
+  todoDetailsSchema,
+  todoAdditionalSchema,
+} from './model/schemas'
+export type {
+  TodoFormData,
+  TodoBasicInfo,
+  TodoDetails,
+  TodoAdditional,
+} from './model/schemas'
+
 // Store
 export { useTodoStore } from './model/store'
 

@@ -5,14 +5,19 @@ import * as todoApi from '@/entities/todo'
 import { TodoStatus, type Todo } from '@/entities/todo'
 import { withSetup } from '@/__tests__/helpers/withSetup'
 
-const mockToast = {
+const mockToast = vi.hoisted(() => ({
   success: vi.fn(),
   error: vi.fn(),
   info: vi.fn(),
-}
+  promise: vi.fn((promise, { success, error }) => {
+    promise.then(() => success()).catch(() => error())
+    return promise
+  }),
+}))
 
 vi.mock('@/shared/ui/toast', () => ({
   useToast: () => ({ toast: mockToast }),
+  toast: mockToast,
 }))
 
 describe('useEditTodo', () => {
@@ -52,16 +57,21 @@ describe('useEditTodo', () => {
 
     await handleSubmit()
 
-    expect(todoApi.updateTodo).toHaveBeenCalledOnce()
+    expect(todoApi.updateTodo).toHaveBeenCalledTimes(1)
     expect(todoApi.updateTodo).toHaveBeenCalledWith('1', {
       title: 'Updated title',
     })
 
-    expect(mockToast.success).toHaveBeenCalledOnce()
-    expect(mockToast.success).toHaveBeenCalledWith({
-      title: 'Todo updated',
-      description: 'Changes saved successfully.',
-    })
+    // With loadingToast, toast.promise is called instead of toast.success
+    expect(mockToast.promise).toHaveBeenCalledTimes(1)
+    expect(mockToast.promise).toHaveBeenCalledWith(
+      expect.any(Promise),
+      expect.objectContaining({
+        loading: 'Saving changes...',
+        success: expect.any(Function),
+        error: expect.any(Function),
+      }),
+    )
 
     unmount()
   })
@@ -87,11 +97,16 @@ describe('useEditTodo', () => {
 
     await expect(handleSubmit()).rejects.toThrow('Network error')
 
-    expect(mockToast.error).toHaveBeenCalledOnce()
-    expect(mockToast.error).toHaveBeenCalledWith({
-      title: 'Failed to update todo',
-      description: 'An error occurred while updating the todo.',
-    })
+    // With loadingToast, toast.promise is called (which internally calls error callback)
+    expect(mockToast.promise).toHaveBeenCalledTimes(1)
+    expect(mockToast.promise).toHaveBeenCalledWith(
+      expect.any(Promise),
+      expect.objectContaining({
+        loading: 'Saving changes...',
+        success: expect.any(Function),
+        error: expect.any(Function),
+      }),
+    )
 
     unmount()
   })

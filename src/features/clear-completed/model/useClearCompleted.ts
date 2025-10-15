@@ -2,7 +2,7 @@ import { clearCompletedTodos, TodoStatus, todoQueriesKeys, type Todo } from '@/e
 import { createMutationFactory } from '@/shared/lib/mutation'
 
 export function useClearCompleted() {
-  const mutation = createMutationFactory({
+  const mutation = createMutationFactory<number, void, Error>({
     mutationFn: async () => {
       const response = await clearCompletedTodos()
       return response.data
@@ -17,19 +17,16 @@ export function useClearCompleted() {
         rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
-    successToast: (count) => ({
-      title: 'Completed todos cleared',
-      description: `${count} completed todo${count === 1 ? '' : 's'} removed.`,
-    }),
+    invalidateKeys: [todoQueriesKeys.list],
+    // Silent optimistic - only show error toast on rollback
     errorToast: {
-      title: 'Failed to clear todos',
-      description: 'An error occurred while clearing completed todos.',
+      title: 'Failed to clear completed todos',
+      description: 'Completed todos have been restored. Please try again.',
     },
   })
 
   async function clearCompleted(onSuccess?: (count: number) => void) {
-    const count = await mutation.mutate(undefined as any)
+    const count = await mutation.mutate(undefined)
     onSuccess?.(count)
   }
 

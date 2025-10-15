@@ -62,6 +62,55 @@ export interface MutationFactoryConfig<TData, TVariables, TError = Error> {
   errorToast?: ToastConfig | ((error: TError, variables: TVariables) => ToastConfig)
 
   /**
+   * Promise-based loading toast (replaces successToast/errorToast)
+   * When provided, shows loading → success/error toast progression
+   *
+   * ⚠️ Best Practice Guide:
+   * - ✅ Use for non-optimistic operations (form submissions, create, etc.)
+   * - ❌ Avoid with optimistic updates (toggle, delete, etc.)
+   *
+   * Why avoid with optimistic updates?
+   * - UI already updated instantly (optimistic)
+   * - Toast shows "Loading..." (UX mismatch!)
+   * - Use silent pattern (errorToast only) or instant successToast instead
+   *
+   * @example
+   * // Non-optimistic (form submission) ✅
+   * {
+   *   loadingToast: {
+   *     loading: 'Creating todo...',
+   *     success: 'Todo created!',
+   *     error: 'Failed to create todo'
+   *   }
+   * }
+   *
+   * @example
+   * // Optimistic - Silent pattern (recommended) ✅
+   * {
+   *   optimisticUpdate: (cache, id) => { ... },
+   *   errorToast: {
+   *     title: 'Failed to update',
+   *     description: 'Changes have been reverted'
+   *   }
+   *   // No successToast, no loadingToast
+   * }
+   *
+   * @example
+   * // Optimistic - Instant confirmation (alternative) ✅
+   * {
+   *   optimisticUpdate: (cache, id) => { ... },
+   *   successToast: { title: 'Updated!', description: 'Changes saved' },
+   *   errorToast: { title: 'Failed', description: 'Changes reverted' }
+   *   // No loadingToast
+   * }
+   */
+  loadingToast?: {
+    loading: string
+    success: string | ((data: TData) => string)
+    error: string | ((error: TError) => string)
+  }
+
+  /**
    * Additional onMutate handler (runs after optimistic update)
    */
   onMutate?: (variables: TVariables) => void | Promise<void>

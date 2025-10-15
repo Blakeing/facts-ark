@@ -46,11 +46,11 @@ export interface SelectProps extends Omit<SelectRootProps<SelectItem>, 'collecti
   /** Array of select items or grouped items */
   items: SelectItem[] | SelectItemGroup[]
 
-  /** Label for the select */
-  label?: string
-
   /** Placeholder text when no value is selected */
   placeholder?: string
+
+  /** Visually hide the underlying select element */
+  hideHiddenSelect?: boolean
 
   /**
    * Size variant

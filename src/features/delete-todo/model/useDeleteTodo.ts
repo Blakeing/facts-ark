@@ -21,14 +21,11 @@ export function useDeleteTodo() {
         rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
-    successToast: {
-      title: 'Todo deleted',
-      description: 'The todo has been successfully deleted.',
-    },
+    invalidateKeys: [todoQueriesKeys.list],
+    // Silent optimistic - only show error toast on rollback
     errorToast: {
       title: 'Failed to delete todo',
-      description: 'An error occurred while deleting the todo.',
+      description: 'The todo has been restored. Please try again.',
     },
   })
 

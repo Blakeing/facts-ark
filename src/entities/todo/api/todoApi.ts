@@ -90,11 +90,15 @@ export async function deleteTodo(id: string): Promise<ApiResponse<void>> {
 
 /**
  * Toggle todo status (pending <-> completed)
+ *
+ * Optimized: Accepts current status to avoid extra GET request
  */
-export async function toggleTodoStatus(id: string): Promise<ApiResponse<Todo>> {
-  // Fetch current todo, toggle status, then update
-  const { data: todo } = await createRequestBuilder(apiClient).get(`/todos/${id}`).execute<Todo>()
-  const newStatus = todo.status === TodoStatus.COMPLETED ? TodoStatus.PENDING : TodoStatus.COMPLETED
+export async function toggleTodoStatus(
+  id: string,
+  currentStatus: TodoStatus,
+): Promise<ApiResponse<Todo>> {
+  const newStatus =
+    currentStatus === TodoStatus.COMPLETED ? TodoStatus.PENDING : TodoStatus.COMPLETED
   const updates: Partial<Todo> = {
     status: newStatus,
     updatedAt: new Date().toISOString(),

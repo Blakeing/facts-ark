@@ -1,59 +1,68 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { Field } from '@ark-ui/vue/field'
-import { computed, useSlots } from 'vue'
-import { cn } from '@/shared/lib/utils'
+import { Field as ArkField } from '@ark-ui/vue/field'
+import { computed } from 'vue'
 import { fieldVariants } from './field.variants'
 import type { FieldProps } from './field.types'
 
 /**
- * A Field component that wraps form inputs with label, helper text, and error messages.
- * Uses Ark UI for accessibility and state management.
- * Supports both props and slots for helper/error text.
+ * Field - Form field wrapper with label, helper text, and error messages
+ *
+ * Provides complete form field structure with accessibility built-in.
+ * Uses Ark UI's Field component for proper ARIA attributes and IDs.
  *
  * @example
- * <Field label="Email" required>
- *   <Input type="email" />
+ * <Field label="Email" required helperText="We'll never share your email">
+ *   <FieldInput v-model="email" type="email" />
  * </Field>
  *
  * @example
- * <Field label="Username" helperText="Choose a unique username" invalid errorText="Username is taken">
- *   <Input />
- * </Field>
- *
- * @example
- * <Field label="Password" :invalid="hasError">
- *   <Input type="password" />
- *   <template #helperText>Must be at least 8 characters</template>
- *   <template #errorText>Password is required</template>
+ * // With error
+ * <Field label="Password" :invalid="hasError" errorText="Password is required">
+ *   <FieldInput type="password" v-model="password" />
  * </Field>
  */
 
-const props = defineProps<FieldProps>()
-const slots = useSlots()
+const props = withDefaults(defineProps<FieldProps>(), {
+  required: false,
+  invalid: false,
+  disabled: false,
+  readOnly: false,
+})
 
-const styles = computed(() => fieldVariants())
+const styles = computed(() =>
+  fieldVariants({
+    class: props.class,
+  })
+)
 </script>
 
 <template>
-  <Field.Root v-bind="props" :class="cn(styles.root(), props.class)">
-    <Field.Label v-if="props.label" :class="styles.label()">
+  <ArkField.Root
+    :class="styles.base()"
+    :invalid="props.invalid"
+    :disabled="props.disabled"
+    :required="props.required"
+    :read-only="props.readOnly"
+    :id="props.id"
+  >
+    <ArkField.Label v-if="props.label" :class="styles.label()">
       {{ props.label }}
-      <Field.RequiredIndicator v-if="props.required" :class="styles.requiredIndicator()">
-        *
-      </Field.RequiredIndicator>
-    </Field.Label>
+      <span v-if="props.required" class="field-required">*</span>
+    </ArkField.Label>
 
     <slot />
 
-    <!-- Helper Text: Use slot if provided, otherwise use prop -->
-    <Field.HelperText v-if="(slots.helperText || props.helperText) && !props.invalid" :class="styles.helperText()">
-      <slot name="helperText">{{ props.helperText }}</slot>
-    </Field.HelperText>
+    <ArkField.HelperText v-if="props.helperText && !props.invalid" :class="styles.helperText()">
+      {{ props.helperText }}
+    </ArkField.HelperText>
 
-    <!-- Error Text: Use slot if provided, otherwise use prop -->
-    <Field.ErrorText v-if="(slots.errorText || props.errorText) && props.invalid" :class="styles.errorText()">
-      <slot name="errorText">{{ props.errorText }}</slot>
-    </Field.ErrorText>
-  </Field.Root>
+    <ArkField.ErrorText v-if="props.errorText && props.invalid" :class="styles.errorText()">
+      {{ props.errorText }}
+    </ArkField.ErrorText>
+
+    <slot v-if="!props.helperText && !props.invalid" name="helperText" />
+    <slot v-if="!props.errorText && props.invalid" name="errorText" />
+  </ArkField.Root>
 </template>
+

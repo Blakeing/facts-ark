@@ -6,12 +6,12 @@
  *
  * Routes organized by purpose:
  * - / (home): Dashboard/activity view
- * - /components: Interactive component gallery (NEW)
+ * - /components: Interactive component gallery
  * - /showcase: Original component showcase
  * - /theme: Theming demo
  * - /transitions: Vue transitions demo
  * - /todos: FSD todo app demo
- * - /wizard: XState multi-step form wizard demo (NEW)
+ * - /form-example: Unified form pattern demo (NEW)
  * - /about: About page
  *
  * Lazy-loaded routes are code-split into separate chunks,
@@ -76,8 +76,8 @@ const router = createRouter({
       name: 'about',
       component: () => import('../../pages/about/ui/AboutPage.vue'),
       meta: {
-        title: 'About',
-        description: 'About Facts Ark design system',
+        title: 'Contact',
+        description: 'Contact form demonstrating unified form architecture',
       },
     },
     {
@@ -90,12 +90,12 @@ const router = createRouter({
       },
     },
     {
-      path: '/wizard',
-      name: 'wizard',
-      component: () => import('../../pages/wizard/ui/WizardPage.vue'),
+      path: '/form-example',
+      name: 'form-example',
+      component: () => import('../../pages/form-example/ui/FormExamplePage.vue'),
       meta: {
-        title: 'Form Wizard',
-        description: 'Multi-step form powered by XState',
+        title: 'Unified Form Example',
+        description: 'Simple form using unified XState + Zod + VeeValidate pattern',
       },
     },
   ],

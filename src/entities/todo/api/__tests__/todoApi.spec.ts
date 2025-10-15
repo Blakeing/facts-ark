@@ -33,7 +33,7 @@ describe('todoApi', () => {
 
     const response = await todoApi.fetchTodos()
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todos')
+    expect(apiClient.get).toHaveBeenCalledWithExactlyOnceWith('/todos')
     expect(response.data).toEqual([todo])
   })
 
@@ -42,7 +42,7 @@ describe('todoApi', () => {
 
     const response = await todoApi.fetchTodoById('1')
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todos/1')
+    expect(apiClient.get).toHaveBeenCalledWithExactlyOnceWith('/todos/1')
     expect(response.data).toEqual(todo)
   })
 
@@ -51,7 +51,7 @@ describe('todoApi', () => {
 
     const response = await todoApi.createTodo({ title: 'Test', description: 'Details' })
 
-    expect(apiClient.post).toHaveBeenCalledWith(
+    expect(apiClient.post).toHaveBeenCalledWithExactlyOnceWith(
       '/todos',
       expect.objectContaining({ title: 'Test', description: 'Details' }),
     )
@@ -63,7 +63,7 @@ describe('todoApi', () => {
 
     const response = await todoApi.updateTodo('1', { title: 'Updated' })
 
-    expect(apiClient.patch).toHaveBeenCalledWith(
+    expect(apiClient.patch).toHaveBeenCalledWithExactlyOnceWith(
       '/todos/1',
       expect.objectContaining({ title: 'Updated' }),
     )
@@ -75,18 +75,19 @@ describe('todoApi', () => {
 
     const response = await todoApi.deleteTodo('1')
 
-    expect(apiClient.delete).toHaveBeenCalledWith('/todos/1')
+    expect(apiClient.delete).toHaveBeenCalledWithExactlyOnceWith('/todos/1')
     expect(response.status).toBe(200)
   })
 
   it('toggleTodoStatus toggles and updates todo', async () => {
     const completedTodo = { ...todo, status: TodoStatus.COMPLETED }
-    vi.mocked(apiClient.get).mockResolvedValueOnce({ data: todo, status: 200 })
     vi.mocked(apiClient.patch).mockResolvedValue({ data: completedTodo, status: 200 })
 
-    const response = await todoApi.toggleTodoStatus('1')
+    const response = await todoApi.toggleTodoStatus('1', TodoStatus.PENDING)
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todos/1')
+    // Should not fetch - we're passing current status
+    expect(apiClient.get).not.toHaveBeenCalled()
+    expect(apiClient.patch).toHaveBeenCalledTimes(1)
     expect(apiClient.patch).toHaveBeenCalledWith(
       '/todos/1',
       expect.objectContaining({ status: TodoStatus.COMPLETED }),
@@ -100,7 +101,7 @@ describe('todoApi', () => {
 
     const response = await todoApi.fetchTodoStats()
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todos')
+    expect(apiClient.get).toHaveBeenCalledWithExactlyOnceWith('/todos')
     expect(response.data).toEqual({ total: 2, completed: 1, pending: 1 })
   })
 
@@ -114,8 +115,8 @@ describe('todoApi', () => {
 
     const response = await todoApi.clearCompletedTodos()
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todos')
-    expect(apiClient.delete).toHaveBeenCalledWith('/todos/1')
+    expect(apiClient.get).toHaveBeenCalledWithExactlyOnceWith('/todos')
+    expect(apiClient.delete).toHaveBeenCalledWithExactlyOnceWith('/todos/1')
     expect(response.data).toBe(1)
   })
 })

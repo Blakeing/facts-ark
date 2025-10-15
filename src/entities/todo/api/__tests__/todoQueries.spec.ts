@@ -51,7 +51,7 @@ describe('todoQueries', () => {
     await query.options.query()
 
     expect(key).toEqual([...todoQueriesKeys.detail('1')])
-    expect(todoApi.fetchTodoById).toHaveBeenCalledWith('1')
+    expect(todoApi.fetchTodoById).toHaveBeenCalledWithExactlyOnceWith('1')
   })
 
   it('useTodoStats configures query with stats key', async () => {

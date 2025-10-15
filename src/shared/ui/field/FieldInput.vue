@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { Field } from '@ark-ui/vue/field'
+import { computed } from 'vue'
 import { inputVariants } from '../input/input.variants'
 import type { FieldInputProps } from './field.types'
 
@@ -15,7 +16,7 @@ import type { FieldInputProps } from './field.types'
  * accessibility, validation state, and ID management.
  *
  * @example
- * <Field label="Email" invalid errorText="Invalid email">
+ * <Field label="Email" invalid errorText="Email is required">
  *   <FieldInput type="email" placeholder="you@example.com" />
  * </Field>
  */
@@ -24,17 +25,21 @@ const props = withDefaults(defineProps<FieldInputProps>(), {
   type: 'text',
   size: 'md',
 })
+
+defineOptions({
+  inheritAttrs: false,
+})
 </script>
 
 <template>
   <Field.Context v-slot="field">
     <Field.Input
-      :type="props.type"
       :class="inputVariants({
         size: props.size,
         variant: props.variant || (field.invalid ? 'error' : 'default'),
         class: props.class,
       })"
+      :type="props.type"
       :disabled="props.disabled"
       :readonly="props.readonly"
       :required="props.required"
@@ -43,4 +48,4 @@ const props = withDefaults(defineProps<FieldInputProps>(), {
     />
   </Field.Context>
 </template>
-–
+

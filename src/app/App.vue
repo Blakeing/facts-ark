@@ -8,6 +8,7 @@
   Structure:
   - AppLayout: Provides consistent sidebar and header across all pages
   - RouterView: Dynamically renders the current route's component
+  - Toast: Global toast notifications
 
   Vue Query and Pinia Colada are configured as plugins in main.ts.
 
@@ -17,10 +18,14 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import AppLayout from './layouts/AppLayout.vue'
+import { Toast } from '@/shared/ui/toast'
 </script>
 
 <template>
   <AppLayout>
     <RouterView />
   </AppLayout>
+
+  <!-- Global toast notifications (vue-sonner) -->
+  <Toast />
 </template>

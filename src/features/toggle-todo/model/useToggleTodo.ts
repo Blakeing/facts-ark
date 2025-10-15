@@ -9,12 +9,16 @@ import { TodoStatus, toggleTodoStatus, todoQueriesKeys, type Todo } from '@/enti
 import { createMutationFactory } from '@/shared/lib/mutation'
 
 export function useToggleTodo() {
-  const mutation = createMutationFactory({
-    mutationFn: async (id: Todo['id']) => {
-      const response = await toggleTodoStatus(id)
+  const mutation = createMutationFactory<
+    Todo,
+    { id: Todo['id']; currentStatus: TodoStatus },
+    Error
+  >({
+    mutationFn: async ({ id, currentStatus }) => {
+      const response = await toggleTodoStatus(id, currentStatus)
       return response.data
     },
-    optimisticUpdate: (cache, id: Todo['id']) => {
+    optimisticUpdate: (cache, { id }: { id: Todo['id']; currentStatus: TodoStatus }) => {
       const rollbackData = cache.optimisticUpdate(todoQueriesKeys.list, id, (todo: Todo) => {
         const toggledStatus =
           todo.status === TodoStatus.COMPLETED ? TodoStatus.PENDING : TodoStatus.COMPLETED
@@ -32,19 +36,16 @@ export function useToggleTodo() {
         rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
-    successToast: {
-      title: 'Todo updated',
-      description: 'Status toggled successfully.',
-    },
+    invalidateKeys: [todoQueriesKeys.list],
+    // Silent optimistic - only show error toast on rollback
     errorToast: {
       title: 'Failed to update todo',
-      description: 'An error occurred while toggling the todo status.',
+      description: 'Changes have been reverted. Please try again.',
     },
   })
 
-  async function toggleTodo(id: string, onSuccess?: () => void) {
-    await mutation.mutate(id)
+  async function toggleTodo(id: string, currentStatus: TodoStatus, onSuccess?: () => void) {
+    await mutation.mutate({ id, currentStatus })
     onSuccess?.()
   }
 

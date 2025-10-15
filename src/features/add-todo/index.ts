@@ -2,5 +2,5 @@
  * Add Todo Feature Public API
  */
 
-export { useAddTodo } from './model/useAddTodo'
+export { useCreateTodo } from './model/useCreateTodo' // Unified form pattern
 export { default as AddTodoForm } from './ui/AddTodoForm.vue'

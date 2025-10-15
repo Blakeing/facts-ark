@@ -4,15 +4,29 @@
  *
  * Displays statistics about todos (total, pending, completed).
  * Uses Badge components for visual representation.
+ *
+ * Optimized: Computes stats from existing todos query instead of
+ * making a separate API call.
  */
 
 import { computed } from 'vue'
-import { useTodoStats } from '@/entities/todo'
+import { useTodos, TodoStatus } from '@/entities/todo'
 import { Badge } from '@/shared/ui/badge'
 import { Card } from '@/shared/ui/card'
 
-const { data: stats, status } = useTodoStats()
+const { data: todos, status } = useTodos()
 const isLoading = computed(() => status.value === 'pending')
+
+// Compute stats from todos data (no separate API call needed)
+const stats = computed(() => {
+  if (!todos.value) return null
+
+  const total = todos.value.length
+  const completed = todos.value.filter(t => t.status === TodoStatus.COMPLETED).length
+  const pending = total - completed
+
+  return { total, completed, pending }
+})
 </script>
 
 <template>

@@ -4,7 +4,7 @@
  * Example feature demonstrating XState integration for complex workflows.
  */
 
-// Machine
+// Machine (keeping for reference, but prefer unified pattern)
 export { formWizardMachine } from './model/machines/form-wizard.machine'
 export type {
   FormWizardMachine,
@@ -23,6 +23,5 @@ export type {
   AdditionalData,
 } from './model/machines/types'
 
-// Composable
-export { useFormWizard } from './model/useFormWizard'
-export type { UseFormWizardReturn } from './model/useFormWizard'
+// Unified Form Composable (Recommended)
+export { useFormWizardUnified } from './model/useFormWizardUnified'

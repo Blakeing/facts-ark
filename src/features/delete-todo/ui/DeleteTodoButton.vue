@@ -10,7 +10,6 @@ import { ref } from 'vue'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/patterns'
 import { useDeleteTodo } from '../model/useDeleteTodo'
-import { useToast } from '@/shared/ui/toast'
 
 interface Props {
   todoId: string
@@ -32,15 +31,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const { deleteTodo, isPending } = useDeleteTodo()
-const { toast } = useToast()
 const openConfirm = ref(false)
 
 function handleDelete() {
   deleteTodo(props.todoId, () => {
-    toast.success({
-      title: 'Todo deleted',
-      description: 'The todo has been removed.',
-    })
+    // Toast is now handled by mutation factory via loadingToast
     openConfirm.value = false
     emit('deleted')
   })
@@ -52,8 +47,8 @@ function handleDelete() {
     <Button
       :variant="variant"
       :size="size"
-      :loading="isPending"
-      :disabled="isPending"
+      :loading="isPending.value"
+      :disabled="isPending.value"
       @click="props.confirmDelete ? (openConfirm = true) : handleDelete()"
       type="button"
     >
@@ -74,7 +69,7 @@ function handleDelete() {
       description="Are you sure you want to delete this todo? This action cannot be undone."
       confirm-text="Delete"
       variant="danger"
-      :loading="isPending"
+      :loading="isPending.value"
       @confirm="handleDelete"
       @cancel="openConfirm = false"
     />

@@ -11,116 +11,111 @@ import { tv } from 'tailwind-variants/lite'
  * Select variants matching Park UI's design system
  *
  * Features:
- * - Semantic color tokens throughout
+ * - Semantic color tokens
  * - Proper focus states with ring
- * - Consistent sizing with Input component
- * - Accessible by default (Ark UI)
+ * - Disabled states
+ * - Indicator positioning
  */
 export const selectVariants = tv({
   slots: {
-    root: 'relative',
+    root: '',
+    control: [
+      // Layout
+      'grid w-full grid-cols-[1fr_auto] items-center gap-3',
 
-    label: 'block text-sm font-medium text-foreground mb-1',
-
-    control: 'relative',
-
+      // Sizing
+      'min-h-10',
+    ],
     trigger: [
       // Layout
-      'relative w-full cursor-pointer rounded-md pr-8 text-left',
+      'flex w-full items-center justify-between gap-2 rounded-md',
 
-      // Colors
-      'bg-background text-foreground',
-      'border border-input',
+      // Border & Background
+      'border border-input bg-background',
+
+      // Typography
+      'text-sm text-foreground',
+
+      // Padding
+      'px-3 py-2',
 
       // Focus states
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'focus-ring',
 
-      // States
-      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+      // Disabled state
+      'disabled:cursor-not-allowed disabled:opacity-50',
 
-      // Transition
-      'transition-colors',
+      // Placeholder state
+      '[&[data-placeholder-shown]]:text-muted-foreground',
+
+      // Animations
+      'transition-colors-smooth',
     ],
-
-    valueText: 'block truncate',
-
-    indicator:
-      'pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-muted-foreground',
-
-    positioner: 'z-50',
-
+    valueText: '',
+    indicator: ['h-4 w-4 shrink-0 text-muted-foreground'],
+    positioner: '',
     content: [
       // Layout
-      'mt-1 max-h-60 w-[var(--reference-width)] overflow-auto rounded-md py-1',
+      'z-50 min-w-[8rem] overflow-hidden rounded-md',
 
-      // Colors
-      'bg-popover text-popover-foreground',
-      'border border-border',
+      // Border & Background
+      'border border-border bg-popover',
 
       // Shadow
-      'shadow-lg',
+      'shadow-md',
+
+      // Animation
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     ],
-
-    itemGroup: '',
-
-    itemGroupLabel:
-      'px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider',
-
+    hiddenSelect: ['hidden'],
     item: [
       // Layout
-      'relative cursor-pointer select-none py-2',
+      'relative flex w-full cursor-pointer select-none items-center rounded-sm',
 
-      // Colors
-      'text-foreground',
-      'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
+      // Padding
+      'py-1.5 pl-8 pr-2',
 
-      // States
-      'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+      // Typography
+      'text-sm',
 
-      // Transition
-      'transition-colors',
+      // Outline
+      'outline-none',
+
+      // Focus state
+      'focus:bg-accent focus:text-accent-foreground',
+
+      // Disabled state
+      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
     ],
-
-    itemText: 'block truncate',
-
-    itemIndicator: [
-      'absolute inset-y-0 flex items-center',
-      'text-primary',
-      'data-[highlighted]:text-accent-foreground',
-    ],
-
-    itemContent: 'flex items-center gap-3',
-
-    itemAvatar: 'size-5 shrink-0 rounded-full',
-
-    itemStatus: 'inline-block size-2 shrink-0 rounded-full',
-
-    itemDescription:
-      'ml-2 truncate text-muted-foreground data-[highlighted]:text-accent-foreground',
+    itemIndicator: ['absolute left-2 flex h-3.5 w-3.5 items-center justify-center'],
+    itemText: '',
+    itemContent: ['flex w-full items-center gap-3'],
+    itemAvatar: ['h-6 w-6 min-h-6 min-w-6 rounded-full object-cover'],
+    itemStatus: ['h-2.5 w-2.5 rounded-full'],
+    itemDescription: ['block text-xs text-muted-foreground'],
+    itemGroup: '',
+    itemGroupLabel: ['px-2 py-1.5 text-sm font-semibold text-muted-foreground'],
   },
   variants: {
     size: {
       sm: {
         trigger: 'h-9 px-2 text-xs',
-        content: 'text-xs',
       },
       md: {
         trigger: 'h-10 px-3 text-sm',
-        content: 'text-sm',
       },
       lg: {
         trigger: 'h-11 px-4 text-base',
-        content: 'text-base',
       },
     },
     indicatorPosition: {
       left: {
-        item: 'pl-8 pr-4',
-        itemIndicator: 'left-0 pl-1.5',
+        trigger: 'flex-row-reverse',
       },
       right: {
-        item: 'pl-3 pr-9',
-        itemIndicator: 'right-0 pr-4',
+        trigger: 'flex-row',
       },
     },
   },

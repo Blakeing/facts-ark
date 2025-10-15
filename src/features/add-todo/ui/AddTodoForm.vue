@@ -3,13 +3,13 @@
  * AddTodoForm Component
  *
  * Form for creating a new todo.
- * Uses Input and Button components from the design system.
+ * Uses unified form pattern with TextField/Textarea components.
  */
 
-import { FieldInput } from '@/shared/ui/field'
+import { TextField, Textarea } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
-import { BaseForm, BaseFormField } from '@/shared/ui/form'
-import { useAddTodo } from '../model/useAddTodo'
+import { useCreateTodo } from '../model/useCreateTodo'
+import { computed } from 'vue'
 
 interface Emits {
   (e: 'success'): void
@@ -17,52 +17,44 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const { form, canSubmit, isPending, isError, error, handleSubmit } = useAddTodo()
+const { form, handleSubmit, isSubmitting, canSubmit, state } = useCreateTodo()
 
-function onSubmit() {
-  handleSubmit(() => {
+// Helper to show character count
+const titleValue = computed(() => form.values.title || '')
+const descriptionValue = computed(() => form.values.description || '')
+
+async function onSubmit() {
+  await handleSubmit()
+  if (state.value.value === 'success') {
     emit('success')
-  })
+  }
 }
 </script>
 
 <template>
-  <BaseForm :form="form" :on-submit="onSubmit" class="space-y-4">
+  <form @submit.prevent="onSubmit" class="space-y-4">
     <!-- Title Field -->
-    <BaseFormField name="title" label="Title" required>
-      <template #default="{ field }">
-        <FieldInput
-          placeholder="What needs to be done?"
-          :disabled="isPending"
-          maxlength="200"
-          required
-          v-bind="field"
-        />
-      </template>
-      <template #description="{ meta, value, errorMessage }">
-        <span v-if="errorMessage" class="text-xs text-fg-error">{{ errorMessage }}</span>
-        <span v-else-if="!meta.touched" class="text-xs text-muted-foreground">1-200 characters</span>
-        <span v-else class="text-xs text-muted-foreground">{{ value.length }}/200 characters</span>
-      </template>
-    </BaseFormField>
+    <TextField
+      name="title"
+      label="Title"
+      placeholder="What needs to be done?"
+      :disabled="isSubmitting"
+      required
+      :helper-text="`${titleValue.length}/200 characters`"
+    />
 
     <!-- Description Field -->
-    <BaseFormField name="description" label="Description (optional)">
-      <template #default="{ field }">
-        <FieldInput
-          placeholder="Add more details..."
-          :disabled="isPending"
-          maxlength="1000"
-          v-bind="field"
-        />
-      </template>
-      <template #description="{ value }">
-        <span class="text-xs text-muted-foreground">{{ value.length }}/1000 characters</span>
-      </template>
-    </BaseFormField>
+    <Textarea
+      name="description"
+      label="Description (optional)"
+      placeholder="Add more details..."
+      :disabled="isSubmitting"
+      :rows="3"
+      :helper-text="`${descriptionValue.length}/1000 characters`"
+    />
 
     <!-- Error Message -->
-    <div v-if="isError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
+    <div v-if="state.value.context?.submitError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
       <div class="flex items-start gap-2">
         <svg class="mt-0.5 h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path
@@ -71,16 +63,16 @@ function onSubmit() {
             clip-rule="evenodd"
           />
         </svg>
-        <span>{{ error?.message || 'Failed to create todo' }}</span>
+        <span>{{ state.value.context.submitError }}</span>
       </div>
     </div>
 
     <!-- Submit Button -->
     <div class="flex justify-end">
-      <Button type="submit" :disabled="!canSubmit" :loading="isPending">
-        {{ isPending ? 'Creating...' : 'Add Todo' }}
+      <Button type="submit" :disabled="!canSubmit" :loading="isSubmitting">
+        {{ isSubmitting ? 'Creating...' : 'Add Todo' }}
       </Button>
     </div>
-  </BaseForm>
+  </form>
 </template>
 

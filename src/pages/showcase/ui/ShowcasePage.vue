@@ -32,6 +32,7 @@ import RatingGroup from '@/shared/ui/rating-group/RatingGroup.vue'
 import SegmentGroup from '@/shared/ui/segment-group/SegmentGroup.vue'
 import Slider from '@/shared/ui/slider/Slider.vue'
 import Steps from '@/shared/ui/steps/Steps.vue'
+import { toast } from '@/shared/ui/toast'
 
 // State management
 const inputValue = ref('')
@@ -121,6 +122,18 @@ const segmentItems = [
   { value: 'tab2', label: 'Tab 2' },
   { value: 'tab3', label: 'Tab 3' },
 ]
+
+// Functions
+const showPromiseToast = () => {
+  toast.promise(
+    new Promise((resolve) => setTimeout(resolve, 2000)),
+    {
+      loading: 'Loading data...',
+      success: 'Data loaded successfully!',
+      error: 'Failed to load data',
+    },
+  )
+}
 
 const menuItems = [
   { value: 'new', label: 'New File', shortcut: '⌘N' },
@@ -260,9 +273,23 @@ const menuItems = [
               <h3 class="text-xl font-semibold text-foreground mb-4">Textarea</h3>
               <div class="max-w-md space-y-4">
                 <Textarea
+                  name="showcase-textarea-md"
                   v-model="textareaValue"
                   placeholder="Enter your message..."
                   :rows="4"
+                  size="md"
+                />
+                <Textarea
+                  name="showcase-textarea-sm"
+                  placeholder="Small textarea..."
+                  :rows="3"
+                  size="sm"
+                />
+                <Textarea
+                  name="showcase-textarea-lg"
+                  placeholder="Large textarea..."
+                  :rows="5"
+                  size="lg"
                 />
               </div>
             </Card>
@@ -590,6 +617,128 @@ const menuItems = [
             <Card variant="outline" padding="lg">
               <h3 class="text-xl font-semibold text-foreground mb-4">Steps</h3>
               <Steps :items="stepsItems" variant="default" />
+            </Card>
+          </div>
+        </section>
+
+        <!-- Toast Notifications Section -->
+        <section>
+          <h2 class="text-3xl font-bold text-foreground mb-8 border-b border-border pb-4">
+            🔔 Toast Notifications
+          </h2>
+
+          <div class="space-y-8">
+            <!-- Basic Toast Types -->
+            <Card variant="outline" padding="lg">
+              <h3 class="text-xl font-semibold text-foreground mb-4">Basic Types</h3>
+              <p class="text-sm text-muted-foreground mb-6">
+                Vue Sonner toasts styled with semantic tokens (shadcn-vue pattern). Auto-dismiss after 5 seconds.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <Button
+                  variant="solid"
+                  @click="toast.success('Success!', {
+                    description: 'Your action was completed successfully.',
+                  })"
+                >
+                  Success
+                </Button>
+                <Button
+                  variant="destructive"
+                  @click="toast.error('Error occurred', {
+                    description: 'Something went wrong. Please try again.',
+                  })"
+                >
+                  Error
+                </Button>
+                <Button
+                  variant="outline"
+                  @click="toast.warning('Warning!', {
+                    description: 'Please review this information carefully.',
+                  })"
+                >
+                  Warning
+                </Button>
+                <Button
+                  variant="secondary"
+                  @click="toast.info('Information', {
+                    description: 'Here is some useful information for you.',
+                  })"
+                >
+                  Info
+                </Button>
+                <Button
+                  variant="ghost"
+                  @click="toast('Default notification', {
+                    description: 'A neutral default toast message.',
+                  })"
+                >
+                  Default
+                </Button>
+              </div>
+            </Card>
+
+            <!-- Toasts with Actions -->
+            <Card variant="outline" padding="lg">
+              <h3 class="text-xl font-semibold text-foreground mb-4">With Action Buttons</h3>
+              <p class="text-sm text-muted-foreground mb-6">
+                Toasts can include action buttons for user interaction. These stay longer (10 seconds) for user to act.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <Button
+                  variant="solid"
+                  @click="toast.success('File uploaded', {
+                    description: 'Your document has been uploaded successfully.',
+                    action: {
+                      label: 'View',
+                      onClick: () => console.log('View status clicked!')
+                    },
+                    duration: 10000
+                  })"
+                >
+                  With Action
+                </Button>
+                <Button
+                  variant="outline"
+                  @click="toast('Event created', {
+                    description: 'Your event has been scheduled.',
+                    action: {
+                      label: 'Undo',
+                      onClick: () => console.log('Undo clicked!')
+                    },
+                    duration: 10000
+                  })"
+                >
+                  With Undo
+                </Button>
+              </div>
+            </Card>
+
+            <!-- Promise Toast -->
+            <Card variant="outline" padding="lg">
+              <h3 class="text-xl font-semibold text-foreground mb-4">Promise-based Toast</h3>
+              <p class="text-sm text-muted-foreground mb-6">
+                Show loading, success, or error based on promise resolution. Shows loading for 2 seconds then success.
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <Button variant="outline" @click="showPromiseToast">
+                  Show Promise Toast
+                </Button>
+              </div>
+            </Card>
+
+            <!-- Dismiss Controls -->
+            <Card variant="outline" padding="lg">
+              <h3 class="text-xl font-semibold text-foreground mb-4">Dismissing Toasts</h3>
+              <p class="text-sm text-muted-foreground mb-6">
+                All toasts have a dismiss button. Click the × icon on any toast to dismiss it, or use the button below to dismiss all.
+              </p>
+              <Button
+                variant="outline"
+                @click="toast.dismiss()"
+              >
+                Dismiss All Toasts
+              </Button>
             </Card>
           </div>
         </section>

@@ -7,9 +7,8 @@
 
 import { computed } from 'vue'
 import { Dialog } from '@/shared/ui/dialog'
-import { FieldInput } from '@/shared/ui/field'
+import { TextField, Textarea } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
-import { BaseForm, BaseFormField } from '@/shared/ui/form'
 import { useEditTodo } from '../model/useEditTodo'
 import type { Todo } from '@/entities/todo'
 
@@ -57,38 +56,26 @@ async function onSubmit() {
     :showClose="false"
   >
     <template #content>
-      <BaseForm :form="form" :on-submit="onSubmit" class="space-y-4">
-        <BaseFormField name="title" label="Title" required>
-          <template #default="{ field }">
-            <FieldInput
-              placeholder="What needs to be done?"
-              :disabled="isPending"
-              maxlength="200"
-              required
-              v-bind="field"
-            />
-          </template>
-          <template #description="{ errorMessage }">
-            <span v-if="errorMessage" class="text-xs text-fg-error">{{ errorMessage }}</span>
-            <span v-else class="text-xs text-muted-foreground">{{ titleLength }}/200 characters</span>
-          </template>
-        </BaseFormField>
+      <form @submit.prevent="onSubmit" class="space-y-4">
+        <TextField
+          name="title"
+          label="Title"
+          placeholder="What needs to be done?"
+          :disabled="isPending.value"
+          required
+          :helper-text="`${titleLength}/200 characters`"
+        />
 
-        <BaseFormField name="description" label="Description (optional)">
-          <template #default="{ field }">
-            <FieldInput
-              placeholder="Add more details..."
-              :disabled="isPending"
-              maxlength="1000"
-              v-bind="field"
-            />
-          </template>
-          <template #description>
-            <span class="text-xs text-muted-foreground">{{ descriptionLength }}/1000 characters</span>
-          </template>
-        </BaseFormField>
+        <Textarea
+          name="description"
+          label="Description (optional)"
+          placeholder="Add more details..."
+          :disabled="isPending.value"
+          :rows="3"
+          :helper-text="`${descriptionLength}/1000 characters`"
+        />
 
-        <div v-if="isError" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
+        <div v-if="isError.value" class="rounded-md bg-bg-error-subtle p-3 text-sm text-fg-error">
           <div class="flex items-start gap-2">
             <svg class="mt-0.5 h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -97,19 +84,19 @@ async function onSubmit() {
                 clip-rule="evenodd"
               />
             </svg>
-            <span>{{ error?.message || 'Failed to update todo' }}</span>
+            <span>{{ error.value?.message || 'Failed to update todo' }}</span>
           </div>
         </div>
 
         <div class="flex justify-end gap-2">
-          <Button type="button" variant="outline" :disabled="isPending" @click="onClose">
+          <Button type="button" variant="outline" :disabled="isPending.value" @click="onClose">
             Cancel
           </Button>
-          <Button type="submit" variant="solid" :disabled="!canSubmit" :loading="isPending">
-            {{ isPending ? 'Saving...' : 'Save Changes' }}
+          <Button type="submit" variant="solid" :disabled="!canSubmit" :loading="isPending.value">
+            {{ isPending.value ? 'Saving...' : 'Save Changes' }}
           </Button>
         </div>
-      </BaseForm>
+      </form>
     </template>
   </Dialog>
 </template>

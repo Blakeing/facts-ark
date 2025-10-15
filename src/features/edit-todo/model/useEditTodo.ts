@@ -56,18 +56,16 @@ export function useEditTodo(todo: MaybeRef<Todo>, options: UseEditTodoOptions = 
         rollback: () => cache.rollback(todoQueriesKeys.list, rollbackData),
       }
     },
-    invalidateKeys: [todoQueriesKeys.list, todoQueriesKeys.stats],
-    successToast: {
-      title: 'Todo updated',
-      description: 'Changes saved successfully.',
-    },
-    errorToast: {
-      title: 'Failed to update todo',
-      description: 'An error occurred while updating the todo.',
+    invalidateKeys: [todoQueriesKeys.list],
+    // Promise-based toast for instant feedback
+    loadingToast: {
+      loading: 'Saving changes...',
+      success: 'Changes saved successfully!',
+      error: 'Failed to save changes',
     },
     onSettled: async (_data, _error, variables) => {
       // Also invalidate the detail query
-      await queryCache.invalidateQueries({ key: [...todoQueriesKeys.detail(variables.id)] as any })
+      await queryCache.invalidateQueries({ key: [...todoQueriesKeys.detail(variables.id)] })
     },
   })
 

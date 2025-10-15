@@ -2,3 +2,4 @@
 @import './tailwind-theme.css'; /* Enhanced Tailwind + Park UI theming */
 @import './animations.css'; /* Consistent animations & transitions */
 @import './base.css';
+@import 'vue-sonner/style.css'; /* Vue Sonner base styles (animations, positioning) */

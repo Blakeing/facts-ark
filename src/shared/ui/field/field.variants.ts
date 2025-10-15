@@ -1,21 +1,37 @@
 /**
  * Field component - variant definitions
  *
- * Minimal styling approach - rely on Ark UI's built-in behavior
+ * Design inspired by Park UI's field component
+ * Uses semantic color tokens for consistency
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Field variant definitions
- * Uses semantic tokens for dark mode and theming support
+ * Field container variants
+ *
+ * Provides base styling for the field wrapper and its child elements
  */
 export const fieldVariants = tv({
+  base: [
+    // Layout
+    'flex flex-col gap-1.5',
+  ],
   slots: {
-    root: 'space-y-2',
-    label: 'block text-sm font-medium text-foreground',
-    helperText: 'text-sm text-muted-foreground',
-    errorText: 'text-sm text-destructive',
-    requiredIndicator: 'text-destructive ml-1',
+    label: [
+      // Typography
+      'text-sm font-medium text-foreground',
+
+      // Required indicator
+      '[&_.field-required]:text-destructive [&_.field-required]:ml-1',
+    ],
+    helperText: [
+      // Typography
+      'text-sm text-muted-foreground',
+    ],
+    errorText: [
+      // Typography
+      'text-sm text-destructive',
+    ],
   },
 })

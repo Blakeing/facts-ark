@@ -1,133 +1,92 @@
 /**
  * Toast component - variant definitions
  *
- * Design inspired by Park UI's toast component
- * Uses semantic color tokens for consistency
+ * Tailwind-variants for vue-sonner toast styling
+ * Used via toastOptions.classes in Toast.vue
  */
 
 import { tv } from 'tailwind-variants/lite'
 
 /**
- * Toast variants matching Park UI's design system
+ * Toast variants with semantic color tokens
  *
- * Features:
- * - Semantic color tokens throughout
- * - Smooth animations for toasts
- * - Type-based color variants (success, error, warning, info)
- * - Stack positioning
+ * These classes are applied via vue-sonner's toastOptions.classes
+ * using group selectors for proper scoping
  */
 export const toastVariants = tv({
   slots: {
-    root: [
-      // Layout
-      'relative flex items-start gap-3 p-4 rounded-lg shadow-lg',
-      'w-full max-w-sm',
-
-      // Colors
-      'bg-background border border-border',
-
-      // Typography
-      'text-foreground',
-
-      // Focus
-      'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-
-      // Required CSS variables for animation
-      // These are set by Ark UI and must be included
-      '[translate:var(--x)_var(--y)]',
-      '[scale:var(--scale)]',
-      '[z-index:var(--z-index)]',
-      '[height:var(--height)]',
-      '[opacity:var(--opacity)]',
-      '[will-change:translate,opacity,scale]',
-
-      // Transitions
-      'transition-all duration-400 ease-[cubic-bezier(0.21,1.02,0.73,1)]',
-
-      // Closed state transition
-      'data-[state=closed]:duration-400 data-[state=closed]:ease-[cubic-bezier(0.06,0.71,0.55,1)]',
-
-      // Stacking
-      'data-[overlap]:shadow-sm',
+    toast: [
+      'group toast',
+      'group-[.toaster]:bg-card',
+      'group-[.toaster]:text-card-foreground',
+      'group-[.toaster]:border-border',
+      'group-[.toaster]:shadow-lg',
+      'group-[.toaster]:rounded-lg',
     ],
-
-    icon: ['flex-shrink-0', 'size-5'],
-
-    content: ['flex-1 min-w-0'],
-
-    title: ['text-sm font-semibold leading-tight', 'text-foreground'],
-
-    description: ['mt-1 text-sm', 'text-muted-foreground'],
-
-    actionTrigger: [
-      // Layout
-      'inline-flex items-center justify-center rounded-md',
-      'px-3 py-1.5',
-
-      // Typography
-      'text-xs font-medium',
-
-      // Colors
-      'bg-primary text-primary-foreground',
-
-      // States
-      'hover:bg-primary/90',
-
-      // Focus
-      'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-
-      // Transitions
-      'transition-colors',
+    description: ['group-[.toast]:text-muted-foreground'],
+    actionButton: [
+      'group-[.toast]:bg-primary',
+      'group-[.toast]:text-primary-foreground',
+      'group-[.toast]:rounded-md',
+      'group-[.toast]:px-3',
+      'group-[.toast]:py-1.5',
+      'group-[.toast]:text-sm',
+      'group-[.toast]:font-medium',
+      'group-[.toast]:transition-colors',
     ],
-
-    closeTrigger: [
-      // Layout
-      'inline-flex items-center justify-center',
-      'rounded-md',
-      'flex-shrink-0',
-      'ml-auto',
-
-      // Size
-      'size-6',
-
-      // Colors
-      'text-muted-foreground hover:text-foreground',
-
-      // States
-      'opacity-70 hover:opacity-100',
-
-      // Focus
-      'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-
-      // Transitions
-      'transition-all',
+    cancelButton: [
+      'group-[.toast]:bg-muted',
+      'group-[.toast]:text-muted-foreground',
+      'group-[.toast]:rounded-md',
+      'group-[.toast]:px-3',
+      'group-[.toast]:py-1.5',
+      'group-[.toast]:text-sm',
+      'group-[.toast]:transition-colors',
     ],
-  },
-  variants: {
-    type: {
-      info: {
-        root: 'border-blue-200 dark:border-blue-800',
-        icon: 'text-blue-600 dark:text-blue-400',
-      },
-      success: {
-        root: 'border-green-200 dark:border-green-800',
-        icon: 'text-green-600 dark:text-green-400',
-      },
-      warning: {
-        root: 'border-yellow-200 dark:border-yellow-800',
-        icon: 'text-yellow-600 dark:text-yellow-400',
-      },
-      error: {
-        root: 'border-red-200 dark:border-red-800',
-        icon: 'text-red-600 dark:text-red-400',
-      },
-      default: {
-        root: '',
-        icon: 'text-foreground',
-      },
-    },
-  },
-  defaultVariants: {
-    type: 'default',
+    closeButton: [
+      'group-[.toast]:bg-transparent',
+      'group-[.toast]:text-muted-foreground',
+      'hover:group-[.toast]:text-foreground',
+      'group-[.toast]:transition-colors',
+    ],
+    error: [
+      'group-[.toaster]:bg-bg-error-subtle',
+      'group-[.toaster]:text-fg-error',
+      'group-[.toaster]:border-border-error',
+    ],
+    success: [
+      'group-[.toaster]:bg-bg-success-subtle',
+      'group-[.toaster]:text-fg-success',
+      'group-[.toaster]:border-border-success',
+    ],
+    warning: [
+      'group-[.toaster]:bg-bg-warning-subtle',
+      'group-[.toaster]:text-fg-warning',
+      'group-[.toaster]:border-border-warning',
+    ],
+    info: [
+      'group-[.toaster]:bg-bg-info-subtle',
+      'group-[.toaster]:text-fg-info',
+      'group-[.toaster]:border-border-info',
+    ],
   },
 })
+
+/**
+ * Helper to get toast classes for vue-sonner's toastOptions
+ */
+export function getToastClasses() {
+  const styles = toastVariants()
+
+  return {
+    toast: styles.toast(),
+    description: styles.description(),
+    actionButton: styles.actionButton(),
+    cancelButton: styles.cancelButton(),
+    closeButton: styles.closeButton(),
+    error: styles.error(),
+    success: styles.success(),
+    warning: styles.warning(),
+    info: styles.info(),
+  }
+}
