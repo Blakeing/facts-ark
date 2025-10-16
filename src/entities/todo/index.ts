@@ -6,8 +6,14 @@
  */
 
 // Types
+// Existing exports
 export { TodoStatus } from './model/types'
 export type { Todo, CreateTodoDto, UpdateTodoDto, TodoFilter, TodoStats } from './model/types'
+
+// Universal entity pattern
+export { useTodoEntity } from './model/useTodoEntity'
+export { useTodoEntityWithHooks } from './model/useTodoEntityWithHooks'
+export { todoStatusEnum } from './model/enums'
 export { createTodoSchema, type CreateTodoFormValues } from './model/validation'
 
 // Zod Schemas (Unified Form Architecture)
@@ -17,12 +23,7 @@ export {
   todoDetailsSchema,
   todoAdditionalSchema,
 } from './model/schemas'
-export type {
-  TodoFormData,
-  TodoBasicInfo,
-  TodoDetails,
-  TodoAdditional,
-} from './model/schemas'
+export type { TodoFormData, TodoBasicInfo, TodoDetails, TodoAdditional } from './model/schemas'
 
 // Store
 export { useTodoStore } from './model/store'

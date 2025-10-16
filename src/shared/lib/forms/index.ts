@@ -2,6 +2,7 @@ export { useFormMachine } from './useFormMachine'
 export { useWizard } from './useWizard'
 export { createFormMachine } from './createFormMachine'
 export { createFormMachineWithMutation } from './createFormMachineWithMutation'
+export { useFormDirtyCheck, type ConfirmFunction } from './useFormDirtyCheck'
 
 export type { UseFormMachineOptions } from './useFormMachine'
 export type { UseWizardOptions, WizardStep as WizardStepConfig } from './useWizard'
